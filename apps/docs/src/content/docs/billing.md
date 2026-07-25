@@ -31,3 +31,23 @@ plans.
 - Clients may display store state but cannot grant server capabilities.
 - Webhook payloads are sensitive operational data. Never log them or return them from customer
   APIs, and define a retention policy before production.
+
+## Webhook setup
+
+Configure provider endpoints:
+
+- Stripe: `POST /api/webhooks/stripe`
+- RevenueCat: `POST /api/webhooks/revenuecat`
+
+Production requires `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and
+`REVENUECAT_WEBHOOK_AUTHORIZATION`. Store them as Worker secrets, never Wrangler plaintext vars.
+Configure RevenueCat to send the exact authorization header value stored in the Worker secret.
+
+Stripe verification uses the exact raw request body, the `Stripe-Signature` header, and Stripe's
+Web Crypto provider. RevenueCat authorization is compared using fixed-length SHA-256 digests.
+Invalid requests receive generic errors and are never persisted. Valid duplicates receive a
+successful response with `duplicate: true`, allowing provider retries without duplicate effects.
+
+Webhook receipt only records durable input. Projection into subscriptions and entitlements must
+run through idempotent processing logic; do not put checkout, email, or other slow side effects on
+the receipt path.

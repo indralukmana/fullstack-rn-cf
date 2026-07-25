@@ -21,6 +21,7 @@ import { initVarlockIfPresent } from "./lib/varlock-init";
 import { rateLimit } from "./middleware/rate-limit";
 import { requireAuth } from "./middleware/require-auth";
 import { requireOrganization } from "./middleware/require-organization";
+import { billingWebhooks } from "./routes/billing-webhooks";
 
 await initVarlockIfPresent();
 
@@ -101,6 +102,8 @@ app.use("*", async (c, next) => {
     max: config.rateLimitMax,
   })(c, next);
 });
+
+app.route("/api/webhooks", billingWebhooks);
 
 app.on(["GET", "POST"], "/api/auth/*", async (c) => {
   try {

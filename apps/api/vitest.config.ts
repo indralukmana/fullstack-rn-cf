@@ -30,6 +30,9 @@ export default defineConfig({
             AUTH_RATE_LIMIT_MAX: "10000",
             EMAIL_PROVIDER: "console",
             EMAIL_FROM: "RN CF <noreply@localhost>",
+            STRIPE_SECRET_KEY: "stripe-test-secret",
+            STRIPE_WEBHOOK_SECRET: "stripe-webhook-test-secret",
+            REVENUECAT_WEBHOOK_AUTHORIZATION: "Bearer revenuecat-webhook-test-secret",
           },
         },
       };

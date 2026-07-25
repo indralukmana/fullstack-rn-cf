@@ -15,6 +15,9 @@ const productionEnv: AppBindings = {
   EMAIL: {
     send: async () => ({ messageId: "test-message" }),
   },
+  STRIPE_SECRET_KEY: "stripe-secret",
+  STRIPE_WEBHOOK_SECRET: "stripe-webhook-secret",
+  REVENUECAT_WEBHOOK_AUTHORIZATION: "Bearer revenuecat-webhook-secret",
 };
 
 describe("getRuntimeConfig", () => {
@@ -99,6 +102,19 @@ describe("getRuntimeConfig", () => {
         EMAIL_FROM: "RN CF <noreply@localhost>",
       }),
     ).toThrow("EMAIL_FROM must use a verified production domain");
+  });
+
+  it.each([
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "REVENUECAT_WEBHOOK_AUTHORIZATION",
+  ] as const)("requires the %s billing credential in production", (name) => {
+    expect(() =>
+      getRuntimeConfig({
+        ...productionEnv,
+        [name]: undefined,
+      }),
+    ).toThrow(`${name} must be set`);
   });
 
   it("returns normalized validated production configuration", () => {

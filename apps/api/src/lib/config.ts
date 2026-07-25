@@ -12,6 +12,9 @@ export type AppBindings = {
   AUTH_RATE_LIMIT_MAX?: string | number;
   EMAIL_PROVIDER?: string;
   EMAIL_FROM?: string;
+  STRIPE_SECRET_KEY?: string;
+  STRIPE_WEBHOOK_SECRET?: string;
+  REVENUECAT_WEBHOOK_AUTHORIZATION?: string;
   EMAIL?: {
     send(message: {
       from: string;
@@ -137,6 +140,12 @@ export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
 
   if (isProduction && /@localhost(?:[>\s]|$)/i.test(emailFrom)) {
     throw new Error("EMAIL_FROM must use a verified production domain");
+  }
+
+  if (isProduction) {
+    requireNonEmpty(env.STRIPE_SECRET_KEY, "STRIPE_SECRET_KEY");
+    requireNonEmpty(env.STRIPE_WEBHOOK_SECRET, "STRIPE_WEBHOOK_SECRET");
+    requireNonEmpty(env.REVENUECAT_WEBHOOK_AUTHORIZATION, "REVENUECAT_WEBHOOK_AUTHORIZATION");
   }
 
   for (const origin of corsOrigins) {
