@@ -1,10 +1,20 @@
 import { clearOutboundEmails, listOutboundEmails, recordOutboundEmail } from "./outbox";
 
+type CloudflareEmailBinding = {
+  send(message: {
+    from: string;
+    to: string;
+    subject: string;
+    text: string;
+    html?: string;
+  }): Promise<{ messageId: string }>;
+};
+
 export type EmailEnv = {
   ENVIRONMENT?: string;
   EMAIL_PROVIDER?: string;
   EMAIL_FROM?: string;
-  RESEND_API_KEY?: string;
+  EMAIL?: CloudflareEmailBinding;
 };
 
 export type SendEmailInput = {
@@ -18,38 +28,32 @@ export async function sendEmail(env: EmailEnv, input: SendEmailInput) {
   const provider = (env.EMAIL_PROVIDER ?? "console").toLowerCase();
   const from = env.EMAIL_FROM ?? "RN CF <noreply@localhost>";
 
-  if (provider === "resend") {
-    const apiKey = env.RESEND_API_KEY;
-    if (!apiKey) {
-      throw new Error("RESEND_API_KEY is required when EMAIL_PROVIDER=resend");
+  if (provider === "cloudflare") {
+    if (!env.EMAIL) {
+      throw new Error("EMAIL binding is required when EMAIL_PROVIDER=cloudflare");
     }
 
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from,
-        to: [input.to],
-        subject: input.subject,
-        text: input.text,
-        html: input.html ?? `<p>${input.text}</p>`,
-      }),
+    await env.EMAIL.send({
+      from,
+      to: input.to,
+      subject: input.subject,
+      text: input.text,
+      html: input.html,
     });
 
-    if (!response.ok) {
-      const body = await response.text();
-      throw new Error(`Resend failed (${response.status}): ${body}`);
-    }
-
-    // Still record for local debugging when not production.
     if (env.ENVIRONMENT !== "production") {
       recordOutboundEmail(input);
     }
 
     return;
+  }
+
+  if (provider !== "console") {
+    throw new Error("EMAIL_PROVIDER must be either console or cloudflare");
+  }
+
+  if (env.ENVIRONMENT === "production") {
+    throw new Error("Console email delivery is disabled in production");
   }
 
   const recorded = recordOutboundEmail(input);

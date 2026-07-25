@@ -6,7 +6,7 @@ Cloudflare-first pnpm monorepo scaffold with a universal Expo app (iOS, Android,
 
 - App: Expo Router + Uniwind — home, sign-in, register, check-email, forgot/reset password, account/health
 - API: Hono Workers + OpenAPI + Scalar + Better Auth + D1 + varlock
-- Auth email: verification + password reset (console mailer / optional Resend)
+- Auth email: verification + password reset (console locally / Cloudflare Email Service in production)
 - Hardening: security headers, CORS allowlist, rate limits, body limit, `requireAuth` sample
 - API client: Orval-generated TanStack Query hooks, MSW handlers, and Faker factories
 - Docs site: Astro Starlight

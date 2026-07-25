@@ -12,7 +12,7 @@ This starter hardens the Cloudflare Workers API with application controls and do
 | Body size limit          | 1 MB via Hono `bodyLimit`                                          |
 | Rate limiting            | In-isolate limiter (`RATE_LIMIT_*`, `AUTH_RATE_LIMIT_*`)           |
 | Auth gate                | `requireAuth` middleware (see `GET /api/private/ping`)             |
-| Email verification       | Better Auth + console/Resend mailer (`EMAIL_PROVIDER`)             |
+| Email verification       | Better Auth + Cloudflare Email Service (`EMAIL_PROVIDER`)          |
 | Password reset           | Better Auth `sendResetPassword` + app forgot/reset screens         |
 | Secret leak scan         | `varlock scan` on pre-commit (lefthook)                            |
 

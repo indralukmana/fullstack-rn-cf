@@ -9,6 +9,11 @@ const productionEnv: AppBindings = {
   BETTER_AUTH_URL: "https://api.example.com",
   BETTER_AUTH_SECRET: "production-secret-that-is-at-least-32-characters",
   CORS_ORIGINS: "https://app.example.com",
+  EMAIL_PROVIDER: "cloudflare",
+  EMAIL_FROM: "RN CF <noreply@example.com>",
+  EMAIL: {
+    send: async () => ({ messageId: "test-message" }),
+  },
 };
 
 describe("getRuntimeConfig", () => {
@@ -63,6 +68,29 @@ describe("getRuntimeConfig", () => {
         CORS_ORIGINS: "https://app.example.com/path",
       }),
     ).toThrow("CORS_ORIGINS entries must be origins without paths or trailing slashes");
+  });
+
+  it("requires Cloudflare Email Service in production", () => {
+    expect(() =>
+      getRuntimeConfig({
+        ...productionEnv,
+        EMAIL_PROVIDER: "console",
+      }),
+    ).toThrow("EMAIL_PROVIDER must be cloudflare in production");
+
+    expect(() =>
+      getRuntimeConfig({
+        ...productionEnv,
+        EMAIL: undefined,
+      }),
+    ).toThrow("EMAIL binding must be configured in production");
+
+    expect(() =>
+      getRuntimeConfig({
+        ...productionEnv,
+        EMAIL_FROM: "RN CF <noreply@localhost>",
+      }),
+    ).toThrow("EMAIL_FROM must use a verified production domain");
   });
 
   it("returns normalized validated production configuration", () => {

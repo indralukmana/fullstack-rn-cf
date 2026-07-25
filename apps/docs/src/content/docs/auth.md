@@ -16,7 +16,8 @@ Sign-up requires email verification before sign-in (`requireEmailVerification: t
 
 - Verification + password-reset emails are sent through `apps/api/src/lib/email/send.ts`
 - Default provider: `EMAIL_PROVIDER=console` (logs + stores messages)
-- Production option: `EMAIL_PROVIDER=resend` with `RESEND_API_KEY`
+- Production provider: `EMAIL_PROVIDER=cloudflare` through the `EMAIL` Workers binding
+- Cloudflare Email Sending currently requires Workers Paid and a domain onboarded to Email Service
 - Local/dev mailbox: `GET /api/dev/mailbox?to=user@example.com` (disabled in production)
 
 App screens:

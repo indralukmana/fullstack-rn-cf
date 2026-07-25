@@ -29,7 +29,6 @@ export default defineConfig({
             AUTH_RATE_LIMIT_MAX: "10000",
             EMAIL_PROVIDER: "console",
             EMAIL_FROM: "RN CF <noreply@localhost>",
-            RESEND_API_KEY: "",
           },
         },
       };

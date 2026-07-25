@@ -8,7 +8,7 @@
     "typecheck": "tsgo --noEmit",
     "test": "vitest run",
     "openapi:export": "node ../../scripts/openapi-export.mjs",
-    "cf-typegen": "varlock-wrangler types --env-interface CloudflareBindings",
+    "cf-typegen": "varlock-wrangler types --env-interface CloudflareBindings --include-runtime false",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply rn-cf --local",
     "db:migrate:remote": "wrangler d1 migrations apply rn-cf --remote",

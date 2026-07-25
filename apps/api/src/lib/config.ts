@@ -11,6 +11,15 @@ export type AppBindings = {
   AUTH_RATE_LIMIT_MAX?: string | number;
   EMAIL_PROVIDER?: string;
   EMAIL_FROM?: string;
+  EMAIL?: {
+    send(message: {
+      from: string;
+      to: string;
+      subject: string;
+      text: string;
+      html?: string;
+    }): Promise<{ messageId: string }>;
+  };
 };
 
 const DEFAULT_DEV_CORS_ORIGINS = [
@@ -78,6 +87,8 @@ export type RuntimeConfig = {
   rateLimitMax: number;
   authRateLimitTtlMs: number;
   authRateLimitMax: number;
+  emailProvider: "console" | "cloudflare";
+  emailFrom: string;
 };
 
 export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
@@ -90,6 +101,12 @@ export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
   const corsOrigins = parseList(env.CORS_ORIGINS);
   const authUrl = parseAbsoluteUrl(env.BETTER_AUTH_URL, "BETTER_AUTH_URL");
   const authSecret = requireNonEmpty(env.BETTER_AUTH_SECRET, "BETTER_AUTH_SECRET");
+  const emailProvider = env.EMAIL_PROVIDER;
+  const emailFrom = requireNonEmpty(env.EMAIL_FROM, "EMAIL_FROM");
+
+  if (emailProvider !== "console" && emailProvider !== "cloudflare") {
+    throw new Error("EMAIL_PROVIDER must be either console or cloudflare");
+  }
 
   if (isProduction && corsOrigins.length === 0) {
     throw new Error("CORS_ORIGINS must be set in production");
@@ -101,6 +118,18 @@ export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
 
   if (isProduction && authUrl.protocol !== "https:") {
     throw new Error("BETTER_AUTH_URL must use HTTPS in production");
+  }
+
+  if (isProduction && emailProvider !== "cloudflare") {
+    throw new Error("EMAIL_PROVIDER must be cloudflare in production");
+  }
+
+  if (isProduction && !env.EMAIL) {
+    throw new Error("EMAIL binding must be configured in production");
+  }
+
+  if (isProduction && /@localhost(?:[>\s]|$)/i.test(emailFrom)) {
+    throw new Error("EMAIL_FROM must use a verified production domain");
   }
 
   for (const origin of corsOrigins) {
@@ -130,5 +159,7 @@ export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
     rateLimitMax: parsePositiveInt(env.RATE_LIMIT_MAX, 120),
     authRateLimitTtlMs: parsePositiveInt(env.AUTH_RATE_LIMIT_TTL, 900_000),
     authRateLimitMax: parsePositiveInt(env.AUTH_RATE_LIMIT_MAX, 30),
+    emailProvider,
+    emailFrom,
   };
 }
