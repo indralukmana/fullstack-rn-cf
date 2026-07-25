@@ -6,7 +6,7 @@ import { API_ORIGIN, TEST_PASSWORD, WEB_ORIGIN } from "./helpers/constants";
 test("register requires email verification before account access", async ({ page, request }) => {
   const { email } = await registerViaUi(page, request, { name: "Verified E2E" });
 
-  await expect(page.getByText(email)).toBeVisible();
+  await expect(page.getByText(email, { exact: true })).toBeVisible();
 });
 
 test("forgot password flow reaches check-email", async ({ page, request }) => {
