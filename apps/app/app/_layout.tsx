@@ -43,6 +43,7 @@ export default function RootLayout() {
         <Stack.Screen name="check-email" options={{ title: "Check email" }} />
         <Stack.Screen name="forgot-password" options={{ title: "Forgot password" }} />
         <Stack.Screen name="reset-password" options={{ title: "Reset password" }} />
+        <Stack.Screen name="accept-invitation" options={{ title: "Organization invitation" }} />
         <Stack.Screen name="me" options={{ title: "Account" }} />
       </Stack>
     </QueryClientProvider>

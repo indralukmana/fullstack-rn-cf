@@ -1,4 +1,4 @@
-import { Link, router } from "expo-router";
+import { Link, router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 
@@ -6,6 +6,7 @@ import { appCallbackUrl } from "@/lib/app-url";
 import { authClient } from "@/lib/auth-client";
 
 export default function SignInScreen() {
+  const params = useLocalSearchParams<{ returnTo?: string }>();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +33,22 @@ export default function SignInScreen() {
       }
       setError(message);
       return;
+    }
+
+    if (typeof params.returnTo === "string") {
+      const returnUrl = new URL(params.returnTo, "https://app.local");
+      const invitationId = returnUrl.searchParams.get("id");
+      if (
+        returnUrl.origin === "https://app.local" &&
+        returnUrl.pathname === "/accept-invitation" &&
+        invitationId
+      ) {
+        router.replace({
+          pathname: "/accept-invitation",
+          params: { id: invitationId },
+        });
+        return;
+      }
     }
 
     router.replace("/me");
