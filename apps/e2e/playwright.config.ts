@@ -2,6 +2,22 @@ import { defineConfig, devices } from "@playwright/test";
 
 const webPort = 8081;
 const apiPort = 8787;
+const apiEnv = {
+  ...process.env,
+  ENVIRONMENT: "development",
+  SERVICE_NAME: "rn-cf-api",
+  BETTER_AUTH_URL: `http://127.0.0.1:${apiPort}`,
+  BETTER_AUTH_SECRET: "e2e-only-secret-minimum-32-characters-long",
+  APP_URL: `http://127.0.0.1:${webPort}`,
+  CORS_ORIGINS: `http://127.0.0.1:${webPort}`,
+  TRUSTED_ORIGINS: "",
+  RATE_LIMIT_TTL: "60000",
+  RATE_LIMIT_MAX: "10000",
+  AUTH_RATE_LIMIT_TTL: "900000",
+  AUTH_RATE_LIMIT_MAX: "10000",
+  EMAIL_PROVIDER: "console",
+  EMAIL_FROM: "RN CF <noreply@localhost>",
+};
 
 export default defineConfig({
   testDir: ".",
@@ -22,7 +38,8 @@ export default defineConfig({
       timeout: 120_000,
     },
     {
-      command: `pnpm --filter @rn-cf/api db:migrate:local && pnpm --filter @rn-cf/api exec wrangler dev --ip 127.0.0.1 --port ${apiPort}`,
+      command: `pnpm --filter @rn-cf/api db:migrate:local && pnpm --filter @rn-cf/api dev`,
+      env: apiEnv,
       url: `http://127.0.0.1:${apiPort}/health`,
       reuseExistingServer: !process.env.CI,
       timeout: 45_000,
