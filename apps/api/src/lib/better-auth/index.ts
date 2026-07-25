@@ -1,11 +1,13 @@
 import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { organization } from "better-auth/plugins";
 
 import { createDb } from "../../db/client";
 import * as schema from "../../db/schema";
 import { getRuntimeConfig, type AppBindings } from "../config";
 import { createBetterAuthOptions } from "./options";
+import { organizationOptions } from "./organization-options";
 
 export type AuthEnv = AppBindings & {
   DB: D1Database;
@@ -23,7 +25,7 @@ export function createAuth(env: AuthEnv) {
     }),
     baseURL: config.authUrl,
     secret: config.authSecret,
-    plugins: [expo()],
+    plugins: [expo(), organization(organizationOptions)],
     trustedOrigins: config.trustedOrigins,
   });
 }
