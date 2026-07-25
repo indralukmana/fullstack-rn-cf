@@ -26,9 +26,24 @@ export const MeResponseSchema = z
 export type MeUser = z.infer<typeof MeUserSchema>;
 export type MeResponse = z.infer<typeof MeResponseSchema>;
 
+export const OrganizationRoleSchema = z.enum(["owner", "admin", "member"]);
+
+export const OrganizationContextResponseSchema = z
+  .object({
+    organization: z.object({
+      id: z.string().openapi({ example: "org_123" }),
+      role: OrganizationRoleSchema,
+    }),
+  })
+  .openapi("OrganizationContextResponse");
+
+export type OrganizationRole = z.infer<typeof OrganizationRoleSchema>;
+export type OrganizationContextResponse = z.infer<typeof OrganizationContextResponseSchema>;
+
 export const ErrorResponseSchema = z
   .object({
-    error: z.string().openapi({ example: "Unauthorized" }),
+    error: z.string().openapi({ example: "unauthorized" }),
+    message: z.string().openapi({ example: "Authentication required" }),
   })
   .openapi("ErrorResponse");
 

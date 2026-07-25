@@ -8,7 +8,7 @@ import { faker } from "@faker-js/faker";
 import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
-import type { HealthResponse, MeResponse } from "../models";
+import type { HealthResponse, MeResponse, OrganizationContextResponse } from "../models";
 
 export const getGetHealthResponseMock = (
   overrideResponse: Partial<Extract<HealthResponse, object>> = {},
@@ -37,6 +37,16 @@ export const getGetPrivatePingResponseMock = (
 ): HealthResponse => ({
   status: faker.helpers.arrayElement(["ok"] as const),
   service: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  ...overrideResponse,
+});
+
+export const getGetOrganizationContextResponseMock = (
+  overrideResponse: Partial<Extract<OrganizationContextResponse, object>> = {},
+): OrganizationContextResponse => ({
+  organization: {
+    id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    role: faker.helpers.arrayElement(["owner", "admin", "member"] as const),
+  },
   ...overrideResponse,
 });
 
@@ -109,8 +119,33 @@ export const getGetPrivatePingMockHandler = (
     options,
   );
 };
+
+export const getGetOrganizationContextMockHandler = (
+  overrideResponse?:
+    | OrganizationContextResponse
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<OrganizationContextResponse> | OrganizationContextResponse),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/api/private/organization",
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === "function"
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetOrganizationContextResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
 export const getDefaultMock = () => [
   getGetHealthMockHandler(),
   getGetMeMockHandler(),
   getGetPrivatePingMockHandler(),
+  getGetOrganizationContextMockHandler(),
 ];

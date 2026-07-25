@@ -1,5 +1,10 @@
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
-import { HealthResponseSchema, MeResponseSchema } from "@rn-cf/types";
+import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import {
+  ErrorResponseSchema,
+  HealthResponseSchema,
+  MeResponseSchema,
+  OrganizationContextResponseSchema,
+} from "@rn-cf/types";
 import { Scalar } from "@scalar/hono-api-reference";
 import { APIError } from "better-auth";
 import { bodyLimit } from "hono/body-limit";
@@ -15,6 +20,7 @@ import { clearOutboundEmails, listOutboundEmails } from "./lib/email/send";
 import { initVarlockIfPresent } from "./lib/varlock-init";
 import { rateLimit } from "./middleware/rate-limit";
 import { requireAuth } from "./middleware/require-auth";
+import { requireOrganization } from "./middleware/require-organization";
 
 await initVarlockIfPresent();
 
@@ -70,7 +76,7 @@ app.use("*", async (c, next) => {
     origin: (origin) => (origin && origins.has(origin) ? origin : null),
     credentials: true,
     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization", "Cookie"],
+    allowHeaders: ["Content-Type", "Authorization", "Cookie", "X-Organization-Id"],
   })(c, next);
 });
 
@@ -230,6 +236,56 @@ app.openapi(privatePingRoute, (c) => {
     status: "ok" as const,
     service: config.serviceName,
   });
+});
+
+const organizationContextRoute = createRoute({
+  method: "get",
+  path: "/api/private/organization",
+  operationId: "getOrganizationContext",
+  middleware: [requireAuth, requireOrganization] as const,
+  request: {
+    headers: z.object({
+      "x-organization-id": z.string().optional(),
+    }),
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: OrganizationContextResponseSchema,
+        },
+      },
+      description: "Verified organization context for the current user",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+      description: "No organization was selected",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+      description: "Authentication required",
+    },
+    403: {
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+      description: "The user is not a member of the selected organization",
+    },
+  },
+});
+
+app.openapi(organizationContextRoute, (c) => {
+  return c.json({ organization: c.var.organization }, 200);
 });
 
 app.doc("/doc", {

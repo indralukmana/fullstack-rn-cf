@@ -12,7 +12,12 @@ import type {
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthResponse, MeResponse } from "../models";
+import type {
+  ErrorResponse,
+  HealthResponse,
+  MeResponse,
+  OrganizationContextResponse,
+} from "../models";
 
 import { customFetch } from "../../mutator";
 
@@ -228,6 +233,98 @@ export function useGetPrivatePing<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getGetPrivatePingQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getOrganizationContextResponse200 = {
+  data: OrganizationContextResponse;
+  status: 200;
+};
+
+export type getOrganizationContextResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type getOrganizationContextResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type getOrganizationContextResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type getOrganizationContextResponseSuccess = getOrganizationContextResponse200 & {
+  headers: Headers;
+};
+export type getOrganizationContextResponseError = (
+  | getOrganizationContextResponse400
+  | getOrganizationContextResponse401
+  | getOrganizationContextResponse403
+) & {
+  headers: Headers;
+};
+
+export type getOrganizationContextResponse =
+  | getOrganizationContextResponseSuccess
+  | getOrganizationContextResponseError;
+
+export const getGetOrganizationContextUrl = () => {
+  return `/api/private/organization`;
+};
+
+export const getOrganizationContext = async (
+  options?: RequestInit,
+): Promise<getOrganizationContextResponse> => {
+  return customFetch<getOrganizationContextResponse>(getGetOrganizationContextUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetOrganizationContextQueryKey = () => {
+  return [`/api/private/organization`] as const;
+};
+
+export const getGetOrganizationContextQueryOptions = <
+  TData = Awaited<ReturnType<typeof getOrganizationContext>>,
+  TError = ErrorResponse,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof getOrganizationContext>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetOrganizationContextQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrganizationContext>>> = ({ signal }) =>
+    getOrganizationContext({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getOrganizationContext>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetOrganizationContextQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getOrganizationContext>>
+>;
+export type GetOrganizationContextQueryError = ErrorResponse;
+
+export function useGetOrganizationContext<
+  TData = Awaited<ReturnType<typeof getOrganizationContext>>,
+  TError = ErrorResponse,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof getOrganizationContext>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetOrganizationContextQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

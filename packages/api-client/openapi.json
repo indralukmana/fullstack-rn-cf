@@ -49,6 +49,40 @@
           }
         },
         "required": ["id", "name", "email"]
+      },
+      "OrganizationContextResponse": {
+        "type": "object",
+        "properties": {
+          "organization": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "org_123"
+              },
+              "role": {
+                "type": "string",
+                "enum": ["owner", "admin", "member"]
+              }
+            },
+            "required": ["id", "role"]
+          }
+        },
+        "required": ["organization"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "unauthorized"
+          },
+          "message": {
+            "type": "string",
+            "example": "Authentication required"
+          }
+        },
+        "required": ["error", "message"]
       }
     },
     "parameters": {}
@@ -104,6 +138,63 @@
           },
           "401": {
             "description": "Authentication required"
+          }
+        }
+      }
+    },
+    "/api/private/organization": {
+      "get": {
+        "operationId": "getOrganizationContext",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "x-organization-id",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verified organization context for the current user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationContextResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No organization was selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The user is not a member of the selected organization",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }

@@ -43,3 +43,8 @@ Invitation messages are delivered through Cloudflare Email Service and link to
 `APP_URL/accept-invitation?id=...`. `APP_URL` must use HTTPS in production. Pending invitations
 and organization memberships have database uniqueness constraints to prevent duplicate state
 under concurrent requests.
+
+Tenant-owned API routes use `requireOrganization`. A request may send `X-Organization-Id`, or
+fall back to the session's active organization. In both cases the API queries membership before
+setting trusted organization context; the header alone never grants access. Use
+`GET /api/private/organization` as the reference implementation.

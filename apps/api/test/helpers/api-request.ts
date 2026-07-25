@@ -25,8 +25,12 @@ export async function postAuth(path: string, body: Record<string, string>) {
   return response;
 }
 
-export async function getApi(path: string, cookie?: string | null) {
-  return requestApi("GET", path, { cookie });
+export async function getApi(
+  path: string,
+  cookie?: string | null,
+  headers?: Record<string, string>,
+) {
+  return requestApi("GET", path, { cookie, headers });
 }
 
 export async function postApi(
@@ -55,11 +59,13 @@ async function requestApi(
   options: {
     body?: Record<string, unknown>;
     cookie?: string | null;
+    headers?: Record<string, string>;
   } = {},
 ) {
   const ctx = createExecutionContext();
   const headers: Record<string, string> = {
     Origin: webOrigin,
+    ...options.headers,
   };
 
   if (options.cookie) {

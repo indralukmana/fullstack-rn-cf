@@ -74,5 +74,39 @@ describe("organization integration", () => {
         slug: `acme-${suffix}`,
       }),
     ]);
+
+    const context = await getApi("/api/private/organization", account.cookie, {
+      "X-Organization-Id": createdOrganization.id,
+    });
+    expect(context.status).toBe(200);
+    await expect(context.json()).resolves.toEqual({
+      organization: {
+        id: createdOrganization.id,
+        role: "owner",
+      },
+    });
+
+    const otherAccount = await signUpVerifiedUser({
+      email: `other-owner-${suffix}@example.com`,
+      name: "Other Owner",
+    });
+    const otherCreated = await postApi(
+      "/api/auth/organization/create",
+      {
+        name: "Other Company",
+        slug: `other-${suffix}`,
+      },
+      otherAccount.cookie,
+    );
+    expect(otherCreated.status).toBe(200);
+    const otherOrganization = (await otherCreated.json()) as { id: string };
+
+    const crossTenant = await getApi("/api/private/organization", account.cookie, {
+      "X-Organization-Id": otherOrganization.id,
+    });
+    expect(crossTenant.status).toBe(403);
+    await expect(crossTenant.json()).resolves.toMatchObject({
+      error: "forbidden",
+    });
   });
 });

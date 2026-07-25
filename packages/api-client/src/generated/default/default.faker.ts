@@ -6,7 +6,7 @@
  */
 import { faker } from "@faker-js/faker";
 
-import type { HealthResponse, MeResponse } from "../models";
+import type { HealthResponse, MeResponse, OrganizationContextResponse } from "../models";
 
 export const getGetHealthResponseMock = (
   overrideResponse: Partial<Extract<HealthResponse, object>> = {},
@@ -35,5 +35,15 @@ export const getGetPrivatePingResponseMock = (
 ): HealthResponse => ({
   status: faker.helpers.arrayElement(["ok"] as const),
   service: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  ...overrideResponse,
+});
+
+export const getGetOrganizationContextResponseMock = (
+  overrideResponse: Partial<Extract<OrganizationContextResponse, object>> = {},
+): OrganizationContextResponse => ({
+  organization: {
+    id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    role: faker.helpers.arrayElement(["owner", "admin", "member"] as const),
+  },
   ...overrideResponse,
 });
