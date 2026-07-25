@@ -1,0 +1,27 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+nodeOptions: "--disable-warning=DEP0205"
+
+allowBuilds:
+  better-sqlite3: true
+  esbuild: true
+  lefthook: true
+  msw: true
+  sharp: true
+  workerd: true
+
+overrides:
+  zod: "^4.4.3"
+  "@cloudflare/vitest-pool-workers>zod": "3.25.76"
+
+minimumReleaseAgeExclude:
+  - "@typescript/native-preview-darwin-arm64@7.0.0-dev.20260618.1"
+  - "@typescript/native-preview-darwin-x64@7.0.0-dev.20260618.1"
+  - "@typescript/native-preview-linux-arm64@7.0.0-dev.20260618.1"
+  - "@typescript/native-preview-linux-arm@7.0.0-dev.20260618.1"
+  - "@typescript/native-preview-linux-x64@7.0.0-dev.20260618.1"
+  - "@typescript/native-preview-win32-arm64@7.0.0-dev.20260618.1"
+  - "@typescript/native-preview-win32-x64@7.0.0-dev.20260618.1"
+  - "@typescript/native-preview@7.0.0-dev.20260618.1"

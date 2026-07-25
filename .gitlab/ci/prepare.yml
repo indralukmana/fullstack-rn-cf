@@ -1,0 +1,4 @@
+prepare:
+  stage: prepare
+  script:
+    - pnpm install --frozen-lockfile

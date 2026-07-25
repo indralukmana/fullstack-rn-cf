@@ -1,0 +1,4 @@
+format:
+  stage: lint
+  script:
+    - pnpm format:check

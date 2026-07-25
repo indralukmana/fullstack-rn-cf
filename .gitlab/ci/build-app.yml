@@ -1,0 +1,7 @@
+build_app:
+  stage: build
+  script:
+    - pnpm --filter @rn-cf/app export:web
+  artifacts:
+    paths:
+      - apps/app/dist/

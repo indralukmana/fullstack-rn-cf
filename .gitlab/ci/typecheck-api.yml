@@ -1,0 +1,4 @@
+typecheck_api:
+  stage: typecheck
+  script:
+    - pnpm --filter @rn-cf/api typecheck

@@ -1,0 +1,22 @@
+pre-commit:
+  commands:
+    format:
+      glob: "*.{js,jsx,ts,tsx,mjs,cjs,css,md,json,yml,yaml,html,toml}"
+      run: pnpm exec oxfmt {staged_files} && git add {staged_files}
+    lint:
+      glob: "*.{js,jsx,ts,tsx,mjs,cjs}"
+      run: pnpm exec oxlint --fix {staged_files}
+    varlock-scan:
+      run: pnpm exec varlock scan --staged
+    typecheck:
+      glob: "*.{ts,tsx}"
+      run: pnpm typecheck
+
+pre-push:
+  commands:
+    format-check:
+      run: pnpm format:check
+    lint-check:
+      run: pnpm lint:check
+    typecheck:
+      run: pnpm typecheck

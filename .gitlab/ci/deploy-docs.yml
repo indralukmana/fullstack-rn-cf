@@ -1,0 +1,10 @@
+deploy_docs:
+  stage: deploy
+  interruptible: false
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  needs:
+    - typecheck_docs
+    - build_docs
+  script:
+    - pnpm --filter @rn-cf/docs deploy

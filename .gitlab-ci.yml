@@ -1,0 +1,42 @@
+stages:
+  - prepare
+  - lint
+  - typecheck
+  - test
+  - build
+  # deploy stage disabled during scaffold — re-enable includes below when ready
+
+default:
+  image: node:24-alpine
+  interruptible: true
+  cache:
+    key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - .pnpm-store/
+  before_script:
+    - corepack enable
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install --frozen-lockfile
+
+variables:
+  PNPM_STORE_DIR: .pnpm-store
+  NODE_ENV: test
+
+include:
+  - local: .gitlab/ci/prepare.yml
+  - local: .gitlab/ci/format.yml
+  - local: .gitlab/ci/lint.yml
+  - local: .gitlab/ci/typecheck-api.yml
+  - local: .gitlab/ci/typecheck-app.yml
+  - local: .gitlab/ci/typecheck-docs.yml
+  - local: .gitlab/ci/typecheck-e2e.yml
+  - local: .gitlab/ci/test-api.yml
+  - local: .gitlab/ci/test-e2e.yml
+  - local: .gitlab/ci/build-app.yml
+  - local: .gitlab/ci/build-docs.yml
+  # Deploy jobs (require CLOUDFLARE_* CI variables) — enable when ready:
+  # - local: .gitlab/ci/deploy-api.yml
+  # - local: .gitlab/ci/deploy-app.yml
+  # - local: .gitlab/ci/deploy-docs.yml

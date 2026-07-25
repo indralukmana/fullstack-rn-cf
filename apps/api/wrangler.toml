@@ -1,0 +1,14 @@
+name = "rn-cf-api"
+main = "src/index.ts"
+compatibility_date = "2025-05-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Non-secret defaults and secrets are managed by varlock (.env.schema / .env).
+# Use `pnpm --filter @rn-cf/api dev` (varlock-wrangler) so bindings are injected.
+
+[[d1_databases]]
+binding = "DB"
+database_name = "rn-cf"
+# Replace with the id from `wrangler d1 create rn-cf`
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "drizzle"

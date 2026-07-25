@@ -1,0 +1,4 @@
+test_api:
+  stage: test
+  script:
+    - pnpm --filter @rn-cf/api test

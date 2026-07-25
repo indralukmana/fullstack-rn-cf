@@ -1,0 +1,7 @@
+build_docs:
+  stage: build
+  script:
+    - pnpm --filter @rn-cf/docs build
+  artifacts:
+    paths:
+      - apps/docs/dist/

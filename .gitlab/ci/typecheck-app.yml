@@ -1,0 +1,4 @@
+typecheck_app:
+  stage: typecheck
+  script:
+    - pnpm --filter @rn-cf/app typecheck

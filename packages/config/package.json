@@ -1,0 +1,13 @@
+{
+  "name": "@rn-cf/config",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tsconfig/base.json": "./tsconfig/base.json",
+    "./tsconfig/react.json": "./tsconfig/react.json",
+    "./tsconfig/node.json": "./tsconfig/node.json"
+  },
+  "scripts": {
+    "typecheck": "tsgo --noEmit"
+  }
+}

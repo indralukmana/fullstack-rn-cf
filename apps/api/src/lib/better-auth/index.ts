@@ -1,0 +1,31 @@
+import { expo } from "@better-auth/expo";
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+
+import { createDb } from "../../db/client";
+import * as schema from "../../db/schema";
+import { getRuntimeConfig, type AppBindings } from "../config";
+import { createBetterAuthOptions } from "./options";
+
+export type AuthEnv = AppBindings & {
+  DB: D1Database;
+};
+
+export function createAuth(env: AuthEnv) {
+  const db = createDb(env.DB);
+  const config = getRuntimeConfig(env);
+
+  return betterAuth({
+    ...createBetterAuthOptions(env),
+    database: drizzleAdapter(db, {
+      provider: "sqlite",
+      schema,
+    }),
+    baseURL: env.BETTER_AUTH_URL,
+    secret: env.BETTER_AUTH_SECRET,
+    plugins: [expo()],
+    trustedOrigins: config.trustedOrigins,
+  });
+}
+
+export type Auth = ReturnType<typeof createAuth>;

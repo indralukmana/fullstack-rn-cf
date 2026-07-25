@@ -1,0 +1,47 @@
+{
+  "name": "@rn-cf/app",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "dev": "expo start --web --port 8081",
+    "start": "expo start --port 8081",
+    "android": "expo start --android --port 8081",
+    "ios": "expo start --ios --port 8081",
+    "web": "expo start --web --port 8081",
+    "export:web": "expo export --platform web",
+    "typecheck": "tsc --noEmit",
+    "deploy": "pnpm export:web && wrangler pages deploy dist --project-name=rn-cf-web"
+  },
+  "dependencies": {
+    "@better-auth/expo": "^1.6.23",
+    "@expo/metro-runtime": "~57.0.3",
+    "@rn-cf/api-client": "workspace:*",
+    "@rn-cf/types": "workspace:*",
+    "@tanstack/react-query": "^5.101.2",
+    "@varlock/expo-integration": "^1.1.1",
+    "better-auth": "^1.6.23",
+    "expo": "~57.0.4",
+    "expo-constants": "~57.0.3",
+    "expo-linking": "~57.0.2",
+    "expo-network": "~57.0.0",
+    "expo-router": "~57.0.4",
+    "expo-secure-store": "~57.0.0",
+    "expo-status-bar": "~57.0.0",
+    "expo-web-browser": "~57.0.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.0",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.25.2",
+    "react-native-web": "^0.21.2",
+    "uniwind": "^1.0.0",
+    "varlock": "^1.10.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "tailwindcss": "^4.1.0",
+    "typescript": "~5.9.0",
+    "wrangler": "^4.90.0"
+  }
+}

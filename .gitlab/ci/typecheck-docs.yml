@@ -1,0 +1,4 @@
+typecheck_docs:
+  stage: typecheck
+  script:
+    - pnpm --filter @rn-cf/docs typecheck

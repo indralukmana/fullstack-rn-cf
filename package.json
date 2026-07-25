@@ -1,0 +1,41 @@
+{
+  "name": "fullstack-rn-cf",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r --if-present build",
+    "test": "pnpm -r --if-present test",
+    "test:e2e": "pnpm --filter @rn-cf/e2e test",
+    "test:e2e:ui": "pnpm --filter @rn-cf/e2e test:ui",
+    "lint": "oxlint --fix .",
+    "lint:check": "oxlint .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "check:all": "pnpm format:check && pnpm lint:check && pnpm typecheck",
+    "ci:check": "pnpm check:all && pnpm test",
+    "dev": "pnpm --parallel --filter @rn-cf/app --filter @rn-cf/api --filter @rn-cf/docs dev",
+    "dev:api": "pnpm --filter @rn-cf/api dev",
+    "dev:app": "pnpm --filter @rn-cf/app web",
+    "dev:ios": "pnpm --filter @rn-cf/app ios",
+    "dev:android": "pnpm --filter @rn-cf/app android",
+    "dev:docs": "pnpm --filter @rn-cf/docs dev",
+    "openapi:export": "node scripts/openapi-export.mjs",
+    "codegen": "pnpm openapi:export && pnpm exec orval",
+    "setup": "node scripts/setup.mjs",
+    "prepare": "lefthook install"
+  },
+  "devDependencies": {
+    "@typescript/native-preview": "7.0.0-dev.20260618.1",
+    "lefthook": "^1.11.14",
+    "orval": "^8.20.0",
+    "oxfmt": "^0.55.0",
+    "oxlint": "^1.66.0",
+    "oxlint-tsgolint": "^0.23.0",
+    "varlock": "^1.10.0"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@11.10.0"
+}

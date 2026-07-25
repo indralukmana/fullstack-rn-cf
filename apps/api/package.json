@@ -1,0 +1,38 @@
+{
+  "name": "@rn-cf/api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "varlock-wrangler dev --ip 127.0.0.1 --port 8787",
+    "deploy": "varlock-wrangler deploy",
+    "typecheck": "tsgo --noEmit",
+    "test": "vitest run",
+    "openapi:export": "node ../../scripts/openapi-export.mjs",
+    "cf-typegen": "varlock-wrangler types --env-interface CloudflareBindings",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply rn-cf --local",
+    "db:migrate:remote": "wrangler d1 migrations apply rn-cf --remote",
+    "auth:generate-schema": "pnpm dlx @better-auth/cli@latest generate --config ./better-auth.config.ts --output ./src/db/schema/auth.ts"
+  },
+  "dependencies": {
+    "@better-auth/expo": "^1.6.23",
+    "@hono/zod-openapi": "^1.4.0",
+    "@rn-cf/types": "workspace:*",
+    "@scalar/hono-api-reference": "^0.9.10",
+    "@varlock/cloudflare-integration": "^1.2.1",
+    "better-auth": "^1.6.23",
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.12.23",
+    "varlock": "^1.10.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.18.2",
+    "@cloudflare/workers-types": "^4.20250501.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^12.11.1",
+    "drizzle-kit": "^0.31.10",
+    "vitest": "^4.1.8",
+    "wrangler": "^4.90.0"
+  }
+}

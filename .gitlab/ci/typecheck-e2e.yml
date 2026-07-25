@@ -1,0 +1,4 @@
+typecheck_e2e:
+  stage: typecheck
+  script:
+    - pnpm --filter @rn-cf/e2e typecheck

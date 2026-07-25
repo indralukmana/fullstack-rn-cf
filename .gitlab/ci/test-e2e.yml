@@ -1,0 +1,11 @@
+test_e2e:
+  stage: test
+  image: mcr.microsoft.com/playwright:v1.61.0-noble
+  variables:
+    PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+  before_script:
+    - corepack enable
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install --frozen-lockfile
+  script:
+    - pnpm test:e2e
