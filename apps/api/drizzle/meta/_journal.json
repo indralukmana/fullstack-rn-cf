@@ -15,6 +15,13 @@
       "when": 1785004342449,
       "tag": "0001_curved_jocasta",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1785005564237,
+      "tag": "0002_tranquil_tarot",
+      "breakpoints": true
     }
   ]
 }

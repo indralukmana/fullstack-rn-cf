@@ -15,6 +15,7 @@ export default defineConfig({
         { label: "Getting Started", slug: "getting-started" },
         { label: "Architecture", slug: "architecture" },
         { label: "Authentication", slug: "auth" },
+        { label: "Billing", slug: "billing" },
         { label: "Security", slug: "security" },
         { label: "API Reference", slug: "api-reference" },
         { label: "Testing", slug: "testing" },
