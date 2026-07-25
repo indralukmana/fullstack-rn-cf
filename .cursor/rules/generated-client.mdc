@@ -1,0 +1,13 @@
+---
+description: OpenAPI and Orval generated-client ownership
+globs: packages/api-client/**/*
+alwaysApply: false
+---
+
+# Generated Client
+
+Read `packages/api-client/AGENTS.md`.
+
+Never edit `openapi.json` or `src/generated/` directly. Change the source API contract, run
+`pnpm codegen`, inspect the complete generated diff, and commit the contract and output as one
+review unit.

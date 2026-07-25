@@ -1,0 +1,16 @@
+---
+description: Cloudflare API, D1, tenancy, and reliability boundaries
+globs: apps/api/**/*.{ts,toml,sql}
+alwaysApply: false
+---
+
+# API Boundaries
+
+Read `apps/api/AGENTS.md`.
+
+- Derive tenant context from authenticated membership; never trust a raw tenant ID.
+- Keep D1 migrations forward-compatible and tenant-aware.
+- Make webhooks and Queue consumers idempotent.
+- Use generated Cloudflare bindings and direct bindings over REST calls.
+- Do not buffer unbounded bodies, use global request state, or leave floating promises.
+- Redact production errors and logs.

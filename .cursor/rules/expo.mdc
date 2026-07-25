@@ -1,0 +1,15 @@
+---
+description: Universal Expo application and entitlement boundaries
+globs: apps/app/**/*.{ts,tsx,json}
+alwaysApply: false
+---
+
+# Expo Boundaries
+
+Read `apps/app/AGENTS.md`.
+
+- Preserve web, iOS, and Android behavior.
+- Use Expo Router, TanStack Query, and generated API operations.
+- Keep native credentials in SecureStore-backed auth integrations.
+- Treat server entitlements as authoritative.
+- Include loading, offline, empty, error, and accessible states.

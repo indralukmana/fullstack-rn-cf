@@ -1,0 +1,15 @@
+---
+description: Canonical repository safety and change workflow
+alwaysApply: true
+---
+
+# Repository Contract
+
+Read `AGENTS.md` and the nearest scoped `AGENTS.md`; they are canonical.
+
+- Preserve user work and keep changes focused.
+- Never reveal or commit secrets, customer data, tokens, or auth links.
+- Deploys, pushes, remote migrations, billing/secret changes, and destructive Git require
+  explicit user approval.
+- Add focused tests, run relevant checks, and inspect the complete diff.
+- Keep requested commits small and independently reviewable.
