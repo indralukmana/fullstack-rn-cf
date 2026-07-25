@@ -73,7 +73,7 @@ export async function verifyEmailFromMailbox(
   // Follow the emailed link so Better Auth can set the session cookie and redirect.
   await page.goto(link);
   await expect(page).toHaveURL(/\/me/, { timeout: 15_000 });
-  await expect(page.getByRole("heading", { name: "Account" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Account" }).last()).toBeVisible();
 }
 
 export async function registerViaUi(
