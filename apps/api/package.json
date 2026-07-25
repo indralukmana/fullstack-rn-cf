@@ -8,6 +8,7 @@
     "typecheck": "tsgo --noEmit",
     "test": "vitest run",
     "openapi:export": "node ../../scripts/openapi-export.mjs",
+    "env:codegen": "varlock codegen",
     "cf-typegen": "varlock-wrangler types --env-interface CloudflareBindings --include-runtime false",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply rn-cf --local",

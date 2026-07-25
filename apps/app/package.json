@@ -10,6 +10,7 @@
     "ios": "expo start --ios --port 8081",
     "web": "expo start --web --port 8081",
     "export:web": "expo export --platform web",
+    "env:codegen": "varlock codegen",
     "typecheck": "tsc --noEmit",
     "deploy": "pnpm export:web && wrangler pages deploy dist --project-name=rn-cf-web"
   },

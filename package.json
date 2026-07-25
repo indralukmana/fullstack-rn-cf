@@ -22,6 +22,7 @@
     "dev:docs": "pnpm --filter @rn-cf/docs dev",
     "openapi:export": "node scripts/openapi-export.mjs",
     "codegen": "pnpm openapi:export && pnpm exec orval",
+    "env:codegen": "pnpm --filter @rn-cf/api env:codegen && pnpm --filter @rn-cf/app env:codegen",
     "setup": "node scripts/setup.mjs",
     "prepare": "lefthook install"
   },
