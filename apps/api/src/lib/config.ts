@@ -3,6 +3,7 @@ export type AppBindings = {
   SERVICE_NAME?: string;
   BETTER_AUTH_URL?: string;
   BETTER_AUTH_SECRET?: string;
+  APP_URL?: string;
   CORS_ORIGINS?: string;
   TRUSTED_ORIGINS?: string;
   RATE_LIMIT_TTL?: string | number;
@@ -81,6 +82,7 @@ export type RuntimeConfig = {
   serviceName: string;
   authUrl: string;
   authSecret: string;
+  appUrl: string;
   corsOrigins: string[];
   trustedOrigins: string[];
   rateLimitTtlMs: number;
@@ -101,6 +103,7 @@ export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
   const corsOrigins = parseList(env.CORS_ORIGINS);
   const authUrl = parseAbsoluteUrl(env.BETTER_AUTH_URL, "BETTER_AUTH_URL");
   const authSecret = requireNonEmpty(env.BETTER_AUTH_SECRET, "BETTER_AUTH_SECRET");
+  const appUrl = parseAbsoluteUrl(env.APP_URL, "APP_URL");
   const emailProvider = env.EMAIL_PROVIDER;
   const emailFrom = requireNonEmpty(env.EMAIL_FROM, "EMAIL_FROM");
 
@@ -118,6 +121,10 @@ export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
 
   if (isProduction && authUrl.protocol !== "https:") {
     throw new Error("BETTER_AUTH_URL must use HTTPS in production");
+  }
+
+  if (isProduction && appUrl.protocol !== "https:") {
+    throw new Error("APP_URL must use HTTPS in production");
   }
 
   if (isProduction && emailProvider !== "cloudflare") {
@@ -153,6 +160,7 @@ export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
     serviceName: env.SERVICE_NAME ?? "rn-cf-api",
     authUrl: authUrl.href.replace(/\/$/, ""),
     authSecret,
+    appUrl: appUrl.href.replace(/\/$/, ""),
     corsOrigins: resolvedCors,
     trustedOrigins,
     rateLimitTtlMs: parsePositiveInt(env.RATE_LIMIT_TTL, 60_000),

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { getApi, postApi } from "../helpers/api-request";
-import { signUpVerifiedUser } from "../helpers/email-auth";
+import { getMailbox, signUpVerifiedUser } from "../helpers/email-auth";
 
 describe("organization integration", () => {
   it("requires authentication to list organizations", async () => {
@@ -29,7 +29,13 @@ describe("organization integration", () => {
     );
 
     expect(created.status).toBe(200);
-    await expect(created.json()).resolves.toMatchObject({
+    const createdOrganization = (await created.json()) as {
+      id: string;
+      name: string;
+      slug: string;
+      members: Array<{ role: string; userId: string }>;
+    };
+    expect(createdOrganization).toMatchObject({
       name: "Acme Company",
       slug: `acme-${suffix}`,
       members: [
@@ -39,6 +45,26 @@ describe("organization integration", () => {
         },
       ],
     });
+
+    const invitedEmail = `member-${suffix}@example.com`;
+    const invited = await postApi(
+      "/api/auth/organization/invite-member",
+      {
+        email: invitedEmail,
+        role: "member",
+        organizationId: createdOrganization.id,
+      },
+      account.cookie,
+    );
+    expect(invited.status).toBe(200);
+
+    const mailbox = await getMailbox(invitedEmail);
+    expect(mailbox.messages).toEqual([
+      expect.objectContaining({
+        subject: "Join Acme Company",
+        text: expect.stringContaining("http://127.0.0.1:8081/accept-invitation?id="),
+      }),
+    ]);
 
     const listed = await getApi("/api/auth/organization/list", account.cookie);
     expect(listed.status).toBe(200);

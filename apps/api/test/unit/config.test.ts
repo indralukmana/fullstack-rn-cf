@@ -8,6 +8,7 @@ const productionEnv: AppBindings = {
   ENVIRONMENT: "production",
   BETTER_AUTH_URL: "https://api.example.com",
   BETTER_AUTH_SECRET: "production-secret-that-is-at-least-32-characters",
+  APP_URL: "https://app.example.com",
   CORS_ORIGINS: "https://app.example.com",
   EMAIL_PROVIDER: "cloudflare",
   EMAIL_FROM: "RN CF <noreply@example.com>",
@@ -59,6 +60,13 @@ describe("getRuntimeConfig", () => {
         CORS_ORIGINS: "http://app.example.com",
       }),
     ).toThrow("CORS_ORIGINS entries must use HTTPS in production");
+
+    expect(() =>
+      getRuntimeConfig({
+        ...productionEnv,
+        APP_URL: "http://app.example.com",
+      }),
+    ).toThrow("APP_URL must use HTTPS in production");
   });
 
   it("rejects CORS URLs that are not exact origins", () => {
@@ -99,6 +107,7 @@ describe("getRuntimeConfig", () => {
       isProduction: true,
       authUrl: "https://api.example.com",
       authSecret: productionEnv.BETTER_AUTH_SECRET,
+      appUrl: "https://app.example.com",
       corsOrigins: ["https://app.example.com"],
     });
   });

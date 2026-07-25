@@ -7,7 +7,7 @@ import { createDb } from "../../db/client";
 import * as schema from "../../db/schema";
 import { getRuntimeConfig, type AppBindings } from "../config";
 import { createBetterAuthOptions } from "./options";
-import { organizationOptions } from "./organization-options";
+import { createOrganizationOptions } from "./organization-options";
 
 export type AuthEnv = AppBindings & {
   DB: D1Database;
@@ -25,7 +25,7 @@ export function createAuth(env: AuthEnv) {
     }),
     baseURL: config.authUrl,
     secret: config.authSecret,
-    plugins: [expo(), organization(organizationOptions)],
+    plugins: [expo(), organization(createOrganizationOptions(env, config.appUrl))],
     trustedOrigins: config.trustedOrigins,
   });
 }

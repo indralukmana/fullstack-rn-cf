@@ -32,3 +32,14 @@ App screens:
 3. Submit a new password on `/reset-password`
 
 Sessions are revoked on successful password reset.
+
+## Organizations
+
+The Better Auth organization plugin provides organization creation, owner/admin/member roles,
+memberships, invitations, and active organization sessions. Membership is always verified by the
+API; a client-provided organization ID is not an authorization decision.
+
+Invitation messages are delivered through Cloudflare Email Service and link to
+`APP_URL/accept-invitation?id=...`. `APP_URL` must use HTTPS in production. Pending invitations
+and organization memberships have database uniqueness constraints to prevent duplicate state
+under concurrent requests.
