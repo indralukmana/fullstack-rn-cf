@@ -5,6 +5,7 @@ packages:
 nodeOptions: "--disable-warning=DEP0205"
 
 allowBuilds:
+  "@prisma/client": false
   better-sqlite3: true
   esbuild: true
   lefthook: true
