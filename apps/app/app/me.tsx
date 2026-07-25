@@ -72,13 +72,20 @@ export default function MeScreen() {
 
       <View className="flex-row flex-wrap gap-3">
         {session?.user ? (
-          <Pressable
-            accessibilityRole="button"
-            className="rounded-lg bg-slate-900 px-5 py-3"
-            onPress={onSignOut}
-          >
-            <Text className="font-semibold text-white">Sign out</Text>
-          </Pressable>
+          <>
+            <Link href="./organizations" asChild>
+              <Pressable accessibilityRole="button" className="rounded-lg bg-slate-900 px-5 py-3">
+                <Text className="font-semibold text-white">Organizations</Text>
+              </Pressable>
+            </Link>
+            <Pressable
+              accessibilityRole="button"
+              className="rounded-lg border border-slate-300 bg-white px-5 py-3"
+              onPress={onSignOut}
+            >
+              <Text className="font-semibold text-slate-900">Sign out</Text>
+            </Pressable>
+          </>
         ) : (
           <Link href="/sign-in" asChild>
             <Pressable accessibilityRole="button" className="rounded-lg bg-slate-900 px-5 py-3">
