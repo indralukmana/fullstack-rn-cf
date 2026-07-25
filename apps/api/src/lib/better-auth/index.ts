@@ -21,8 +21,8 @@ export function createAuth(env: AuthEnv) {
       provider: "sqlite",
       schema,
     }),
-    baseURL: env.BETTER_AUTH_URL,
-    secret: env.BETTER_AUTH_SECRET,
+    baseURL: config.authUrl,
+    secret: config.authSecret,
     plugins: [expo()],
     trustedOrigins: config.trustedOrigins,
   });
