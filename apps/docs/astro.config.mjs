@@ -14,6 +14,7 @@ export default defineConfig({
       sidebar: [
         { label: "Getting Started", slug: "getting-started" },
         { label: "Environment Configuration", slug: "environment" },
+        { label: "Agent Skills", slug: "agent-skills" },
         { label: "Architecture", slug: "architecture" },
         { label: "Authentication", slug: "auth" },
         { label: "Billing", slug: "billing" },

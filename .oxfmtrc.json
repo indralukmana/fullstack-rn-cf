@@ -21,6 +21,7 @@
     "**/dist/**",
     "**/build/**",
     "**/.astro/**",
-    "**/.expo/**"
+    "**/.expo/**",
+    ".agents/skills/**"
   ]
 }

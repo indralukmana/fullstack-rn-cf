@@ -4,6 +4,9 @@ This file is the canonical repository-wide contract for coding agents. Read the 
 `AGENTS.md` before editing a workspace. Human instructions and the current user request
 override this file.
 
+For architecture, auth, billing, Expo, Worker, environment, migration, code-generation, or release
+work, load `.agents/skills/launchpad-architecture/SKILL.md` before the relevant vendor skill.
+
 ## Repository map
 
 - `apps/api`: Hono API on Cloudflare Workers, D1, Drizzle, Better Auth
