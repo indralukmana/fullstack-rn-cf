@@ -9,8 +9,9 @@
     "test": "vitest run",
     "openapi:export": "node ../../scripts/openapi-export.mjs",
     "env:codegen": "varlock codegen",
-    "cf-typegen": "varlock-wrangler types --env-interface CloudflareBindings --include-runtime false",
+    "cf-typegen": "varlock-wrangler types --env-interface CloudflareBindings --include-runtime false && node scripts/normalize-worker-types.mjs",
     "db:generate": "drizzle-kit generate",
+    "db:validate-migrations": "node scripts/validate-migrations.mjs",
     "db:migrate:local": "wrangler d1 migrations apply rn-cf --local",
     "db:migrate:remote": "wrangler d1 migrations apply rn-cf --remote",
     "auth:generate-schema": "pnpm dlx @better-auth/cli@1.4.21 generate --config ./better-auth.config.ts --output ./src/db/schema/auth.ts --yes"

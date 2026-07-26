@@ -3,4 +3,8 @@ title: CI/CD
 description: GitLab pipeline overview
 ---
 
-GitLab CI runs format, lint, typecheck, API tests, e2e, and builds for the Expo web export and docs. Deploy jobs are commented out until Cloudflare credentials are configured.
+GitLab CI runs format, lint, typecheck, API tests, e2e, generated-code drift, fresh-database
+migration validation, Expo config validation, and builds for the Expo web export and docs.
+Cloudflare deploy jobs remain disabled until account credentials are configured. Native EAS build,
+submit, staged update, and rollback jobs are default-branch-only manual actions using protected
+credentials; store production promotion remains manual.

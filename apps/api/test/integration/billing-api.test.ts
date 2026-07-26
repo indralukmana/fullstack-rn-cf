@@ -77,4 +77,12 @@ describe("personal billing API", () => {
       error: "email_verification_required",
     });
   });
+
+  it("does not create a portal session without a Stripe customer", async () => {
+    const account = await signUpVerifiedUser({
+      email: `portal-${crypto.randomUUID()}@example.com`,
+    });
+    const response = await postApi("/api/billing/portal", undefined, account.cookie);
+    expect(response.status).toBe(404);
+  });
 });

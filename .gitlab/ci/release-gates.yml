@@ -1,0 +1,15 @@
+generated_drift:
+  stage: prepare
+  script:
+    - pnpm codegen:check
+    - pnpm env:check
+
+migration_validation:
+  stage: test
+  script:
+    - pnpm migrations:check
+
+native_config:
+  stage: build
+  script:
+    - pnpm --filter @rn-cf/app exec expo config --type public

@@ -105,4 +105,26 @@ describe("billing event processing", () => {
     });
     expect(storedEvent?.state).toBe("failed");
   });
+
+  it("fails closed for an unknown provider environment", async () => {
+    const db = createDb(env.DB);
+    const eventId = crypto.randomUUID();
+    await db.insert(billingEvent).values({
+      id: eventId,
+      provider: "revenuecat",
+      providerEventId: crypto.randomUUID(),
+      eventType: "INITIAL_PURCHASE",
+      payload: {
+        event: {
+          app_user_id: `user_${crypto.randomUUID()}`,
+          app_id: env.REVENUECAT_IOS_APP_ID,
+          environment: "STAGING",
+        },
+      },
+    });
+
+    await expect(processBillingEvent(db, env, eventId)).rejects.toThrow(
+      "missing identity, app, or environment",
+    );
+  });
 });

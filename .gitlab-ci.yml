@@ -37,6 +37,7 @@ include:
   - local: .gitlab/ci/test-e2e.yml
   - local: .gitlab/ci/build-app.yml
   - local: .gitlab/ci/build-docs.yml
+  - local: .gitlab/ci/release-gates.yml
   - local: .gitlab/ci/release-native.yml
   # Deploy jobs (require CLOUDFLARE_* CI variables) — enable when ready:
   # - local: .gitlab/ci/deploy-api.yml

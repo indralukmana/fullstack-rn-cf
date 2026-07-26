@@ -18,6 +18,7 @@ export default defineConfig({
         { label: "Billing", slug: "billing" },
         { label: "Billing Operations", slug: "billing-operations" },
         { label: "Native Release", slug: "native-release" },
+        { label: "Launch Checklist", slug: "launch-checklist" },
         { label: "Security", slug: "security" },
         { label: "API Reference", slug: "api-reference" },
         { label: "Testing", slug: "testing" },

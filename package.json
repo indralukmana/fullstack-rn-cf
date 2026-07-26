@@ -22,7 +22,11 @@
     "dev:docs": "pnpm --filter @rn-cf/docs dev",
     "openapi:export": "node scripts/openapi-export.mjs",
     "codegen": "pnpm openapi:export && pnpm exec orval",
+    "codegen:check": "pnpm codegen && pnpm exec oxfmt packages/api-client/openapi.json packages/api-client/src/generated && git diff --exit-code -- packages/api-client/openapi.json packages/api-client/src/generated",
     "env:codegen": "pnpm --filter @rn-cf/api env:codegen && pnpm --filter @rn-cf/app env:codegen",
+    "env:check": "pnpm env:codegen && pnpm --filter @rn-cf/api cf-typegen && pnpm exec oxfmt apps/api/env.d.ts apps/app/env.d.ts apps/api/worker-configuration.d.ts && git diff --exit-code -- apps/api/env.d.ts apps/app/env.d.ts apps/api/worker-configuration.d.ts",
+    "migrations:check": "pnpm --filter @rn-cf/api db:validate-migrations",
+    "release:check": "pnpm ci:check && pnpm codegen:check && pnpm env:check && pnpm migrations:check && pnpm --filter @rn-cf/app export:web",
     "setup": "node scripts/setup.mjs",
     "prepare": "lefthook install"
   },

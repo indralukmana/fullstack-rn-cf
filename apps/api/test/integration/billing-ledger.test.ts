@@ -1,4 +1,5 @@
 import { env } from "cloudflare:workers";
+import { and, eq as sqlEq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
 import { createDb } from "../../src/db/client";
@@ -133,6 +134,54 @@ describe("billing ledger invariants", () => {
       source: "stripe",
       expiresAt: future,
     });
+
+    await db
+      .update(providerGrant)
+      .set({ status: "expired", lastProviderState: "canceled" })
+      .where(
+        and(sqlEq(providerGrant.subjectId, subjectId), sqlEq(providerGrant.provider, "stripe")),
+      );
+    await db
+      .update(providerGrant)
+      .set({
+        status: "active",
+        expiresAt: future,
+        lastProviderState: "RESTORE",
+      })
+      .where(
+        and(sqlEq(providerGrant.subjectId, subjectId), sqlEq(providerGrant.provider, "revenuecat")),
+      );
+    await recomputeEntitlement(db, {
+      subjectType: "user",
+      subjectId,
+      entitlementKey: "pro",
+      providerEnvironment: "production",
+      now,
+    });
+    expect(
+      await db.query.entitlement.findFirst({
+        where: (table, { eq: equals }) => equals(table.subjectId, subjectId),
+      }),
+    ).toMatchObject({ status: "active", source: "revenuecat" });
+
+    await db
+      .update(providerGrant)
+      .set({ status: "revoked", lastProviderState: "REFUND" })
+      .where(
+        and(sqlEq(providerGrant.subjectId, subjectId), sqlEq(providerGrant.provider, "revenuecat")),
+      );
+    await recomputeEntitlement(db, {
+      subjectType: "user",
+      subjectId,
+      entitlementKey: "pro",
+      providerEnvironment: "production",
+      now,
+    });
+    expect(
+      await db.query.entitlement.findFirst({
+        where: (table, { eq: equals }) => equals(table.subjectId, subjectId),
+      }),
+    ).toMatchObject({ status: "expired" });
   });
 
   it("does not let sandbox grants unlock production access", async () => {
