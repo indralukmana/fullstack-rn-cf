@@ -1,3 +1,10 @@
+export type BillingQueueMessage = { eventId: string };
+
+export type BillingQueueBinding = {
+  send(message: BillingQueueMessage): Promise<void>;
+  sendBatch(messages: Iterable<{ body: BillingQueueMessage }>): Promise<void>;
+};
+
 export type AppBindings = {
   ENVIRONMENT?: string;
   SERVICE_NAME?: string;
@@ -18,6 +25,8 @@ export type AppBindings = {
   REVENUECAT_SECRET_API_KEY?: string;
   BILLING_ENTITLEMENT_KEY?: string;
   BILLING_GRACE_PERIOD_DAYS?: string | number;
+  BILLING_EVENT_RETENTION_DAYS?: string | number;
+  BILLING_RECONCILIATION_LIMIT?: string | number;
   STRIPE_PRICE_MONTHLY?: string;
   STRIPE_PRICE_YEARLY?: string;
   REVENUECAT_ENTITLEMENT_ID?: string;
@@ -28,6 +37,7 @@ export type AppBindings = {
   REVENUECAT_IOS_PRODUCT_YEARLY?: string;
   REVENUECAT_ANDROID_PRODUCT_MONTHLY?: string;
   REVENUECAT_ANDROID_PRODUCT_YEARLY?: string;
+  BILLING_QUEUE?: BillingQueueBinding;
   EMAIL?: {
     send(message: {
       from: string;
@@ -109,6 +119,8 @@ export type RuntimeConfig = {
   emailFrom: string;
   billingEntitlementKey: string;
   billingGracePeriodDays: number;
+  billingEventRetentionDays: number;
+  billingReconciliationLimit: number;
 };
 
 export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
@@ -129,6 +141,8 @@ export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
     "BILLING_ENTITLEMENT_KEY",
   );
   const billingGracePeriodDays = parsePositiveInt(env.BILLING_GRACE_PERIOD_DAYS, 3);
+  const billingEventRetentionDays = parsePositiveInt(env.BILLING_EVENT_RETENTION_DAYS, 30);
+  const billingReconciliationLimit = parsePositiveInt(env.BILLING_RECONCILIATION_LIMIT, 50);
 
   if (emailProvider !== "console" && emailProvider !== "cloudflare") {
     throw new Error("EMAIL_PROVIDER must be either console or cloudflare");
@@ -177,6 +191,9 @@ export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
     requireNonEmpty(env.REVENUECAT_IOS_PRODUCT_YEARLY, "REVENUECAT_IOS_PRODUCT_YEARLY");
     requireNonEmpty(env.REVENUECAT_ANDROID_PRODUCT_MONTHLY, "REVENUECAT_ANDROID_PRODUCT_MONTHLY");
     requireNonEmpty(env.REVENUECAT_ANDROID_PRODUCT_YEARLY, "REVENUECAT_ANDROID_PRODUCT_YEARLY");
+    if (!env.BILLING_QUEUE) {
+      throw new Error("BILLING_QUEUE binding must be configured in production");
+    }
   }
 
   for (const origin of corsOrigins) {
@@ -211,5 +228,7 @@ export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
     emailFrom,
     billingEntitlementKey,
     billingGracePeriodDays,
+    billingEventRetentionDays,
+    billingReconciliationLimit,
   };
 }

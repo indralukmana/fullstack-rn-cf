@@ -13,6 +13,8 @@ const revenueCatPayloadSchema = z.looseObject({
   event: z.looseObject({
     id: z.string().min(1),
     type: z.string().min(1),
+    environment: z.enum(["SANDBOX", "PRODUCTION"]).optional(),
+    event_timestamp_ms: z.number().optional(),
   }),
 });
 
@@ -75,8 +77,11 @@ billingWebhooks.post("/stripe", async (c) => {
     provider: "stripe",
     providerEventId: event.id,
     eventType: event.type,
+    providerEnvironment: event.livemode ? "production" : "sandbox",
+    occurredAt: new Date(event.created * 1000),
     payload,
   });
+  await c.env.BILLING_QUEUE?.send({ eventId: result.eventId });
 
   return c.json({ received: true, duplicate: result.duplicate }, 200);
 });
@@ -100,8 +105,19 @@ billingWebhooks.post("/revenuecat", async (c) => {
     provider: "revenuecat",
     providerEventId: parsed.data.event.id,
     eventType: parsed.data.event.type,
+    providerEnvironment:
+      parsed.data.event.environment === "SANDBOX"
+        ? "sandbox"
+        : parsed.data.event.environment === "PRODUCTION"
+          ? "production"
+          : undefined,
+    occurredAt:
+      parsed.data.event.event_timestamp_ms === undefined
+        ? undefined
+        : new Date(parsed.data.event.event_timestamp_ms),
     payload: parsed.data,
   });
+  await c.env.BILLING_QUEUE?.send({ eventId: result.eventId });
 
   return c.json({ received: true, duplicate: result.duplicate }, 200);
 });

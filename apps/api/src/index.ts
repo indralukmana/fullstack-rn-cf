@@ -14,8 +14,9 @@ import { secureHeaders } from "hono/secure-headers";
 import type { AppEnv } from "./app-env";
 
 import { getSession } from "./lib/auth/session";
-import { createAuth } from "./lib/better-auth";
-import { getRuntimeConfig } from "./lib/config";
+import { createAuth, type AuthEnv } from "./lib/better-auth";
+import { handleBillingQueue, handleScheduledBilling } from "./lib/billing/worker-handlers";
+import { getRuntimeConfig, type BillingQueueMessage } from "./lib/config";
 import { clearOutboundEmails, listOutboundEmails } from "./lib/email/send";
 import { initVarlockIfPresent } from "./lib/varlock-init";
 import { rateLimit } from "./middleware/rate-limit";
@@ -307,4 +308,10 @@ app.get(
   }),
 );
 
-export default app;
+const worker: ExportedHandler<AuthEnv, BillingQueueMessage> = {
+  fetch: app.fetch,
+  queue: handleBillingQueue,
+  scheduled: handleScheduledBilling,
+};
+
+export default worker;

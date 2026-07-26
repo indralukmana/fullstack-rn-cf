@@ -31,6 +31,10 @@ const productionEnv: AppBindings = {
   REVENUECAT_IOS_PRODUCT_YEARLY: "ios_pro_yearly",
   REVENUECAT_ANDROID_PRODUCT_MONTHLY: "android_pro_monthly",
   REVENUECAT_ANDROID_PRODUCT_YEARLY: "android_pro_yearly",
+  BILLING_QUEUE: {
+    send: async () => undefined,
+    sendBatch: async () => undefined,
+  },
 };
 
 describe("getRuntimeConfig", () => {
@@ -151,6 +155,8 @@ describe("getRuntimeConfig", () => {
       corsOrigins: ["https://app.example.com"],
       billingEntitlementKey: "pro",
       billingGracePeriodDays: 3,
+      billingEventRetentionDays: 30,
+      billingReconciliationLimit: 50,
     });
   });
 });

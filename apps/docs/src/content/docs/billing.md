@@ -30,7 +30,7 @@ authorization model.
 1. Verify the provider webhook signature before parsing or persisting an event.
 2. Insert the event into `billing_event` using `(provider, provider_event_id)` as the
    idempotency boundary.
-3. Process the durable event with retry-safe domain logic.
+3. Enqueue only the durable event ID and process it with retry-safe domain logic.
 4. Project one normalized provider grant per subscription or transaction.
 5. Atomically recompute one aggregate entitlement per `(subject_type, subject_id, key)`.
 6. Authorize paid capabilities from the aggregate server-side entitlement.
@@ -71,5 +71,18 @@ Invalid requests receive generic errors and are never persisted. Valid duplicate
 successful response with `duplicate: true`, allowing provider retries without duplicate effects.
 
 Webhook receipt only records durable input. Projection into subscriptions and entitlements must
-run through idempotent processing logic; do not put checkout, email, or other slow side effects on
-the receipt path.
+run through idempotent Queue processing; do not put provider reconciliation, checkout, email, or
+other slow side effects on the receipt path.
+
+## Queue recovery and reconciliation
+
+Create `rn-cf-billing-events` and `rn-cf-billing-events-dlq` before deploying the Worker. The
+consumer retries failures five times before dead-lettering. Every ten minutes, scheduled
+maintenance re-enqueues durable `received` or retryable `failed` rows, reconciles recently active
+provider customers, and deletes processed/failed payloads beyond
+`BILLING_EVENT_RETENTION_DAYS`.
+
+The D1 event ledger is the replay control plane: support can correct configuration or provider
+availability and re-enqueue a failed event ID without replaying an unauthenticated payload. Queue
+messages contain only that opaque ID. Inspect `billing_event.attempts` and `last_error` before a
+replay; never edit grants or aggregate entitlements directly.
