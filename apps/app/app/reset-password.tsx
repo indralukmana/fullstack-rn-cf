@@ -2,7 +2,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
 import { View } from "react-native";
 
-import { Button, Field, QuietLink, Screen, ScreenTitle, StatusText } from "@/components/ui";
+import { Button, PasswordField, QuietLink, Screen, ScreenTitle, StatusText } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 import { validatePassword, validatePasswordConfirmation } from "@/lib/validation";
 
@@ -61,7 +61,7 @@ export default function ResetPasswordScreen() {
         </StatusText>
       ) : null}
       <View className="gap-3">
-        <Field
+        <PasswordField
           autoComplete="new-password"
           error={passwordError}
           label="New password"
@@ -72,10 +72,9 @@ export default function ResetPasswordScreen() {
             }
           }}
           placeholder="New password"
-          secureTextEntry
           value={password}
         />
-        <Field
+        <PasswordField
           autoComplete="new-password"
           error={confirmError}
           label="Confirm password"
@@ -86,7 +85,6 @@ export default function ResetPasswordScreen() {
             }
           }}
           placeholder="Confirm password"
-          secureTextEntry
           value={confirm}
         />
       </View>

@@ -1,5 +1,5 @@
 import { Link, type Href } from "expo-router";
-import { useEffect, useId, type ComponentProps, type ReactNode } from "react";
+import { useEffect, useId, useState, type ComponentProps, type ReactNode } from "react";
 import {
   AccessibilityInfo,
   Modal,
@@ -110,6 +110,63 @@ export function Field({
         style={[{ fontFamily: fontSans }, style]}
         {...rest}
       />
+      {error ? <StatusText>{error}</StatusText> : null}
+    </View>
+  );
+}
+
+export function PasswordField({
+  label,
+  error,
+  value,
+  onChangeText,
+  placeholder,
+  autoComplete,
+}: {
+  label: string;
+  error?: string | null;
+  value: string;
+  onChangeText: (value: string) => void;
+  placeholder?: string;
+  autoComplete?: TextInputProps["autoComplete"];
+}) {
+  const [visible, setVisible] = useState(false);
+  const { placeholder: placeholderColor } = useThemeColors();
+
+  return (
+    <View className="gap-1.5">
+      <Text
+        className="text-sm font-medium text-foreground-muted"
+        style={{ fontFamily: fontSansSemiBold }}
+      >
+        {label}
+      </Text>
+      <View className="relative">
+        <TextInput
+          accessibilityLabel={label}
+          autoComplete={autoComplete}
+          className={`${fieldClassName} pr-24`}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor={placeholderColor}
+          secureTextEntry={!visible}
+          style={{ fontFamily: fontSans }}
+          value={value}
+        />
+        <Pressable
+          accessibilityLabel={visible ? "Hide password" : "Show password"}
+          accessibilityRole="button"
+          className="absolute inset-y-0 right-0 justify-center px-3"
+          onPress={() => setVisible((current) => !current)}
+        >
+          <Text
+            className="text-sm font-semibold text-foreground-muted"
+            style={{ fontFamily: fontSansSemiBold }}
+          >
+            {visible ? "Hide" : "Show"}
+          </Text>
+        </Pressable>
+      </View>
       {error ? <StatusText>{error}</StatusText> : null}
     </View>
   );

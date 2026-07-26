@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
 
-import { Button, Field, QuietLink, Screen, ScreenTitle } from "@/components/ui";
+import { Button, Field, PasswordField, QuietLink, Screen, ScreenTitle } from "@/components/ui";
 import { appCallbackUrl } from "@/lib/app-url";
 import { authClient } from "@/lib/auth-client";
 import { validateEmail, validateName, validatePassword } from "@/lib/validation";
@@ -80,7 +80,7 @@ export default function SignUpScreen() {
           placeholder="Email"
           value={email}
         />
-        <Field
+        <PasswordField
           autoComplete="new-password"
           error={passwordError}
           label="Password"
@@ -91,7 +91,6 @@ export default function SignUpScreen() {
             }
           }}
           placeholder="Password"
-          secureTextEntry
           value={password}
         />
       </View>
