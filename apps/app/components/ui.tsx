@@ -1,3 +1,4 @@
+import { Link, type Href } from "expo-router";
 import type { ComponentProps, ReactNode } from "react";
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -144,6 +145,16 @@ export function Section({ title, children }: { title: string; children: ReactNod
 
 export function QuietLinkText({ children }: { children: ReactNode }) {
   return <Text className="text-center text-base text-slate-600">{children}</Text>;
+}
+
+export function QuietLink({ href, children }: { href: Href; children: ReactNode }) {
+  return (
+    <Link href={href} asChild>
+      <Pressable accessibilityRole="link" className="min-h-11 items-center justify-center py-2">
+        <QuietLinkText>{children}</QuietLinkText>
+      </Pressable>
+    </Link>
+  );
 }
 
 export function LoadingScreen({ label = "Loading…" }: { label?: string }) {

@@ -1,15 +1,8 @@
-import { Link, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Linking, Pressable, Text, View } from "react-native";
 
-import {
-  Button,
-  QuietLinkText,
-  Screen,
-  ScreenLead,
-  ScreenTitle,
-  StatusText,
-} from "@/components/ui";
+import { Button, QuietLink, Screen, ScreenLead, ScreenTitle, StatusText } from "@/components/ui";
 import { appCallbackUrl } from "@/lib/app-url";
 import { authClient } from "@/lib/auth-client";
 import {
@@ -148,9 +141,7 @@ export default function CheckEmailScreen() {
           </Pressable>
         </View>
       ) : null}
-      <Link href="/sign-in">
-        <QuietLinkText>Back to sign in</QuietLinkText>
-      </Link>
+      <QuietLink href="/sign-in">Back to sign in</QuietLink>
     </Screen>
   );
 }

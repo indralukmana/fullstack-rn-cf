@@ -7,7 +7,7 @@ import {
   Button,
   LoadingScreen,
   QueryError,
-  QuietLinkText,
+  QuietLink,
   Screen,
   ScreenTitle,
   Section,
@@ -103,9 +103,7 @@ export default function MeScreen() {
             <Button label="Sign in" />
           </Link>
         )}
-        <Link href="/">
-          <QuietLinkText>Home</QuietLinkText>
-        </Link>
+        <QuietLink href="/">Home</QuietLink>
       </View>
     </Screen>
   );

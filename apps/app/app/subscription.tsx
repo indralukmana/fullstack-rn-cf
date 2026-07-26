@@ -14,7 +14,7 @@ import {
   Button,
   LoadingScreen,
   QueryError,
-  QuietLinkText,
+  QuietLink,
   Screen,
   ScreenLead,
   ScreenTitle,
@@ -238,9 +238,7 @@ export default function SubscriptionScreen() {
       {pendingAction ? <StatusText tone="muted">Please wait…</StatusText> : null}
       {error ? <StatusText>{error}</StatusText> : null}
 
-      <Link href="/me">
-        <QuietLinkText>Back to account</QuietLinkText>
-      </Link>
+      <QuietLink href="/me">Back to account</QuietLink>
     </Screen>
   );
 }

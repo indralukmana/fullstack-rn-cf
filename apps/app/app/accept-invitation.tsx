@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   Button,
   LoadingScreen,
-  QuietLinkText,
+  QuietLink,
   Screen,
   ScreenLead,
   ScreenTitle,
@@ -75,9 +75,7 @@ export default function AcceptInvitationScreen() {
         </>
       )}
 
-      <Link href="/">
-        <QuietLinkText>Back to home</QuietLinkText>
-      </Link>
+      <QuietLink href="/">Back to home</QuietLink>
     </Screen>
   );
 }

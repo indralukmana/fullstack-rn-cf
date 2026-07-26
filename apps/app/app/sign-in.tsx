@@ -1,8 +1,8 @@
-import { Link, router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
 
-import { Button, Field, QuietLinkText, Screen, ScreenTitle } from "@/components/ui";
+import { Button, Field, QuietLink, Screen, ScreenTitle } from "@/components/ui";
 import { appCallbackUrl } from "@/lib/app-url";
 import { authClient } from "@/lib/auth-client";
 
@@ -89,12 +89,8 @@ export default function SignInScreen() {
       </View>
       <Button disabled={pending} label={pending ? "Signing in…" : "Sign in"} onPress={onSubmit} />
       <View className="gap-3">
-        <Link href="/forgot-password">
-          <QuietLinkText>Forgot password?</QuietLinkText>
-        </Link>
-        <Link href="/sign-up">
-          <QuietLinkText>Need an account? Register</QuietLinkText>
-        </Link>
+        <QuietLink href="/forgot-password">Forgot password?</QuietLink>
+        <QuietLink href="/sign-up">Need an account? Register</QuietLink>
       </View>
     </Screen>
   );

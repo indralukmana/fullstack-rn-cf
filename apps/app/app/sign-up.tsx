@@ -1,8 +1,8 @@
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
 
-import { Button, Field, QuietLinkText, Screen, ScreenTitle } from "@/components/ui";
+import { Button, Field, QuietLink, Screen, ScreenTitle } from "@/components/ui";
 import { appCallbackUrl } from "@/lib/app-url";
 import { authClient } from "@/lib/auth-client";
 
@@ -75,9 +75,7 @@ export default function SignUpScreen() {
         label={pending ? "Creating account…" : "Create account"}
         onPress={onSubmit}
       />
-      <Link href="/sign-in">
-        <QuietLinkText>Already have an account? Sign in</QuietLinkText>
-      </Link>
+      <QuietLink href="/sign-in">Already have an account? Sign in</QuietLink>
     </Screen>
   );
 }

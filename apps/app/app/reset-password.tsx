@@ -1,8 +1,8 @@
-import { Link, router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
 import { View } from "react-native";
 
-import { Button, Field, QuietLinkText, Screen, ScreenTitle, StatusText } from "@/components/ui";
+import { Button, Field, QuietLink, Screen, ScreenTitle, StatusText } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 
 export default function ResetPasswordScreen() {
@@ -87,9 +87,7 @@ export default function ResetPasswordScreen() {
         label={pending ? "Saving…" : "Update password"}
         onPress={onSubmit}
       />
-      <Link href="/forgot-password">
-        <QuietLinkText>Request a new link</QuietLinkText>
-      </Link>
+      <QuietLink href="/forgot-password">Request a new link</QuietLink>
     </Screen>
   );
 }

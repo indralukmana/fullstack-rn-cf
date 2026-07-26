@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import { View } from "react-native";
 
-import { Button, QuietLinkText, Screen, ScreenLead, ScreenTitle } from "@/components/ui";
+import { Button, QuietLink, Screen, ScreenLead, ScreenTitle } from "@/components/ui";
 
 export default function HomeScreen() {
   return (
@@ -19,9 +19,7 @@ export default function HomeScreen() {
         <Link href="/sign-in" asChild>
           <Button label="Sign in" variant="secondary" />
         </Link>
-        <Link href="/me">
-          <QuietLinkText>Account</QuietLinkText>
-        </Link>
+        <QuietLink href="/me">Account</QuietLink>
       </View>
     </Screen>
   );

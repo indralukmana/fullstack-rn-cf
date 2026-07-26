@@ -1,5 +1,5 @@
 import { exportAccountData, useDeleteAccount } from "@rn-cf/api-client";
-import { Link, Redirect, router } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { useState } from "react";
 import { Share, Text, View } from "react-native";
 
@@ -8,7 +8,7 @@ import {
   ConfirmDialog,
   Field,
   LoadingScreen,
-  QuietLinkText,
+  QuietLink,
   Screen,
   ScreenLead,
   ScreenTitle,
@@ -99,9 +99,7 @@ export default function AccountDataScreen() {
           Apple, Google, and Stripe subscriptions must be managed first. Deleting this account never
           cancels store billing.
         </Text>
-        <Link href="./subscription">
-          <Text className="text-base font-semibold text-slate-900">Manage subscriptions</Text>
-        </Link>
+        <QuietLink href="./subscription">Manage subscriptions</QuietLink>
         <View className="gap-3">
           <Field
             autoCapitalize="characters"
@@ -121,9 +119,7 @@ export default function AccountDataScreen() {
 
       {message ? <StatusText>{message}</StatusText> : null}
 
-      <Link href="/me">
-        <QuietLinkText>Back to account</QuietLinkText>
-      </Link>
+      <QuietLink href="/me">Back to account</QuietLink>
 
       <ConfirmDialog
         confirmLabel="Delete account"

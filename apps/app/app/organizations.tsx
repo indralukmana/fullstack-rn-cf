@@ -7,7 +7,7 @@ import {
   Field,
   LoadingScreen,
   QueryError,
-  QuietLinkText,
+  QuietLink,
   Screen,
   ScreenLead,
   ScreenTitle,
@@ -177,9 +177,7 @@ export default function OrganizationsScreen() {
         </View>
       </Section>
 
-      <Link href="/me">
-        <QuietLinkText>Back to account</QuietLinkText>
-      </Link>
+      <QuietLink href="/me">Back to account</QuietLink>
     </Screen>
   );
 }

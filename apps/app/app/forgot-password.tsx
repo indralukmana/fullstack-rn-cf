@@ -1,7 +1,7 @@
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { useState } from "react";
 
-import { Button, Field, QuietLinkText, Screen, ScreenLead, ScreenTitle } from "@/components/ui";
+import { Button, Field, QuietLink, Screen, ScreenLead, ScreenTitle } from "@/components/ui";
 import { appCallbackUrl } from "@/lib/app-url";
 import { authClient } from "@/lib/auth-client";
 
@@ -54,9 +54,7 @@ export default function ForgotPasswordScreen() {
         label={pending ? "Sending…" : "Send reset link"}
         onPress={onSubmit}
       />
-      <Link href="/sign-in">
-        <QuietLinkText>Back to sign in</QuietLinkText>
-      </Link>
+      <QuietLink href="/sign-in">Back to sign in</QuietLink>
     </Screen>
   );
 }
