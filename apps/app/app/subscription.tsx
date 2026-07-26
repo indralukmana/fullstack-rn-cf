@@ -12,6 +12,7 @@ import { Platform, Text, View } from "react-native";
 
 import {
   Button,
+  EmptyState,
   LoadingScreen,
   QueryError,
   QuietLink,
@@ -203,6 +204,15 @@ export default function SubscriptionScreen() {
               onPress={() => run(interval, () => startWebCheckout(interval))}
             />
           ))
+        ) : nativePackages.length === 0 ? (
+          <EmptyState
+            description={
+              error
+                ? "Store offerings could not be loaded. Check your network or RevenueCat configuration, then refresh."
+                : "No store packages are available yet. Refresh after the RevenueCat offering is configured."
+            }
+            title="No packages available"
+          />
         ) : (
           <>
             {nativePackages.map((item) => (

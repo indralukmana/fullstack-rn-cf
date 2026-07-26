@@ -222,6 +222,36 @@ export function QueryError({ message, onRetry }: { message: string; onRetry?: ()
   );
 }
 
+export function EmptyState({
+  title,
+  description,
+  action,
+}: {
+  title: string;
+  description?: string;
+  action?: ReactNode;
+}) {
+  return (
+    <View className="gap-2">
+      <Text
+        className="text-base font-semibold text-foreground"
+        style={{ fontFamily: fontSansSemiBold }}
+      >
+        {title}
+      </Text>
+      {description ? (
+        <Text
+          className="text-sm leading-5 text-foreground-secondary"
+          style={{ fontFamily: fontSans }}
+        >
+          {description}
+        </Text>
+      ) : null}
+      {action}
+    </View>
+  );
+}
+
 export function ConfirmDialog({
   visible,
   title,

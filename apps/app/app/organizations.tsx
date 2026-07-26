@@ -4,6 +4,7 @@ import { Pressable, Text, View } from "react-native";
 
 import {
   Button,
+  EmptyState,
   Field,
   LoadingScreen,
   QueryError,
@@ -147,9 +148,10 @@ export default function OrganizationsScreen() {
             })}
           </View>
         ) : (
-          <Text className="text-base text-foreground-secondary">
-            Create your first organization below.
-          </Text>
+          <EmptyState
+            description="Create an organization below to collaborate and invite members."
+            title="No organizations yet"
+          />
         )}
       </Section>
 
