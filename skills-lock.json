@@ -25,6 +25,12 @@
       "skillPath": "skills/cloudflare-email-service/SKILL.md",
       "computedHash": "6274be056fe5211aa220833c97ff6a7d96a1cdfd8854a53ca839ca758d35f356"
     },
+    "drizzle-orm": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "drizzle-orm/SKILL.md",
+      "computedHash": "8c96d6e1bbfaad8453371b4727f2bfa73febe9686c75997fd502e38981da211f"
+    },
     "eas-app-stores": {
       "source": "expo/skills",
       "sourceType": "github",

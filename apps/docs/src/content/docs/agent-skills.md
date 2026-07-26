@@ -20,6 +20,7 @@ a task matches, keeping normal context small.
 | Varlock                  | Secret-safe schema, validation, and environment workflows              |
 | Orval                    | OpenAPI-generated fetch, TanStack Query, MSW, and Faker clients        |
 | Hono creator skill       | Routing, middleware, Worker runtime, and request testing               |
+| Drizzle ORM              | Schema, queries, and Kit workflows (D1/RQB v2 overrides in launchpad)  |
 | `launchpad-architecture` | Repository-specific invariants and conflict resolution                 |
 
 The source and content hash for downloaded skills are recorded in `skills-lock.json`. The

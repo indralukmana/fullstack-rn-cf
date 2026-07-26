@@ -1,6 +1,6 @@
 ---
 name: launchpad-architecture
-description: Applies this repository's Cloudflare, Expo, authentication, billing, generated-client, and release invariants. Use when changing architecture, Hono routes, D1 schema or migrations, Better Auth, organizations, Stripe, RevenueCat, entitlements, Expo native flows, Varlock configuration, or release automation in this launchpad.
+description: Applies this repository's Cloudflare, Expo, authentication, billing, generated-client, Drizzle/D1, and release invariants. Use when changing architecture, Hono routes, D1 schema or migrations, Better Auth, organizations, Stripe, RevenueCat, entitlements, Expo native flows, Varlock configuration, or release automation in this launchpad.
 ---
 
 # Launchpad architecture
@@ -53,6 +53,11 @@ routes money to third parties.
   Drizzle ORM 1 uses nested `drizzle/<folder>/migration.sql` files and RQB v2 relations in
   `apps/api/src/db/relations.ts` (not `relations()` beside table schemas).
   Never hand-edit generated auth schema casually.
+- When the vendor `drizzle-orm` skill shows PostgreSQL tables, flat `*.sql` migrations, or RQB v1
+  `relations()` / callback `where` filters, follow this launchpad instead: SQLite/`sqliteTable`,
+  Wrangler `migrations_pattern = "drizzle/*/migration.sql"`, `defineRelations()`, and object
+  `where` filters. Apply migrations with Wrangler D1 (`db:migrate:local` / approved remote), not
+  generic Node migrate scripts, unless the user asks otherwise.
 
 ## Worker and data rules
 
