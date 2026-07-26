@@ -56,7 +56,7 @@ const DEFAULT_DEV_CORS_ORIGINS = [
   "http://127.0.0.1:19006",
 ];
 
-const NATIVE_TRUSTED_ORIGINS = ["rn-cf://", "exp://"];
+const NATIVE_TRUSTED_ORIGINS = ["rncf://", "exp://"];
 
 function parseList(value: string | undefined): string[] {
   if (!value?.trim()) {

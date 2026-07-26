@@ -16,6 +16,7 @@ export default defineConfig({
         { label: "Architecture", slug: "architecture" },
         { label: "Authentication", slug: "auth" },
         { label: "Billing", slug: "billing" },
+        { label: "Native Release", slug: "native-release" },
         { label: "Security", slug: "security" },
         { label: "API Reference", slug: "api-reference" },
         { label: "Testing", slug: "testing" },

@@ -5,15 +5,23 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "rn-cf",
+    "scheme": "rncf",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
     "experiments": {
       "typedRoutes": true
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.example.rncf"
+      "bundleIdentifier": "com.rncf.launchpad",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
@@ -22,7 +30,8 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.example.rncf",
+      "package": "com.rncf.launchpad",
+      "versionCode": 1,
       "predictiveBackGestureEnabled": false
     },
     "web": {

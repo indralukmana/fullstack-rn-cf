@@ -1,0 +1,63 @@
+.native_release:
+  variables:
+    EXPO_NO_TELEMETRY: "1"
+  before_script:
+    - test -n "$EXPO_TOKEN"
+    - corepack enable
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install --frozen-lockfile
+  rules:
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+      when: manual
+    - when: never
+
+native:preview:
+  extends: .native_release
+  stage: build
+  allow_failure: true
+  script:
+    - pnpm dlx eas-cli@latest build --platform all --profile preview --non-interactive --no-wait
+
+native:production:
+  extends: .native_release
+  stage: release
+  allow_failure: false
+  environment:
+    name: native-production
+  script:
+    - pnpm dlx eas-cli@latest build --platform all --profile production --non-interactive --no-wait
+
+native:submit:
+  extends: .native_release
+  stage: release
+  allow_failure: false
+  environment:
+    name: native-production
+  script:
+    - pnpm dlx eas-cli@latest submit --platform all --profile production --latest --non-interactive
+
+native:update:preview:
+  extends: .native_release
+  stage: release
+  allow_failure: true
+  script:
+    - pnpm dlx eas-cli@latest update --channel preview --message "$CI_COMMIT_TITLE" --non-interactive
+
+native:update:production:
+  extends: .native_release
+  stage: release
+  allow_failure: false
+  environment:
+    name: native-production
+  script:
+    - pnpm dlx eas-cli@latest update --channel production --message "$CI_COMMIT_TITLE" --rollout-percentage="${EAS_ROLLOUT_PERCENTAGE:-10}" --non-interactive
+
+native:update:rollback:
+  extends: .native_release
+  stage: release
+  allow_failure: false
+  environment:
+    name: native-production
+  script:
+    - test -n "$EAS_UPDATE_GROUP_ID"
+    - pnpm dlx eas-cli@latest update:rollback "$EAS_UPDATE_GROUP_ID" --non-interactive
