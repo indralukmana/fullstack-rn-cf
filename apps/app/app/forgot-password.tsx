@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button, Field, QuietLink, Screen, ScreenLead, ScreenTitle } from "@/components/ui";
 import { appCallbackUrl } from "@/lib/app-url";
 import { authClient } from "@/lib/auth-client";
+import { validateEmail } from "@/lib/validation";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
@@ -11,10 +12,16 @@ export default function ForgotPasswordScreen() {
   const [pending, setPending] = useState(false);
 
   async function onSubmit() {
+    const nextError = validateEmail(email);
+    setError(nextError);
+    if (nextError) {
+      return;
+    }
+
     setPending(true);
     setError(null);
     const result = await authClient.requestPasswordReset({
-      email,
+      email: email.trim(),
       redirectTo: appCallbackUrl("/reset-password"),
     });
     setPending(false);
@@ -26,7 +33,7 @@ export default function ForgotPasswordScreen() {
 
     router.replace({
       pathname: "/check-email",
-      params: { email, purpose: "reset" },
+      params: { email: email.trim(), purpose: "reset" },
     });
   }
 

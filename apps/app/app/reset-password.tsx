@@ -4,6 +4,7 @@ import { View } from "react-native";
 
 import { Button, Field, QuietLink, Screen, ScreenTitle, StatusText } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
+import { validatePassword, validatePasswordConfirmation } from "@/lib/validation";
 
 export default function ResetPasswordScreen() {
   const params = useLocalSearchParams<{ token?: string; error?: string }>();
@@ -18,6 +19,7 @@ export default function ResetPasswordScreen() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [formError, setFormError] = useState<string | null>(paramError);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [confirmError, setConfirmError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -26,15 +28,16 @@ export default function ResetPasswordScreen() {
       setFormError("Missing or invalid reset token");
       return;
     }
-    if (password !== confirm) {
-      setConfirmError("Passwords do not match");
-      setFormError(null);
+    const nextPasswordError = validatePassword(password);
+    const nextConfirmError = validatePasswordConfirmation(password, confirm);
+    setPasswordError(nextPasswordError);
+    setConfirmError(nextConfirmError);
+    setFormError(null);
+    if (nextPasswordError || nextConfirmError) {
       return;
     }
 
     setPending(true);
-    setFormError(null);
-    setConfirmError(null);
     const result = await authClient.resetPassword({
       newPassword: password,
       token,
@@ -60,8 +63,14 @@ export default function ResetPasswordScreen() {
       <View className="gap-3">
         <Field
           autoComplete="new-password"
+          error={passwordError}
           label="New password"
-          onChangeText={setPassword}
+          onChangeText={(value) => {
+            setPassword(value);
+            if (passwordError) {
+              setPasswordError(null);
+            }
+          }}
           placeholder="New password"
           secureTextEntry
           value={password}

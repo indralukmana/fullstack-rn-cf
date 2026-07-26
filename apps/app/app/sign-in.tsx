@@ -5,19 +5,29 @@ import { View } from "react-native";
 import { Button, Field, QuietLink, Screen, ScreenTitle } from "@/components/ui";
 import { appCallbackUrl } from "@/lib/app-url";
 import { authClient } from "@/lib/auth-client";
+import { validateEmail, validatePassword } from "@/lib/validation";
 
 export default function SignInScreen() {
   const params = useLocalSearchParams<{ returnTo?: string }>();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   async function onSubmit() {
+    const nextEmailError = validateEmail(email);
+    const nextPasswordError = validatePassword(password);
+    setEmailError(nextEmailError);
+    setPasswordError(nextPasswordError);
+    if (nextEmailError || nextPasswordError) {
+      return;
+    }
+
     setPending(true);
-    setError(null);
+    setPasswordError(null);
     const result = await authClient.signIn.email({
-      email,
+      email: email.trim(),
       password,
       callbackURL: appCallbackUrl("/me"),
     });
@@ -28,11 +38,11 @@ export default function SignInScreen() {
       if (/verif/i.test(message) || result.error.code === "EMAIL_NOT_VERIFIED") {
         router.replace({
           pathname: "/check-email",
-          params: { email, purpose: "verify" },
+          params: { email: email.trim(), purpose: "verify" },
         });
         return;
       }
-      setError(message);
+      setPasswordError(message);
       return;
     }
 
@@ -66,20 +76,26 @@ export default function SignInScreen() {
         <Field
           autoCapitalize="none"
           autoComplete="email"
+          error={emailError}
           keyboardType="email-address"
           label="Email"
-          onChangeText={setEmail}
+          onChangeText={(value) => {
+            setEmail(value);
+            if (emailError) {
+              setEmailError(null);
+            }
+          }}
           placeholder="Email"
           value={email}
         />
         <Field
           autoComplete="password"
-          error={error}
+          error={passwordError}
           label="Password"
           onChangeText={(value) => {
             setPassword(value);
-            if (error) {
-              setError(null);
+            if (passwordError) {
+              setPasswordError(null);
             }
           }}
           placeholder="Password"
