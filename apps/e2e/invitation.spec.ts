@@ -12,5 +12,5 @@ test("returns signed-out invitees to the invitation after sign-in", async ({ pag
   await page.getByRole("link", { name: "Sign in to continue" }).click();
 
   await expect(page).toHaveURL(/\/sign-in\?.*returnTo=/);
-  await expect(page.getByLabel("Email")).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Email" })).toBeVisible();
 });

@@ -5,7 +5,7 @@ import { registerViaUi } from "./helpers/auth";
 test.describe("personal subscription", () => {
   test("protects the paywall from signed-out visitors", async ({ page }) => {
     await page.goto("/subscription");
-    await expect(page.getByLabel("Email")).toBeVisible();
+    await expect(page.getByRole("textbox", { name: "Email" })).toBeVisible();
   });
 
   test("shows server-authoritative web plans to a verified free user", async ({

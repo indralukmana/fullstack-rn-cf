@@ -95,8 +95,8 @@ export async function registerViaUi(
   const password = options.password ?? TEST_PASSWORD;
 
   await page.goto("/sign-up");
-  await page.getByLabel("Name", { exact: true }).fill(name);
-  await page.getByLabel("Email", { exact: true }).fill(email);
+  await page.getByRole("textbox", { name: "Name" }).fill(name);
+  await page.getByRole("textbox", { name: "Email" }).fill(email);
   await page.getByRole("textbox", { name: "Password" }).fill(password);
   await page.getByRole("button", { name: "Create account" }).click();
 

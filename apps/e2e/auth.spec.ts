@@ -23,7 +23,7 @@ test("forgot password flow reaches check-email", async ({ page, request }) => {
   });
 
   await page.goto("/forgot-password");
-  await page.getByLabel("Email").fill(email);
+  await page.getByRole("textbox", { name: "Email" }).fill(email);
   await page.getByRole("button", { name: "Send reset link" }).click();
 
   await expect(page).toHaveURL(/\/check-email/);
@@ -49,8 +49,8 @@ test("duplicate sign-up follows the check-email path without leaking accounts", 
   expect(firstSignUp.ok()).toBeTruthy();
 
   await page.goto("/sign-up");
-  await page.getByLabel("Name", { exact: true }).fill("Another User");
-  await page.getByLabel("Email", { exact: true }).fill(email);
+  await page.getByRole("textbox", { name: "Name" }).fill("Another User");
+  await page.getByRole("textbox", { name: "Email" }).fill(email);
   await page.getByRole("textbox", { name: "Password" }).fill(TEST_PASSWORD);
   await page.getByRole("button", { name: "Create account" }).click();
 
