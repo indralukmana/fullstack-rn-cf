@@ -53,13 +53,25 @@ export function ScreenLead({ children }: { children: ReactNode }) {
   return <Text className="text-base leading-6 text-slate-600">{children}</Text>;
 }
 
-export function Field(props: TextInputProps) {
-  const { className, ...rest } = props;
+export function Field({
+  label,
+  error,
+  className,
+  ...rest
+}: TextInputProps & {
+  label: string;
+  error?: string | null;
+}) {
   return (
-    <TextInput
-      className={className ? `${fieldClassName} ${className}` : fieldClassName}
-      {...rest}
-    />
+    <View className="gap-1.5">
+      <Text className="text-sm font-medium text-slate-700">{label}</Text>
+      <TextInput
+        accessibilityLabel={label}
+        className={className ? `${fieldClassName} ${className}` : fieldClassName}
+        {...rest}
+      />
+      {error ? <StatusText>{error}</StatusText> : null}
+    </View>
   );
 }
 

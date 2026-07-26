@@ -2,7 +2,7 @@ import { Link, router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
 
-import { Button, Field, QuietLinkText, Screen, ScreenTitle, StatusText } from "@/components/ui";
+import { Button, Field, QuietLinkText, Screen, ScreenTitle } from "@/components/ui";
 import { appCallbackUrl } from "@/lib/app-url";
 import { authClient } from "@/lib/auth-client";
 
@@ -67,19 +67,26 @@ export default function SignInScreen() {
           autoCapitalize="none"
           autoComplete="email"
           keyboardType="email-address"
+          label="Email"
           onChangeText={setEmail}
           placeholder="Email"
           value={email}
         />
         <Field
           autoComplete="password"
-          onChangeText={setPassword}
+          error={error}
+          label="Password"
+          onChangeText={(value) => {
+            setPassword(value);
+            if (error) {
+              setError(null);
+            }
+          }}
           placeholder="Password"
           secureTextEntry
           value={password}
         />
       </View>
-      {error ? <StatusText>{error}</StatusText> : null}
       <Button disabled={pending} label={pending ? "Signing in…" : "Sign in"} onPress={onSubmit} />
       <View className="gap-3">
         <Link href="/forgot-password">

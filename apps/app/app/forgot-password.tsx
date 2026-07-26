@@ -1,15 +1,7 @@
 import { Link, router } from "expo-router";
 import { useState } from "react";
 
-import {
-  Button,
-  Field,
-  QuietLinkText,
-  Screen,
-  ScreenLead,
-  ScreenTitle,
-  StatusText,
-} from "@/components/ui";
+import { Button, Field, QuietLinkText, Screen, ScreenLead, ScreenTitle } from "@/components/ui";
 import { appCallbackUrl } from "@/lib/app-url";
 import { authClient } from "@/lib/auth-client";
 
@@ -45,12 +37,18 @@ export default function ForgotPasswordScreen() {
       <Field
         autoCapitalize="none"
         autoComplete="email"
+        error={error}
         keyboardType="email-address"
-        onChangeText={setEmail}
+        label="Email"
+        onChangeText={(value) => {
+          setEmail(value);
+          if (error) {
+            setError(null);
+          }
+        }}
         placeholder="Email"
         value={email}
       />
-      {error ? <StatusText>{error}</StatusText> : null}
       <Button
         disabled={pending}
         label={pending ? "Sending…" : "Send reset link"}

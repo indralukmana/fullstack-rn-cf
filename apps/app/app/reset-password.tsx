@@ -17,21 +17,24 @@ export default function ResetPasswordScreen() {
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState<string | null>(paramError);
+  const [formError, setFormError] = useState<string | null>(paramError);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   async function onSubmit() {
     if (!token) {
-      setError("Missing or invalid reset token");
+      setFormError("Missing or invalid reset token");
       return;
     }
     if (password !== confirm) {
-      setError("Passwords do not match");
+      setConfirmError("Passwords do not match");
+      setFormError(null);
       return;
     }
 
     setPending(true);
-    setError(null);
+    setFormError(null);
+    setConfirmError(null);
     const result = await authClient.resetPassword({
       newPassword: password,
       token,
@@ -39,7 +42,7 @@ export default function ResetPasswordScreen() {
     setPending(false);
 
     if (result.error) {
-      setError(result.error.message ?? "Could not reset password");
+      setFormError(result.error.message ?? "Could not reset password");
       return;
     }
 
@@ -57,6 +60,7 @@ export default function ResetPasswordScreen() {
       <View className="gap-3">
         <Field
           autoComplete="new-password"
+          label="New password"
           onChangeText={setPassword}
           placeholder="New password"
           secureTextEntry
@@ -64,13 +68,20 @@ export default function ResetPasswordScreen() {
         />
         <Field
           autoComplete="new-password"
-          onChangeText={setConfirm}
+          error={confirmError}
+          label="Confirm password"
+          onChangeText={(value) => {
+            setConfirm(value);
+            if (confirmError) {
+              setConfirmError(null);
+            }
+          }}
           placeholder="Confirm password"
           secureTextEntry
           value={confirm}
         />
       </View>
-      {error ? <StatusText>{error}</StatusText> : null}
+      {formError ? <StatusText>{formError}</StatusText> : null}
       <Button
         disabled={pending || !token}
         label={pending ? "Saving…" : "Update password"}

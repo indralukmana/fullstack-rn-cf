@@ -139,6 +139,7 @@ export default function OrganizationsScreen() {
         <View className="gap-3">
           <Field
             autoComplete="organization"
+            label="Organization name"
             onChangeText={setName}
             placeholder="Organization name"
             value={name}
@@ -146,6 +147,7 @@ export default function OrganizationsScreen() {
           <Field
             autoCapitalize="none"
             autoCorrect={false}
+            label="Slug"
             onChangeText={setSlug}
             placeholder="organization-slug"
             value={slug}

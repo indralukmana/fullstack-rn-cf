@@ -97,6 +97,7 @@ export default function AccountDataScreen() {
         <View className="gap-3">
           <Field
             autoCapitalize="characters"
+            label="Confirmation"
             onChangeText={setConfirmation}
             placeholder="Type DELETE"
             value={confirmation}
