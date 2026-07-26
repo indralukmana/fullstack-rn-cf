@@ -81,6 +81,13 @@ export async function verifyEmailFromMailbox(
   await expect(page.getByRole("heading", { name: "Account" }).last()).toBeVisible();
 }
 
+async function fillTextbox(page: Page, label: string, value: string) {
+  const input = page.getByRole("textbox", { name: label });
+  await input.click();
+  await input.fill(value);
+  await expect(input).toHaveValue(value);
+}
+
 export async function registerViaUi(
   page: Page,
   request: APIRequestContext,
@@ -95,9 +102,9 @@ export async function registerViaUi(
   const password = options.password ?? TEST_PASSWORD;
 
   await page.goto("/sign-up");
-  await page.getByRole("textbox", { name: "Name" }).fill(name);
-  await page.getByRole("textbox", { name: "Email" }).fill(email);
-  await page.getByRole("textbox", { name: "Password" }).fill(password);
+  await fillTextbox(page, "Name", name);
+  await fillTextbox(page, "Email", email);
+  await fillTextbox(page, "Password", password);
   await page.getByRole("button", { name: "Create account" }).click();
 
   await expect(page).toHaveURL(/\/check-email/, { timeout: 15_000 });
