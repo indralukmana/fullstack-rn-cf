@@ -1,7 +1,15 @@
 import { Link, router } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
 
+import {
+  Button,
+  Field,
+  QuietLinkText,
+  Screen,
+  ScreenLead,
+  ScreenTitle,
+  StatusText,
+} from "@/components/ui";
 import { appCallbackUrl } from "@/lib/app-url";
 import { authClient } from "@/lib/auth-client";
 
@@ -31,36 +39,26 @@ export default function ForgotPasswordScreen() {
   }
 
   return (
-    <View className="flex-1 justify-center gap-4 bg-slate-50 px-6">
-      <Text accessibilityRole="header" className="text-2xl font-bold text-slate-900">
-        Forgot password
-      </Text>
-      <Text className="text-base text-slate-700">
-        Enter your email and we will send a reset link if an account exists.
-      </Text>
-      <TextInput
+    <Screen centered>
+      <ScreenTitle>Forgot password</ScreenTitle>
+      <ScreenLead>Enter your email and we will send a reset link if an account exists.</ScreenLead>
+      <Field
         autoCapitalize="none"
         autoComplete="email"
-        className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900"
         keyboardType="email-address"
         onChangeText={setEmail}
         placeholder="Email"
         value={email}
       />
-      {error ? <Text className="text-sm text-red-600">{error}</Text> : null}
-      <Pressable
-        accessibilityRole="button"
-        className="rounded-lg bg-slate-900 px-5 py-3"
+      {error ? <StatusText>{error}</StatusText> : null}
+      <Button
         disabled={pending}
+        label={pending ? "Sending…" : "Send reset link"}
         onPress={onSubmit}
-      >
-        <Text className="text-center font-semibold text-white">
-          {pending ? "Sending…" : "Send reset link"}
-        </Text>
-      </Pressable>
-      <Link href="/sign-in" className="text-center text-slate-600">
-        Back to sign in
+      />
+      <Link href="/sign-in">
+        <QuietLinkText>Back to sign in</QuietLinkText>
       </Link>
-    </View>
+    </Screen>
   );
 }

@@ -1,7 +1,8 @@
 import { Link, router } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { View } from "react-native";
 
+import { Button, Field, QuietLinkText, Screen, ScreenTitle, StatusText } from "@/components/ui";
 import { appCallbackUrl } from "@/lib/app-url";
 import { authClient } from "@/lib/auth-client";
 
@@ -35,48 +36,35 @@ export default function SignUpScreen() {
   }
 
   return (
-    <View className="flex-1 justify-center gap-4 bg-slate-50 px-6">
-      <Text accessibilityRole="header" className="text-2xl font-bold text-slate-900">
-        Get started
-      </Text>
-      <TextInput
-        autoComplete="name"
-        className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900"
-        onChangeText={setName}
-        placeholder="Name"
-        value={name}
-      />
-      <TextInput
-        autoCapitalize="none"
-        autoComplete="email"
-        className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900"
-        keyboardType="email-address"
-        onChangeText={setEmail}
-        placeholder="Email"
-        value={email}
-      />
-      <TextInput
-        autoComplete="new-password"
-        className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900"
-        onChangeText={setPassword}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-      />
-      {error ? <Text className="text-sm text-red-600">{error}</Text> : null}
-      <Pressable
-        accessibilityRole="button"
-        className="rounded-lg bg-slate-900 px-5 py-3"
+    <Screen centered>
+      <ScreenTitle>Get started</ScreenTitle>
+      <View className="gap-3">
+        <Field autoComplete="name" onChangeText={setName} placeholder="Name" value={name} />
+        <Field
+          autoCapitalize="none"
+          autoComplete="email"
+          keyboardType="email-address"
+          onChangeText={setEmail}
+          placeholder="Email"
+          value={email}
+        />
+        <Field
+          autoComplete="new-password"
+          onChangeText={setPassword}
+          placeholder="Password"
+          secureTextEntry
+          value={password}
+        />
+      </View>
+      {error ? <StatusText>{error}</StatusText> : null}
+      <Button
         disabled={pending}
+        label={pending ? "Creating account…" : "Create account"}
         onPress={onSubmit}
-      >
-        <Text className="text-center font-semibold text-white">
-          {pending ? "Creating account…" : "Create account"}
-        </Text>
-      </Pressable>
-      <Link href="/sign-in" className="text-center text-slate-600">
-        Already have an account? Sign in
+      />
+      <Link href="/sign-in">
+        <QuietLinkText>Already have an account? Sign in</QuietLinkText>
       </Link>
-    </View>
+    </Screen>
   );
 }

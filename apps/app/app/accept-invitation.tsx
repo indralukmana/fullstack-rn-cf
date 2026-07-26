@@ -1,7 +1,15 @@
 import { Link, router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
 
+import {
+  Button,
+  LoadingScreen,
+  QuietLinkText,
+  Screen,
+  ScreenLead,
+  ScreenTitle,
+  StatusText,
+} from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 
 export default function AcceptInvitationScreen() {
@@ -31,49 +39,28 @@ export default function AcceptInvitationScreen() {
   }
 
   if (sessionPending) {
-    return (
-      <View className="flex-1 items-center justify-center bg-slate-50 px-6">
-        <Text className="text-slate-700">Checking your account…</Text>
-      </View>
-    );
+    return <LoadingScreen label="Checking your account…" />;
   }
 
   return (
-    <View className="flex-1 justify-center gap-4 bg-slate-50 px-6">
-      <Text accessibilityRole="header" className="text-2xl font-bold text-slate-900">
-        Organization invitation
-      </Text>
+    <Screen centered>
+      <ScreenTitle>Organization invitation</ScreenTitle>
 
       {!invitationId ? (
-        <Text accessibilityRole="alert" className="text-sm text-red-600">
-          This invitation link is incomplete.
-        </Text>
+        <StatusText>This invitation link is incomplete.</StatusText>
       ) : session?.user ? (
         <>
-          <Text className="text-base text-slate-700">
-            Accept this invitation as {session.user.email}.
-          </Text>
-          {error ? (
-            <Text accessibilityRole="alert" className="text-sm text-red-600">
-              {error}
-            </Text>
-          ) : null}
-          <Pressable
-            accessibilityRole="button"
-            className="rounded-lg bg-slate-900 px-5 py-3"
+          <ScreenLead>Accept this invitation as {session.user.email}.</ScreenLead>
+          {error ? <StatusText>{error}</StatusText> : null}
+          <Button
             disabled={pending}
+            label={pending ? "Accepting…" : "Accept invitation"}
             onPress={onAccept}
-          >
-            <Text className="text-center font-semibold text-white">
-              {pending ? "Accepting…" : "Accept invitation"}
-            </Text>
-          </Pressable>
+          />
         </>
       ) : (
         <>
-          <Text className="text-base text-slate-700">
-            Sign in with the invited email address before accepting.
-          </Text>
+          <ScreenLead>Sign in with the invited email address before accepting.</ScreenLead>
           <Link
             href={{
               pathname: "/sign-in",
@@ -83,16 +70,14 @@ export default function AcceptInvitationScreen() {
             }}
             asChild
           >
-            <Pressable accessibilityRole="button" className="rounded-lg bg-slate-900 px-5 py-3">
-              <Text className="text-center font-semibold text-white">Sign in to continue</Text>
-            </Pressable>
+            <Button label="Sign in to continue" />
           </Link>
         </>
       )}
 
-      <Link href="/" className="text-center text-slate-600">
-        Back to home
+      <Link href="/">
+        <QuietLinkText>Back to home</QuietLinkText>
       </Link>
-    </View>
+    </Screen>
   );
 }

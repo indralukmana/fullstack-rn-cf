@@ -1,7 +1,18 @@
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
+import {
+  Button,
+  Field,
+  LoadingScreen,
+  QuietLinkText,
+  Screen,
+  ScreenLead,
+  ScreenTitle,
+  Section,
+  StatusText,
+} from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -75,99 +86,82 @@ export default function OrganizationsScreen() {
   }
 
   if (sessionPending || organizations.isPending || activeOrganization.isPending) {
-    return (
-      <View className="flex-1 items-center justify-center bg-slate-50 px-6">
-        <Text className="text-slate-700">Loading organizations…</Text>
-      </View>
-    );
+    return <LoadingScreen label="Loading organizations…" />;
   }
 
   if (!session?.user) {
     return (
-      <View className="flex-1 justify-center gap-4 bg-slate-50 px-6">
-        <Text accessibilityRole="header" className="text-2xl font-bold text-slate-900">
-          Organizations
-        </Text>
-        <Text className="text-slate-700">Sign in to manage organizations.</Text>
-        <Link href="/sign-in" className="text-center font-semibold text-slate-900">
-          Sign in
+      <Screen centered>
+        <ScreenTitle>Organizations</ScreenTitle>
+        <ScreenLead>Sign in to manage organizations.</ScreenLead>
+        <Link href="/sign-in" asChild>
+          <Button label="Sign in" />
         </Link>
-      </View>
+      </Screen>
     );
   }
 
   return (
-    <View className="flex-1 gap-5 bg-slate-50 px-6 py-8">
-      <Text accessibilityRole="header" className="text-2xl font-bold text-slate-900">
-        Organizations
-      </Text>
+    <Screen scroll>
+      <ScreenTitle>Organizations</ScreenTitle>
 
-      <View className="gap-3 rounded-xl border border-slate-200 bg-white p-4">
-        <Text className="text-base font-semibold text-slate-900">Your organizations</Text>
+      <Section title="Your organizations">
         {organizations.data?.length ? (
-          organizations.data.map((organization) => {
-            const active = organization.id === activeOrganization.data?.id;
-            return (
-              <Pressable
-                key={organization.id}
-                accessibilityRole="button"
-                accessibilityState={{ selected: active, disabled: pending }}
-                className={`rounded-lg border px-4 py-3 ${
-                  active ? "border-slate-900 bg-slate-100" : "border-slate-200 bg-white"
-                }`}
-                disabled={pending || active}
-                onPress={() => onSelect(organization.id)}
-              >
-                <Text className="font-semibold text-slate-900">{organization.name}</Text>
-                <Text className="text-sm text-slate-500">
-                  {organization.slug}
-                  {active ? " · active" : ""}
-                </Text>
-              </Pressable>
-            );
-          })
+          <View className="gap-2">
+            {organizations.data.map((organization) => {
+              const active = organization.id === activeOrganization.data?.id;
+              return (
+                <Pressable
+                  key={organization.id}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: active, disabled: pending }}
+                  className={`rounded-lg border px-4 py-3.5 ${
+                    active ? "border-slate-900 bg-slate-100" : "border-slate-300 bg-white"
+                  }`}
+                  disabled={pending || active}
+                  onPress={() => onSelect(organization.id)}
+                >
+                  <Text className="font-semibold text-slate-900">{organization.name}</Text>
+                  <Text className="text-sm text-slate-500">
+                    {organization.slug}
+                    {active ? " · active" : ""}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
         ) : (
-          <Text className="text-slate-600">Create your first organization below.</Text>
+          <Text className="text-base text-slate-600">Create your first organization below.</Text>
         )}
-      </View>
+      </Section>
 
-      <View className="gap-3 rounded-xl border border-slate-200 bg-white p-4">
-        <Text className="text-base font-semibold text-slate-900">Create organization</Text>
-        <TextInput
-          autoComplete="organization"
-          className="rounded-lg border border-slate-300 px-4 py-3 text-slate-900"
-          onChangeText={setName}
-          placeholder="Organization name"
-          value={name}
-        />
-        <TextInput
-          autoCapitalize="none"
-          autoCorrect={false}
-          className="rounded-lg border border-slate-300 px-4 py-3 text-slate-900"
-          onChangeText={setSlug}
-          placeholder="organization-slug"
-          value={slug}
-        />
-        {error ? (
-          <Text accessibilityRole="alert" className="text-sm text-red-600">
-            {error}
-          </Text>
-        ) : null}
-        <Pressable
-          accessibilityRole="button"
-          className="rounded-lg bg-slate-900 px-5 py-3"
-          disabled={pending}
-          onPress={onCreate}
-        >
-          <Text className="text-center font-semibold text-white">
-            {pending ? "Saving…" : "Create organization"}
-          </Text>
-        </Pressable>
-      </View>
+      <Section title="Create organization">
+        <View className="gap-3">
+          <Field
+            autoComplete="organization"
+            onChangeText={setName}
+            placeholder="Organization name"
+            value={name}
+          />
+          <Field
+            autoCapitalize="none"
+            autoCorrect={false}
+            onChangeText={setSlug}
+            placeholder="organization-slug"
+            value={slug}
+          />
+          {error ? <StatusText>{error}</StatusText> : null}
+          <Button
+            disabled={pending}
+            label={pending ? "Saving…" : "Create organization"}
+            onPress={onCreate}
+          />
+        </View>
+      </Section>
 
-      <Link href="/me" className="text-center text-slate-600">
-        Back to account
+      <Link href="/me">
+        <QuietLinkText>Back to account</QuietLinkText>
       </Link>
-    </View>
+    </Screen>
   );
 }

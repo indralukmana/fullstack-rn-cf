@@ -1,38 +1,28 @@
 import { Link } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { View } from "react-native";
+
+import { Button, QuietLinkText, Screen, ScreenLead, ScreenTitle } from "@/components/ui";
 
 export default function HomeScreen() {
   return (
-    <View className="flex-1 items-center justify-center gap-6 bg-slate-50 px-6">
-      <Text accessibilityRole="header" className="text-center text-4xl font-bold text-slate-900">
-        RN CF
-      </Text>
-      <Text className="max-w-md text-center text-base text-slate-600">
-        Cloudflare Workers API with a universal Expo app for iOS, Android, and web.
-      </Text>
-      <View className="flex-row flex-wrap items-center justify-center gap-3">
+    <Screen centered>
+      <View className="gap-3">
+        <ScreenTitle>RN CF</ScreenTitle>
+        <ScreenLead>
+          A Cloudflare Workers API with a universal Expo app for web, iOS, and Android.
+        </ScreenLead>
+      </View>
+      <View className="gap-3">
         <Link href="/sign-up" asChild>
-          <Pressable accessibilityRole="button" className="rounded-lg bg-slate-900 px-5 py-3">
-            <Text className="font-semibold text-white">Get started</Text>
-          </Pressable>
+          <Button label="Get started" />
         </Link>
         <Link href="/sign-in" asChild>
-          <Pressable
-            accessibilityRole="button"
-            className="rounded-lg border border-slate-300 bg-white px-5 py-3"
-          >
-            <Text className="font-semibold text-slate-900">Sign in</Text>
-          </Pressable>
+          <Button label="Sign in" variant="secondary" />
         </Link>
-        <Link href="/me" asChild>
-          <Pressable
-            accessibilityRole="button"
-            className="rounded-lg border border-slate-300 bg-white px-5 py-3"
-          >
-            <Text className="font-semibold text-slate-900">Account</Text>
-          </Pressable>
+        <Link href="/me">
+          <QuietLinkText>Account</QuietLinkText>
         </Link>
       </View>
-    </View>
+    </Screen>
   );
 }

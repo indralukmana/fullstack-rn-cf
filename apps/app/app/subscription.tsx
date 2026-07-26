@@ -8,8 +8,18 @@ import {
 import * as Linking from "expo-linking";
 import { Link, Redirect } from "expo-router";
 import { useEffect, useState } from "react";
-import { Platform, Pressable, ScrollView, Text, View } from "react-native";
+import { Platform, Text, View } from "react-native";
 
+import {
+  Button,
+  LoadingScreen,
+  QuietLinkText,
+  Screen,
+  ScreenLead,
+  ScreenTitle,
+  Section,
+  StatusText,
+} from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 import {
   configureNativeBilling,
@@ -65,34 +75,26 @@ export default function SubscriptionScreen() {
   }, [session?.user.id]);
 
   if (sessionPending) {
-    return (
-      <View className="flex-1 items-center justify-center bg-slate-50">
-        <Text className="text-slate-700">Checking your account…</Text>
-      </View>
-    );
+    return <LoadingScreen label="Checking your account…" />;
   }
   if (!session?.user) {
     return <Redirect href="/sign-in?returnTo=/subscription" />;
   }
   if (!session.user.emailVerified) {
     return (
-      <View className="flex-1 items-center justify-center gap-4 bg-slate-50 px-6">
-        <Text accessibilityRole="header" className="text-xl font-bold text-slate-900">
-          Verify your account
-        </Text>
-        <Text className="text-center text-slate-600">
-          Verify {session.user.email} before choosing a subscription.
-        </Text>
+      <Screen centered>
+        <ScreenTitle>Verify your account</ScreenTitle>
+        <ScreenLead>Verify {session.user.email} before choosing a subscription.</ScreenLead>
         <Link
           href={{
             pathname: "/check-email",
             params: { email: session.user.email, purpose: "verify" },
           }}
-          className="font-semibold text-slate-900"
+          asChild
         >
-          Continue verification
+          <Button label="Continue verification" />
         </Link>
-      </View>
+      </Screen>
     );
   }
 
@@ -156,15 +158,12 @@ export default function SubscriptionScreen() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-slate-50" contentContainerClassName="gap-4 px-6 py-8">
-      <Text accessibilityRole="header" className="text-2xl font-bold text-slate-900">
-        Pro subscription
-      </Text>
-      <Text className="text-slate-600">One account unlocks Pro on web, iOS, and Android.</Text>
+    <Screen scroll>
+      <ScreenTitle>Pro subscription</ScreenTitle>
+      <ScreenLead>One account unlocks Pro on web, iOS, and Android.</ScreenLead>
 
-      <View className="rounded-xl border border-slate-200 bg-white p-4">
-        <Text className="text-sm font-semibold uppercase text-slate-500">Access</Text>
-        <Text className="mt-2 text-lg font-semibold text-slate-900">
+      <Section title="Access">
+        <Text className="text-lg font-semibold text-slate-900">
           {statusQuery.isLoading
             ? "Checking…"
             : status?.hasAccess
@@ -172,83 +171,66 @@ export default function SubscriptionScreen() {
               : "Free"}
         </Text>
         {activeGrant ? (
-          <Text className="mt-1 text-sm text-slate-600">
+          <Text className="text-sm text-slate-600">
             Managed by {activeGrant.provider === "stripe" ? "Stripe" : "your app store"}
           </Text>
         ) : null}
+      </Section>
+
+      <View className="gap-3">
+        {status?.hasAccess ? (
+          <Button
+            disabled={Boolean(pendingAction)}
+            label="Manage subscription"
+            onPress={() => run("manage", manageSubscription)}
+          />
+        ) : Platform.OS === "web" ? (
+          (["monthly", "yearly"] as const).map((interval) => (
+            <Button
+              key={interval}
+              disabled={Boolean(pendingAction)}
+              label={`Choose ${interval}`}
+              onPress={() => run(interval, () => startWebCheckout(interval))}
+            />
+          ))
+        ) : (
+          <>
+            {nativePackages.map((item) => (
+              <Button
+                key={item.id}
+                disabled={Boolean(pendingAction)}
+                label={`${item.interval} · ${item.price}`}
+                onPress={() => run(item.id, () => buyNative(item))}
+              />
+            ))}
+            <Button
+              disabled={Boolean(pendingAction)}
+              label="Restore purchases"
+              onPress={() =>
+                run("restore", async () => {
+                  await restoreNativePurchases();
+                  await refreshStatus();
+                })
+              }
+              variant="secondary"
+            />
+          </>
+        )}
+
+        <Button
+          disabled={Boolean(pendingAction)}
+          label="Refresh subscription"
+          onPress={() => run("refresh", refreshStatus)}
+          variant="secondary"
+        />
       </View>
 
-      {status?.hasAccess ? (
-        <Pressable
-          accessibilityRole="button"
-          className="rounded-lg bg-slate-900 px-5 py-3"
-          disabled={Boolean(pendingAction)}
-          onPress={() => run("manage", manageSubscription)}
-        >
-          <Text className="text-center font-semibold text-white">Manage subscription</Text>
-        </Pressable>
-      ) : Platform.OS === "web" ? (
-        <View className="gap-3">
-          {(["monthly", "yearly"] as const).map((interval) => (
-            <Pressable
-              key={interval}
-              accessibilityRole="button"
-              className="rounded-lg bg-slate-900 px-5 py-3"
-              disabled={Boolean(pendingAction)}
-              onPress={() => run(interval, () => startWebCheckout(interval))}
-            >
-              <Text className="text-center font-semibold capitalize text-white">
-                Choose {interval}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-      ) : (
-        <View className="gap-3">
-          {nativePackages.map((item) => (
-            <Pressable
-              key={item.id}
-              accessibilityRole="button"
-              className="rounded-lg bg-slate-900 px-5 py-3"
-              disabled={Boolean(pendingAction)}
-              onPress={() => run(item.id, () => buyNative(item))}
-            >
-              <Text className="text-center font-semibold capitalize text-white">
-                {item.interval} · {item.price}
-              </Text>
-            </Pressable>
-          ))}
-          <Pressable
-            accessibilityRole="button"
-            className="rounded-lg border border-slate-300 bg-white px-5 py-3"
-            disabled={Boolean(pendingAction)}
-            onPress={() =>
-              run("restore", async () => {
-                await restoreNativePurchases();
-                await refreshStatus();
-              })
-            }
-          >
-            <Text className="text-center font-semibold text-slate-900">Restore purchases</Text>
-          </Pressable>
-        </View>
-      )}
+      {pendingAction ? <StatusText tone="muted">Please wait…</StatusText> : null}
+      {error ? <StatusText>{error}</StatusText> : null}
 
-      <Pressable
-        accessibilityRole="button"
-        className="rounded-lg border border-slate-300 bg-white px-5 py-3"
-        disabled={Boolean(pendingAction)}
-        onPress={() => run("refresh", refreshStatus)}
-      >
-        <Text className="text-center font-semibold text-slate-900">Refresh subscription</Text>
-      </Pressable>
-
-      {pendingAction ? <Text className="text-center text-slate-600">Please wait…</Text> : null}
-      {error ? (
-        <Text accessibilityRole="alert" className="text-sm text-red-600">
-          {error}
-        </Text>
-      ) : null}
-    </ScrollView>
+      <Link href="/me">
+        <QuietLinkText>Back to account</QuietLinkText>
+      </Link>
+    </Screen>
   );
 }

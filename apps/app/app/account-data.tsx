@@ -1,8 +1,19 @@
 import { exportAccountData, useDeleteAccount } from "@rn-cf/api-client";
 import { Link, Redirect, router } from "expo-router";
 import { useState } from "react";
-import { Pressable, Share, Text, TextInput, View } from "react-native";
+import { Share, Text, View } from "react-native";
 
+import {
+  Button,
+  Field,
+  LoadingScreen,
+  QuietLinkText,
+  Screen,
+  ScreenLead,
+  ScreenTitle,
+  Section,
+  StatusText,
+} from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 import { clearNativeBillingIdentity } from "@/lib/billing/revenuecat";
 
@@ -21,11 +32,7 @@ export default function AccountDataScreen() {
   const [message, setMessage] = useState<string | null>(null);
 
   if (sessionPending) {
-    return (
-      <View className="flex-1 items-center justify-center bg-slate-50">
-        <Text className="text-slate-700">Checking your account…</Text>
-      </View>
-    );
+    return <LoadingScreen label="Checking your account…" />;
   }
   if (!session?.user) {
     return <Redirect href="/sign-in" />;
@@ -73,53 +80,41 @@ export default function AccountDataScreen() {
   }
 
   return (
-    <View className="flex-1 gap-5 bg-slate-50 px-6 py-8">
-      <Text accessibilityRole="header" className="text-2xl font-bold text-slate-900">
-        Account data
-      </Text>
-      <Text className="text-slate-600">
-        Export a portable copy of account, membership, and subscription data.
-      </Text>
-      <Pressable
-        accessibilityRole="button"
-        className="rounded-lg border border-slate-300 bg-white px-5 py-3"
-        disabled={pending}
-        onPress={onExport}
-      >
-        <Text className="text-center font-semibold text-slate-900">Export my data</Text>
-      </Pressable>
+    <Screen scroll>
+      <ScreenTitle>Account data</ScreenTitle>
+      <ScreenLead>Export a portable copy of account, membership, and subscription data.</ScreenLead>
 
-      <View className="mt-4 gap-3 rounded-xl border border-red-200 bg-white p-4">
-        <Text className="text-lg font-bold text-red-700">Delete account</Text>
-        <Text className="text-sm text-slate-600">
+      <Button disabled={pending} label="Export my data" onPress={onExport} variant="secondary" />
+
+      <Section title="Delete account">
+        <Text className="text-sm leading-5 text-slate-600">
           Apple, Google, and Stripe subscriptions must be managed first. Deleting this account never
           cancels store billing.
         </Text>
-        <Link href="./subscription" className="font-semibold text-slate-900">
-          Manage subscriptions
+        <Link href="./subscription">
+          <Text className="text-base font-semibold text-slate-900">Manage subscriptions</Text>
         </Link>
-        <TextInput
-          autoCapitalize="characters"
-          className="rounded-lg border border-slate-300 px-4 py-3 text-slate-900"
-          onChangeText={setConfirmation}
-          placeholder="Type DELETE"
-          value={confirmation}
-        />
-        <Pressable
-          accessibilityRole="button"
-          className="rounded-lg bg-red-700 px-5 py-3"
-          disabled={pending || confirmation !== "DELETE"}
-          onPress={onDelete}
-        >
-          <Text className="text-center font-semibold text-white">Permanently delete account</Text>
-        </Pressable>
-      </View>
+        <View className="gap-3">
+          <Field
+            autoCapitalize="characters"
+            onChangeText={setConfirmation}
+            placeholder="Type DELETE"
+            value={confirmation}
+          />
+          <Button
+            disabled={pending || confirmation !== "DELETE"}
+            label="Permanently delete account"
+            onPress={onDelete}
+            variant="danger"
+          />
+        </View>
+      </Section>
 
-      {message ? (
-        <Text accessibilityRole="alert" className="text-sm text-red-600">
-          {message}
-        </Text>
-      ) : null}
-    </View>
+      {message ? <StatusText>{message}</StatusText> : null}
+
+      <Link href="/me">
+        <QuietLinkText>Back to account</QuietLinkText>
+      </Link>
+    </Screen>
   );
 }

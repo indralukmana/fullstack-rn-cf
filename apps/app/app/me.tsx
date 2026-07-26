@@ -1,9 +1,17 @@
 import { getGetBillingStatusQueryKey, useGetBillingStatus, useGetMe } from "@rn-cf/api-client";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
-import { Platform } from "react-native";
+import { Platform, Text, View } from "react-native";
 
+import {
+  Button,
+  LoadingScreen,
+  QuietLinkText,
+  Screen,
+  ScreenTitle,
+  Section,
+  StatusText,
+} from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 import { clearNativeBillingIdentity } from "@/lib/billing/revenuecat";
 
@@ -36,96 +44,59 @@ export default function MeScreen() {
     await clearNativeBillingIdentity();
   }
 
+  if (sessionPending || (session?.user && meQuery.isLoading)) {
+    return <LoadingScreen label="Loading account…" />;
+  }
+
   return (
-    <View className="flex-1 gap-4 bg-slate-50 px-6 py-8">
-      <Text accessibilityRole="header" className="text-2xl font-bold text-slate-900">
-        Account
-      </Text>
-      <View className="rounded-xl border border-slate-200 bg-white p-4">
-        <Text className="mb-2 text-sm font-semibold uppercase text-slate-500">Session</Text>
-        {sessionPending ? (
-          <Text className="text-slate-700">Loading session…</Text>
-        ) : session?.user ? (
+    <Screen scroll>
+      <ScreenTitle>Account</ScreenTitle>
+
+      <Section title="Signed in as">
+        {session?.user ? (
           <View className="gap-1">
-            <Text className="text-slate-900">{session.user.name}</Text>
-            <Text className="text-slate-600">{session.user.email}</Text>
+            <Text className="text-lg font-semibold text-slate-900">{session.user.name}</Text>
+            <Text className="text-base text-slate-600">{session.user.email}</Text>
           </View>
         ) : (
-          <Text className="text-slate-700">Signed out</Text>
+          <Text className="text-base text-slate-600">Signed out</Text>
         )}
-      </View>
+      </Section>
 
-      <View className="rounded-xl border border-slate-200 bg-white p-4">
-        <Text className="mb-2 text-sm font-semibold uppercase text-slate-500">/api/me</Text>
-        <Text className="text-slate-700">
-          {meQuery.isLoading
-            ? "Loading…"
-            : meQuery.data?.data.user
-              ? `${meQuery.data.data.user.name} <${meQuery.data.data.user.email}>`
-              : "No authenticated user"}
-        </Text>
-      </View>
-
-      <View className="rounded-xl border border-slate-200 bg-white p-4">
-        <Text className="mb-2 text-sm font-semibold uppercase text-slate-500">Subscription</Text>
+      <Section title="Subscription">
         <Text className="text-lg font-semibold text-slate-900">
           {billingQuery.isLoading ? "Checking…" : billingStatus?.hasAccess ? "Pro" : "Free"}
         </Text>
-        <Link href="./subscription" className="mt-2 font-semibold text-slate-700">
-          View subscription
+        <Link href="./subscription">
+          <Text className="text-base font-semibold text-slate-700">View subscription</Text>
         </Link>
-      </View>
+      </Section>
 
-      {signOutError ? <Text className="text-sm text-red-600">{signOutError}</Text> : null}
+      {signOutError ? <StatusText>{signOutError}</StatusText> : null}
 
-      <View className="flex-row flex-wrap gap-3">
+      <View className="gap-3">
         {session?.user ? (
           <>
             <Link href="./subscription" asChild>
-              <Pressable accessibilityRole="button" className="rounded-lg bg-slate-900 px-5 py-3">
-                <Text className="font-semibold text-white">Subscription</Text>
-              </Pressable>
+              <Button label="Subscription" />
             </Link>
             <Link href="./organizations" asChild>
-              <Pressable
-                accessibilityRole="button"
-                className="rounded-lg border border-slate-300 bg-white px-5 py-3"
-              >
-                <Text className="font-semibold text-slate-900">Organizations</Text>
-              </Pressable>
+              <Button label="Organizations" variant="secondary" />
             </Link>
             <Link href="./account-data" asChild>
-              <Pressable
-                accessibilityRole="button"
-                className="rounded-lg border border-slate-300 bg-white px-5 py-3"
-              >
-                <Text className="font-semibold text-slate-900">Account data</Text>
-              </Pressable>
+              <Button label="Account data" variant="secondary" />
             </Link>
-            <Pressable
-              accessibilityRole="button"
-              className="rounded-lg border border-slate-300 bg-white px-5 py-3"
-              onPress={onSignOut}
-            >
-              <Text className="font-semibold text-slate-900">Sign out</Text>
-            </Pressable>
+            <Button label="Sign out" onPress={onSignOut} variant="secondary" />
           </>
         ) : (
           <Link href="/sign-in" asChild>
-            <Pressable accessibilityRole="button" className="rounded-lg bg-slate-900 px-5 py-3">
-              <Text className="font-semibold text-white">Sign in</Text>
-            </Pressable>
+            <Button label="Sign in" />
           </Link>
         )}
-        <Link href="/" asChild>
-          <Pressable
-            accessibilityRole="button"
-            className="rounded-lg border border-slate-300 bg-white px-5 py-3"
-          >
-            <Text className="font-semibold text-slate-900">Home</Text>
-          </Pressable>
+        <Link href="/">
+          <QuietLinkText>Home</QuietLinkText>
         </Link>
       </View>
-    </View>
+    </Screen>
   );
 }

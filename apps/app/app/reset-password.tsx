@@ -1,7 +1,8 @@
 import { Link, router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { View } from "react-native";
 
+import { Button, Field, QuietLinkText, Screen, ScreenTitle, StatusText } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 
 export default function ResetPasswordScreen() {
@@ -46,45 +47,38 @@ export default function ResetPasswordScreen() {
   }
 
   return (
-    <View className="flex-1 justify-center gap-4 bg-slate-50 px-6">
-      <Text accessibilityRole="header" className="text-2xl font-bold text-slate-900">
-        Choose a new password
-      </Text>
+    <Screen centered>
+      <ScreenTitle>Choose a new password</ScreenTitle>
       {!token ? (
-        <Text className="text-sm text-red-600">
+        <StatusText>
           This reset link is missing a token. Request a new link from forgot password.
-        </Text>
+        </StatusText>
       ) : null}
-      <TextInput
-        autoComplete="new-password"
-        className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900"
-        onChangeText={setPassword}
-        placeholder="New password"
-        secureTextEntry
-        value={password}
-      />
-      <TextInput
-        autoComplete="new-password"
-        className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900"
-        onChangeText={setConfirm}
-        placeholder="Confirm password"
-        secureTextEntry
-        value={confirm}
-      />
-      {error ? <Text className="text-sm text-red-600">{error}</Text> : null}
-      <Pressable
-        accessibilityRole="button"
-        className="rounded-lg bg-slate-900 px-5 py-3"
+      <View className="gap-3">
+        <Field
+          autoComplete="new-password"
+          onChangeText={setPassword}
+          placeholder="New password"
+          secureTextEntry
+          value={password}
+        />
+        <Field
+          autoComplete="new-password"
+          onChangeText={setConfirm}
+          placeholder="Confirm password"
+          secureTextEntry
+          value={confirm}
+        />
+      </View>
+      {error ? <StatusText>{error}</StatusText> : null}
+      <Button
         disabled={pending || !token}
+        label={pending ? "Saving…" : "Update password"}
         onPress={onSubmit}
-      >
-        <Text className="text-center font-semibold text-white">
-          {pending ? "Saving…" : "Update password"}
-        </Text>
-      </Pressable>
-      <Link href="/forgot-password" className="text-center text-slate-600">
-        Request a new link
+      />
+      <Link href="/forgot-password">
+        <QuietLinkText>Request a new link</QuietLinkText>
       </Link>
-    </View>
+    </Screen>
   );
 }

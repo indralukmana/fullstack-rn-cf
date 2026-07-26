@@ -2,6 +2,14 @@ import { Link, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Linking, Pressable, Text, View } from "react-native";
 
+import {
+  Button,
+  QuietLinkText,
+  Screen,
+  ScreenLead,
+  ScreenTitle,
+  StatusText,
+} from "@/components/ui";
 import { appCallbackUrl } from "@/lib/app-url";
 import { authClient } from "@/lib/auth-client";
 import {
@@ -84,38 +92,29 @@ export default function CheckEmailScreen() {
   }
 
   return (
-    <View className="flex-1 justify-center gap-4 bg-slate-50 px-6">
-      <Text accessibilityRole="header" className="text-2xl font-bold text-slate-900">
-        Check your email
-      </Text>
-      <Text className="text-base text-slate-700">
+    <Screen centered scroll>
+      <ScreenTitle>Check your email</ScreenTitle>
+      <ScreenLead>
         {purpose === "reset"
           ? "If an account exists for that address, we sent a password reset link."
           : "We sent a verification link. Open it to finish creating your account."}
-      </Text>
-      {email ? <Text className="text-sm font-medium text-slate-900">{email}</Text> : null}
-      {message ? <Text className="text-sm text-emerald-700">{message}</Text> : null}
-      {error ? <Text className="text-sm text-red-600">{error}</Text> : null}
+      </ScreenLead>
+      {email ? <Text className="text-base font-medium text-slate-900">{email}</Text> : null}
+      {message ? <StatusText tone="success">{message}</StatusText> : null}
+      {error ? <StatusText>{error}</StatusText> : null}
       {email ? (
-        <Pressable
-          accessibilityRole="button"
-          className="rounded-lg bg-slate-900 px-5 py-3"
+        <Button
           disabled={pending}
+          label={
+            pending ? "Sending…" : purpose === "reset" ? "Resend reset link" : "Resend verification"
+          }
           onPress={onResend}
-        >
-          <Text className="text-center font-semibold text-white">
-            {pending
-              ? "Sending…"
-              : purpose === "reset"
-                ? "Resend reset link"
-                : "Resend verification"}
-          </Text>
-        </Pressable>
+        />
       ) : null}
       {showDevMailbox ? (
-        <View className="gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+        <View className="gap-3 border-t border-amber-200 pt-5">
           <Text className="text-sm font-semibold text-amber-950">Local mailbox (dev only)</Text>
-          <Text className="text-sm text-amber-900">
+          <Text className="text-sm leading-5 text-amber-900">
             Emails are logged by the API console provider. Open the mailbox JSON or the latest
             message link below.
           </Text>
@@ -132,30 +131,26 @@ export default function CheckEmailScreen() {
             </Pressable>
           ) : null}
           {latestLink ? (
-            <Pressable
-              accessibilityRole="button"
-              className="rounded-lg bg-amber-900 px-4 py-3"
+            <Button
+              label={`Open latest ${purpose === "reset" ? "reset" : "verification"} link`}
               onPress={() => {
                 void Linking.openURL(latestLink);
               }}
-            >
-              <Text className="text-center font-semibold text-amber-50">
-                Open latest {purpose === "reset" ? "reset" : "verification"} link
-              </Text>
-            </Pressable>
+              variant="secondary"
+            />
           ) : null}
           {latestMessage ? (
             <Text className="text-xs text-amber-900">Latest subject: {latestMessage.subject}</Text>
           ) : null}
-          {mailboxError ? <Text className="text-sm text-red-700">{mailboxError}</Text> : null}
+          {mailboxError ? <StatusText>{mailboxError}</StatusText> : null}
           <Pressable accessibilityRole="button" onPress={() => void refreshMailbox()}>
             <Text className="text-sm font-medium text-amber-950 underline">Refresh mailbox</Text>
           </Pressable>
         </View>
       ) : null}
-      <Link href="/sign-in" className="text-center text-slate-600">
-        Back to sign in
+      <Link href="/sign-in">
+        <QuietLinkText>Back to sign in</QuietLinkText>
       </Link>
-    </View>
+    </Screen>
   );
 }
