@@ -1,5 +1,5 @@
 import type { ComponentProps, ReactNode } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 type PressableProps = ComponentProps<typeof Pressable>;
 type TextInputProps = ComponentProps<typeof TextInput>;
@@ -145,5 +145,53 @@ export function LoadingScreen({ label = "Loading…" }: { label?: string }) {
     <View className="flex-1 items-center justify-center bg-slate-50 px-6">
       <Text className="text-base text-slate-600">{label}</Text>
     </View>
+  );
+}
+
+export function ConfirmDialog({
+  visible,
+  title,
+  message,
+  confirmLabel,
+  cancelLabel = "Cancel",
+  destructive = false,
+  pending = false,
+  onConfirm,
+  onCancel,
+}: {
+  visible: boolean;
+  title: string;
+  message: string;
+  confirmLabel: string;
+  cancelLabel?: string;
+  destructive?: boolean;
+  pending?: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <Modal animationType="fade" onRequestClose={onCancel} transparent visible={visible}>
+      <View className="flex-1 items-center justify-center bg-slate-900/40 px-6">
+        <View
+          accessibilityRole="summary"
+          accessibilityViewIsModal
+          className="w-full max-w-md gap-4 rounded-lg border border-slate-200 bg-white p-5"
+        >
+          <Text accessibilityRole="header" className="text-xl font-bold text-slate-900">
+            {title}
+          </Text>
+          <Text className="text-base leading-6 text-slate-600">{message}</Text>
+          <View className="gap-3">
+            <Button
+              disabled={pending}
+              label={pending ? "Working…" : confirmLabel}
+              onPress={onConfirm}
+              variant={destructive ? "danger" : "primary"}
+            />
+            <Button disabled={pending} label={cancelLabel} onPress={onCancel} variant="secondary" />
+          </View>
+        </View>
+      </View>
+    </Modal>
   );
 }

@@ -5,6 +5,7 @@ import { Share, Text, View } from "react-native";
 
 import {
   Button,
+  ConfirmDialog,
   Field,
   LoadingScreen,
   QuietLinkText,
@@ -29,6 +30,7 @@ export default function AccountDataScreen() {
   const deleteAccount = useDeleteAccount();
   const [confirmation, setConfirmation] = useState("");
   const [pending, setPending] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   if (sessionPending) {
@@ -57,11 +59,16 @@ export default function AccountDataScreen() {
     }
   }
 
-  async function onDelete() {
+  function onRequestDelete() {
     if (confirmation !== "DELETE") {
       setMessage("Type DELETE exactly to confirm.");
       return;
     }
+    setMessage(null);
+    setConfirmDeleteOpen(true);
+  }
+
+  async function onDelete() {
     setPending(true);
     setMessage(null);
     try {
@@ -69,6 +76,7 @@ export default function AccountDataScreen() {
       if (!("deleted" in result.data)) {
         throw new Error(result.data.message);
       }
+      setConfirmDeleteOpen(false);
       await clearNativeBillingIdentity();
       await authClient.signOut();
       router.replace("/");
@@ -105,7 +113,7 @@ export default function AccountDataScreen() {
           <Button
             disabled={pending || confirmation !== "DELETE"}
             label="Permanently delete account"
-            onPress={onDelete}
+            onPress={onRequestDelete}
             variant="danger"
           />
         </View>
@@ -116,6 +124,17 @@ export default function AccountDataScreen() {
       <Link href="/me">
         <QuietLinkText>Back to account</QuietLinkText>
       </Link>
+
+      <ConfirmDialog
+        confirmLabel="Delete account"
+        destructive
+        message="This permanently removes your account data. Store and Stripe subscriptions are not canceled by this action."
+        onCancel={() => setConfirmDeleteOpen(false)}
+        onConfirm={() => void onDelete()}
+        pending={pending}
+        title="Delete account?"
+        visible={confirmDeleteOpen}
+      />
     </Screen>
   );
 }
