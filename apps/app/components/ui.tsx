@@ -200,15 +200,30 @@ export function QuietLink({ href, children }: { href: Href; children: ReactNode 
   );
 }
 
+export function Skeleton({ className }: { className?: string }) {
+  return (
+    <View
+      accessibilityElementsHidden
+      className={`rounded-lg bg-selected ${className ?? "h-4 w-full"}`}
+      importantForAccessibility="no-hide-descendants"
+    />
+  );
+}
+
 export function LoadingScreen({ label = "Loading…" }: { label?: string }) {
   return (
     <SafeAreaView
-      className="flex-1 items-center justify-center bg-canvas px-6"
+      accessibilityLabel={label}
+      className="flex-1 justify-center bg-canvas px-6"
       edges={["bottom", "left", "right"]}
     >
-      <Text className="text-base text-foreground-secondary" style={{ fontFamily: fontSans }}>
-        {label}
-      </Text>
+      <View accessibilityRole="progressbar" className="w-full max-w-lg gap-4 self-center">
+        <Skeleton className="h-9 w-2/3" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-5/6" />
+        <Skeleton className="mt-2 h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
+      </View>
     </SafeAreaView>
   );
 }
