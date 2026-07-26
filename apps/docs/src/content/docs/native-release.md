@@ -42,6 +42,21 @@ store app.
   (extension deadline November 1, 2026). Verify the generated AAB in Play Console; do not assume
   the wrapper SDK version proves compliance.
 
+## UI / device verification (non-billing)
+
+Web E2E does not prove native chrome. On a development build or simulator, confirm:
+
+- [ ] Safe-area padding clears home indicator / notches under the stack header
+- [ ] Source Serif / Source Sans faces load (titles and body are not system fallback)
+- [ ] Offline banner appears when the device network is disabled
+- [ ] Light / dark / system theme switcher on Account updates canvas and controls
+- [ ] Password Show/Hide toggles work on sign-in and reset
+- [ ] Cold-start deep link opens `/accept-invitation?id=…` and `/reset-password?token=…`
+- [ ] Empty native subscription packages show the EmptyState copy (misconfigured offering)
+
+Record failures with platform, OS version, and build profile before changing shared Uniwind
+primitives.
+
 ## Test matrix
 
 Build `development` for device work and `preview` for release candidates. A passing web build does
