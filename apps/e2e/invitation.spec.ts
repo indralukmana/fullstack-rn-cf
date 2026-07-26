@@ -4,7 +4,7 @@ test("rejects an incomplete organization invitation link", async ({ page }) => {
   await page.goto("/accept-invitation");
 
   await expect(page.getByRole("heading", { name: "Organization invitation" })).toBeVisible();
-  await expect(page.getByRole("alert")).toContainText("incomplete");
+  await expect(page.getByText("This invitation link is incomplete")).toBeVisible();
 });
 
 test("returns signed-out invitees to the invitation after sign-in", async ({ page }) => {

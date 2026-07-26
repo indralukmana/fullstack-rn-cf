@@ -8,6 +8,7 @@ import { Platform, View } from "react-native";
 import { useUniwind } from "uniwind";
 
 import "../global.css";
+import { DeepLinkHandler } from "@/components/deep-link-handler";
 import { OfflineBanner } from "@/components/offline-banner";
 import { authClient } from "@/lib/auth-client";
 import { env } from "@/lib/env";
@@ -53,6 +54,7 @@ export default function RootLayout() {
       {/* oxlint-disable-next-line react/style-prop-object */}
       <StatusBar style="auto" />
       <View className="flex-1 bg-canvas">
+        <DeepLinkHandler />
         <OfflineBanner />
         <Stack
           screenOptions={{

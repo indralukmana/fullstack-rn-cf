@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import {
   Button,
+  EmptyState,
   LoadingScreen,
   QuietLink,
   Screen,
@@ -47,7 +48,10 @@ export default function AcceptInvitationScreen() {
       <ScreenTitle>Organization invitation</ScreenTitle>
 
       {!invitationId ? (
-        <StatusText>This invitation link is incomplete.</StatusText>
+        <EmptyState
+          description="Open the invitation from your email so the link includes an invitation id."
+          title="This invitation link is incomplete"
+        />
       ) : session?.user ? (
         <>
           <ScreenLead>Accept this invitation as {session.user.email}.</ScreenLead>

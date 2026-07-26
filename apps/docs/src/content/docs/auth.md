@@ -46,6 +46,10 @@ Invitation messages are delivered through Cloudflare Email Service and link to
 and organization memberships have database uniqueness constraints to prevent duplicate state
 under concurrent requests.
 
+On native, `DeepLinkHandler` maps Expo scheme URLs (via `appCallbackUrl` / `Linking.createURL`)
+for `/accept-invitation`, `/reset-password`, and `/me` onto Expo Router screens. Web continues to
+use ordinary HTTPS paths under `APP_URL`.
+
 Tenant-owned API routes use `requireOrganization`. A request may send `X-Organization-Id`, or
 fall back to the session's active organization. In both cases the API queries membership before
 setting trusted organization context; the header alone never grants access. Use
