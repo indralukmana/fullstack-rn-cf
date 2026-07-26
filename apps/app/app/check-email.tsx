@@ -1,8 +1,16 @@
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Linking, Pressable, Text, View } from "react-native";
+import { Linking, Pressable, View } from "react-native";
 
-import { Button, QuietLink, Screen, ScreenLead, ScreenTitle, StatusText } from "@/components/ui";
+import {
+  BodyText,
+  Button,
+  QuietLink,
+  Screen,
+  ScreenLead,
+  ScreenTitle,
+  StatusText,
+} from "@/components/ui";
 import { appCallbackUrl } from "@/lib/app-url";
 import { authClient } from "@/lib/auth-client";
 import {
@@ -92,7 +100,11 @@ export default function CheckEmailScreen() {
           ? "If an account exists for that address, we sent a password reset link."
           : "We sent a verification link. Open it to finish creating your account."}
       </ScreenLead>
-      {email ? <Text className="text-base font-medium text-foreground">{email}</Text> : null}
+      {email ? (
+        <BodyText className="text-base text-foreground" weight="semibold">
+          {email}
+        </BodyText>
+      ) : null}
       {message ? <StatusText tone="success">{message}</StatusText> : null}
       {error ? <StatusText>{error}</StatusText> : null}
       {email ? (
@@ -106,13 +118,13 @@ export default function CheckEmailScreen() {
       ) : null}
       {showDevMailbox ? (
         <View className="gap-3 border-t border-warning-border pt-5">
-          <Text className="text-sm font-semibold text-warning-foreground">
+          <BodyText className="text-sm text-warning-foreground" weight="semibold">
             Local mailbox (dev only)
-          </Text>
-          <Text className="text-sm leading-5 text-warning-foreground">
+          </BodyText>
+          <BodyText className="text-sm leading-5 text-warning-foreground">
             Emails are logged by the API console provider. Open the mailbox JSON or the latest
             message link below.
-          </Text>
+          </BodyText>
           {mailboxApiUrl ? (
             <Pressable
               accessibilityRole="link"
@@ -120,9 +132,9 @@ export default function CheckEmailScreen() {
                 void Linking.openURL(mailboxApiUrl);
               }}
             >
-              <Text className="text-sm font-medium text-warning-foreground underline">
+              <BodyText className="text-sm text-warning-foreground underline" weight="semibold">
                 Open /api/dev/mailbox for this address
-              </Text>
+              </BodyText>
             </Pressable>
           ) : null}
           {latestLink ? (
@@ -135,15 +147,15 @@ export default function CheckEmailScreen() {
             />
           ) : null}
           {latestMessage ? (
-            <Text className="text-xs text-warning-foreground">
+            <BodyText className="text-xs text-warning-foreground">
               Latest subject: {latestMessage.subject}
-            </Text>
+            </BodyText>
           ) : null}
           {mailboxError ? <StatusText>{mailboxError}</StatusText> : null}
           <Pressable accessibilityRole="button" onPress={() => void refreshMailbox()}>
-            <Text className="text-sm font-medium text-warning-foreground underline">
+            <BodyText className="text-sm text-warning-foreground underline" weight="semibold">
               Refresh mailbox
-            </Text>
+            </BodyText>
           </Pressable>
         </View>
       ) : null}

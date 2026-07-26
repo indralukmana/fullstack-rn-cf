@@ -1,8 +1,9 @@
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import {
+  BodyText,
   Button,
   EmptyState,
   Field,
@@ -138,11 +139,13 @@ export default function OrganizationsScreen() {
                   disabled={pending || active}
                   onPress={() => onSelect(organization.id)}
                 >
-                  <Text className="font-semibold text-foreground">{organization.name}</Text>
-                  <Text className="text-sm text-foreground-muted">
+                  <BodyText className="text-foreground" weight="semibold">
+                    {organization.name}
+                  </BodyText>
+                  <BodyText className="text-sm text-foreground-muted">
                     {organization.slug}
                     {active ? " · active" : ""}
-                  </Text>
+                  </BodyText>
                 </Pressable>
               );
             })}

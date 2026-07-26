@@ -83,6 +83,25 @@ export function ScreenLead({ children }: { children: ReactNode }) {
   );
 }
 
+export function BodyText({
+  children,
+  className,
+  weight = "regular",
+  ...props
+}: ComponentProps<typeof Text> & {
+  weight?: "regular" | "semibold";
+}) {
+  return (
+    <Text
+      className={className}
+      style={{ fontFamily: weight === "semibold" ? fontSansSemiBold : fontSans }}
+      {...props}
+    >
+      {children}
+    </Text>
+  );
+}
+
 export function Field({
   label,
   error,

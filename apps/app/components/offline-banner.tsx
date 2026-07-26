@@ -1,6 +1,8 @@
 import * as Network from "expo-network";
 import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+
+import { BodyText } from "@/components/ui";
 
 function isOfflineState(state: Network.NetworkState): boolean {
   return state.isConnected === false || state.isInternetReachable === false;
@@ -42,9 +44,9 @@ export function OfflineBanner() {
       accessibilityRole="alert"
       className="border-b border-warning-border bg-warning-canvas px-4 py-2.5"
     >
-      <Text className="text-center text-sm font-medium text-warning-foreground">
+      <BodyText className="text-center text-sm text-warning-foreground" weight="semibold">
         You are offline. Some actions may fail until you reconnect.
-      </Text>
+      </BodyText>
     </View>
   );
 }

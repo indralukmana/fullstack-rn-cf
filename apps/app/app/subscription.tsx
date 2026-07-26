@@ -8,9 +8,10 @@ import {
 import * as Linking from "expo-linking";
 import { Link, Redirect } from "expo-router";
 import { useEffect, useState } from "react";
-import { Platform, Text, View } from "react-native";
+import { Platform, View } from "react-native";
 
 import {
+  BodyText,
   Button,
   EmptyState,
   LoadingScreen,
@@ -172,17 +173,17 @@ export default function SubscriptionScreen() {
           />
         ) : (
           <>
-            <Text className="text-lg font-semibold text-foreground">
+            <BodyText className="text-lg text-foreground" weight="semibold">
               {statusQuery.isLoading
                 ? "Checking…"
                 : status?.hasAccess
                   ? `Pro · ${status.status.replace("_", " ")}`
                   : "Free"}
-            </Text>
+            </BodyText>
             {activeGrant ? (
-              <Text className="text-sm text-foreground-secondary">
+              <BodyText className="text-sm text-foreground-secondary">
                 Managed by {activeGrant.provider === "stripe" ? "Stripe" : "your app store"}
-              </Text>
+              </BodyText>
             ) : null}
           </>
         )}

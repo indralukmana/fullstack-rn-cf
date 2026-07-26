@@ -1,9 +1,10 @@
 import { getGetBillingStatusQueryKey, useGetBillingStatus, useGetMe } from "@rn-cf/api-client";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Platform, Text, View } from "react-native";
+import { Platform, View } from "react-native";
 
 import {
+  BodyText,
   Button,
   LoadingScreen,
   QueryError,
@@ -61,11 +62,15 @@ export default function MeScreen() {
           />
         ) : session?.user ? (
           <View className="gap-1">
-            <Text className="text-lg font-semibold text-foreground">{session.user.name}</Text>
-            <Text className="text-base text-foreground-secondary">{session.user.email}</Text>
+            <BodyText className="text-lg text-foreground" weight="semibold">
+              {session.user.name}
+            </BodyText>
+            <BodyText className="text-base text-foreground-secondary">
+              {session.user.email}
+            </BodyText>
           </View>
         ) : (
-          <Text className="text-base text-foreground-secondary">Signed out</Text>
+          <BodyText className="text-base text-foreground-secondary">Signed out</BodyText>
         )}
       </Section>
 
@@ -76,9 +81,9 @@ export default function MeScreen() {
             onRetry={() => void billingQuery.refetch()}
           />
         ) : (
-          <Text className="text-lg font-semibold text-foreground">
+          <BodyText className="text-lg text-foreground" weight="semibold">
             {billingQuery.isLoading ? "Checking…" : billingStatus?.hasAccess ? "Pro" : "Free"}
-          </Text>
+          </BodyText>
         )}
       </Section>
 
