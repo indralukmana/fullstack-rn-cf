@@ -19,6 +19,8 @@ Sign-up requires email verification before sign-in (`requireEmailVerification: t
 - Production provider: `EMAIL_PROVIDER=cloudflare` through the `EMAIL` Workers binding
 - Cloudflare Email Sending currently requires Workers Paid and a domain onboarded to Email Service
 - Local/dev mailbox: `GET /api/dev/mailbox?to=user@example.com` (disabled in production)
+- On the Expo `/check-email` screen, `__DEV__` builds also show a local-mailbox panel that opens
+  that API URL and the latest verification or reset link
 
 App screens:
 
