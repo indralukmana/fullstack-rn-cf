@@ -40,6 +40,50 @@ export const OrganizationContextResponseSchema = z
 export type OrganizationRole = z.infer<typeof OrganizationRoleSchema>;
 export type OrganizationContextResponse = z.infer<typeof OrganizationContextResponseSchema>;
 
+export const BillingIntervalSchema = z.enum(["monthly", "yearly"]);
+export const BillingGrantStatusSchema = z.enum(["active", "grace_period", "revoked", "expired"]);
+
+export const BillingStatusResponseSchema = z
+  .object({
+    entitlement: z.literal("pro"),
+    hasAccess: z.boolean(),
+    status: BillingGrantStatusSchema,
+    expiresAt: z.iso.datetime().nullable(),
+    grants: z.array(
+      z.object({
+        provider: z.enum(["stripe", "revenuecat"]),
+        status: BillingGrantStatusSchema,
+        interval: BillingIntervalSchema,
+        expiresAt: z.iso.datetime().nullable(),
+        managementUrl: z.url().nullable(),
+      }),
+    ),
+  })
+  .openapi("BillingStatusResponse");
+
+export const CreateCheckoutRequestSchema = z
+  .object({
+    interval: BillingIntervalSchema,
+  })
+  .openapi("CreateCheckoutRequest");
+
+export const BillingUrlResponseSchema = z
+  .object({
+    url: z.url(),
+  })
+  .openapi("BillingUrlResponse");
+
+export const ReconciliationResponseSchema = z
+  .object({
+    accepted: z.literal(true),
+  })
+  .openapi("ReconciliationResponse");
+
+export type BillingInterval = z.infer<typeof BillingIntervalSchema>;
+export type BillingStatusResponse = z.infer<typeof BillingStatusResponseSchema>;
+export type CreateCheckoutRequest = z.infer<typeof CreateCheckoutRequestSchema>;
+export type BillingUrlResponse = z.infer<typeof BillingUrlResponseSchema>;
+
 export const ErrorResponseSchema = z
   .object({
     error: z.string().openapi({ example: "unauthorized" }),

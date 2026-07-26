@@ -17,7 +17,7 @@ const child = spawn(
     "--filter",
     "@rn-cf/api",
     "exec",
-    "wrangler",
+    "varlock-wrangler",
     "dev",
     "--ip",
     "127.0.0.1",
@@ -26,7 +26,8 @@ const child = spawn(
   ],
   {
     cwd: root,
-    stdio: "pipe",
+    detached: process.platform !== "win32",
+    stdio: "ignore",
     shell: process.platform === "win32",
   },
 );
@@ -60,5 +61,13 @@ try {
     process.exit(1);
   }
 } finally {
-  child.kill("SIGTERM");
+  try {
+    if (process.platform === "win32") {
+      child.kill("SIGTERM");
+    } else {
+      process.kill(-child.pid, "SIGTERM");
+    }
+  } catch {
+    // The development server may already have exited after an export failure.
+  }
 }

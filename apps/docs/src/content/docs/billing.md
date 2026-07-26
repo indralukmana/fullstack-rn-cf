@@ -86,3 +86,18 @@ The D1 event ledger is the replay control plane: support can correct configurati
 availability and re-enqueue a failed event ID without replaying an unauthenticated payload. Queue
 messages contain only that opaque ID. Inspect `billing_event.attempts` and `last_error` before a
 replay; never edit grants or aggregate entitlements directly.
+
+## Customer API
+
+All purchase endpoints require an authenticated, verified account:
+
+- `GET /api/billing/status` returns the aggregate `pro` decision and provider grants.
+- `POST /api/billing/checkout` accepts only `monthly` or `yearly` and returns a Stripe Checkout
+  URL on web.
+- `POST /api/billing/portal` returns Stripe's hosted management URL.
+- `POST /api/billing/reconcile` requests an authoritative provider refresh.
+
+Checkout reuses one Stripe Customer per Better Auth user, sets immutable `user.id` metadata,
+enforces one pending attempt, and uses the persisted attempt ID as Stripe's idempotency key.
+Existing active/grace grants block a second checkout. Customer apps must authorize from the
+status endpoint; `requireEntitlement("pro")` is the matching server middleware for paid routes.

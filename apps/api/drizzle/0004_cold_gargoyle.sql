@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `purchase_attempt_pending_user_uidx` ON `purchase_attempt` (`user_id`) WHERE "purchase_attempt"."state" = 'pending';

@@ -29,6 +29,13 @@
       "when": 1785052587513,
       "tag": "0003_light_baron_zemo",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1785053218964,
+      "tag": "0004_cold_gargoyle",
+      "breakpoints": true
     }
   ]
 }

@@ -21,7 +21,9 @@ import { clearOutboundEmails, listOutboundEmails } from "./lib/email/send";
 import { initVarlockIfPresent } from "./lib/varlock-init";
 import { rateLimit } from "./middleware/rate-limit";
 import { requireAuth } from "./middleware/require-auth";
+import { requireEntitlement } from "./middleware/require-entitlement";
 import { requireOrganization } from "./middleware/require-organization";
+import { billingRoutes } from "./routes/billing";
 import { billingWebhooks } from "./routes/billing-webhooks";
 
 await initVarlockIfPresent();
@@ -105,6 +107,7 @@ app.use("*", async (c, next) => {
 });
 
 app.route("/api/webhooks", billingWebhooks);
+app.route("/api/billing", billingRoutes);
 
 app.on(["GET", "POST"], "/api/auth/*", async (c) => {
   try {
@@ -240,6 +243,30 @@ app.openapi(privatePingRoute, (c) => {
     status: "ok" as const,
     service: config.serviceName,
   });
+});
+
+const proPingRoute = createRoute({
+  method: "get",
+  path: "/api/private/pro",
+  operationId: "getProPing",
+  tags: ["Billing"],
+  middleware: [requireAuth, requireEntitlement("pro")] as const,
+  responses: {
+    200: {
+      content: { "application/json": { schema: HealthResponseSchema } },
+      description: "Capability protected by the Pro entitlement",
+    },
+    401: { description: "Authentication required" },
+    403: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Pro entitlement required",
+    },
+  },
+});
+
+app.openapi(proPingRoute, (c) => {
+  const config = getRuntimeConfig(c.env);
+  return c.json({ status: "ok" as const, service: config.serviceName }, 200);
 });
 
 const organizationContextRoute = createRoute({

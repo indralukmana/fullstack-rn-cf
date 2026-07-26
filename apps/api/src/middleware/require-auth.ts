@@ -6,6 +6,7 @@ export type AuthUser = {
   id: string;
   name: string;
   email: string;
+  emailVerified: boolean;
 };
 
 export type AuthVariables = {
@@ -23,6 +24,7 @@ export const requireAuth = createMiddleware<{ Variables: AuthVariables }>(async 
     id: session.user.id,
     name: session.user.name,
     email: session.user.email,
+    emailVerified: session.user.emailVerified,
   });
 
   return await next();

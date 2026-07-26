@@ -6,6 +6,103 @@
   },
   "components": {
     "schemas": {
+      "BillingStatusResponse": {
+        "type": "object",
+        "properties": {
+          "entitlement": {
+            "type": "string",
+            "enum": ["pro"]
+          },
+          "hasAccess": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "grace_period", "revoked", "expired"]
+          },
+          "expiresAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "grants": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "provider": {
+                  "type": "string",
+                  "enum": ["stripe", "revenuecat"]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["active", "grace_period", "revoked", "expired"]
+                },
+                "interval": {
+                  "type": "string",
+                  "enum": ["monthly", "yearly"]
+                },
+                "expiresAt": {
+                  "type": "string",
+                  "nullable": true,
+                  "format": "date-time"
+                },
+                "managementUrl": {
+                  "type": "string",
+                  "nullable": true,
+                  "format": "uri"
+                }
+              },
+              "required": ["provider", "status", "interval", "expiresAt", "managementUrl"]
+            }
+          }
+        },
+        "required": ["entitlement", "hasAccess", "status", "expiresAt", "grants"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "unauthorized"
+          },
+          "message": {
+            "type": "string",
+            "example": "Authentication required"
+          }
+        },
+        "required": ["error", "message"]
+      },
+      "BillingUrlResponse": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": ["url"]
+      },
+      "CreateCheckoutRequest": {
+        "type": "object",
+        "properties": {
+          "interval": {
+            "type": "string",
+            "enum": ["monthly", "yearly"]
+          }
+        },
+        "required": ["interval"]
+      },
+      "ReconciliationResponse": {
+        "type": "object",
+        "properties": {
+          "accepted": {
+            "type": "boolean",
+            "enum": [true]
+          }
+        },
+        "required": ["accepted"]
+      },
       "HealthResponse": {
         "type": "object",
         "properties": {
@@ -69,25 +166,193 @@
           }
         },
         "required": ["organization"]
-      },
-      "ErrorResponse": {
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "string",
-            "example": "unauthorized"
-          },
-          "message": {
-            "type": "string",
-            "example": "Authentication required"
-          }
-        },
-        "required": ["error", "message"]
       }
     },
     "parameters": {}
   },
   "paths": {
+    "/api/billing/status": {
+      "get": {
+        "operationId": "getBillingStatus",
+        "tags": ["Billing"],
+        "responses": {
+          "200": {
+            "description": "Server-authoritative personal entitlement and provider grants",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Verified account or billing eligibility required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/billing/checkout": {
+      "post": {
+        "operationId": "createStripeCheckout",
+        "tags": ["Billing"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckoutRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stripe Checkout URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingUrlResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Verified account or billing eligibility required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "An entitlement or purchase is already active",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/billing/portal": {
+      "post": {
+        "operationId": "createStripePortal",
+        "tags": ["Billing"],
+        "responses": {
+          "200": {
+            "description": "Stripe Customer Portal URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingUrlResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Verified account or billing eligibility required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No Stripe customer exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/billing/reconcile": {
+      "post": {
+        "operationId": "requestBillingReconciliation",
+        "tags": ["Billing"],
+        "responses": {
+          "202": {
+            "description": "Reconciliation accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReconciliationResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Verified account or billing eligibility required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "operationId": "getHealth",
@@ -138,6 +403,37 @@
           },
           "401": {
             "description": "Authentication required"
+          }
+        }
+      }
+    },
+    "/api/private/pro": {
+      "get": {
+        "operationId": "getProPing",
+        "tags": ["Billing"],
+        "responses": {
+          "200": {
+            "description": "Capability protected by the Pro entitlement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Pro entitlement required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }

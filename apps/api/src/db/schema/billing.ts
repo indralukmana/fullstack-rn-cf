@@ -252,6 +252,9 @@ export const purchaseAttempt = sqliteTable(
       table.provider,
       table.providerSessionId,
     ),
+    uniqueIndex("purchase_attempt_pending_user_uidx")
+      .on(table.userId)
+      .where(sql`${table.state} = 'pending'`),
     index("purchase_attempt_user_state_idx").on(table.userId, table.state, table.expiresAt),
     check("purchase_attempt_provider_check", sql`${table.provider} in ('stripe', 'revenuecat')`),
     check(
