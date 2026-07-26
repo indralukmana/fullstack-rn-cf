@@ -7,9 +7,9 @@ test("creates and activates an organization", async ({ page, request }) => {
   await page.goto("/organizations");
 
   await expect(page.getByRole("heading", { name: "Organizations" })).toBeVisible();
-  await page.getByPlaceholder("Organization name").fill("E2E Company");
+  await page.getByLabel("Organization name").fill("E2E Company");
   const slug = `e2e-${Date.now()}`;
-  await page.getByPlaceholder("organization-slug").fill(slug);
+  await page.getByLabel("Slug").fill(slug);
   await page.getByRole("button", { name: "Create organization" }).click();
 
   await expect(page.getByText("E2E Company")).toBeVisible();
