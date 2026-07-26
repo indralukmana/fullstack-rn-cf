@@ -13,6 +13,7 @@ import { Platform, Text, View } from "react-native";
 import {
   Button,
   LoadingScreen,
+  QueryError,
   QuietLinkText,
   Screen,
   ScreenLead,
@@ -163,18 +164,27 @@ export default function SubscriptionScreen() {
       <ScreenLead>One account unlocks Pro on web, iOS, and Android.</ScreenLead>
 
       <Section title="Access">
-        <Text className="text-lg font-semibold text-slate-900">
-          {statusQuery.isLoading
-            ? "Checking…"
-            : status?.hasAccess
-              ? `Pro · ${status.status.replace("_", " ")}`
-              : "Free"}
-        </Text>
-        {activeGrant ? (
-          <Text className="text-sm text-slate-600">
-            Managed by {activeGrant.provider === "stripe" ? "Stripe" : "your app store"}
-          </Text>
-        ) : null}
+        {statusQuery.isError ? (
+          <QueryError
+            message="Could not load subscription status."
+            onRetry={() => void statusQuery.refetch()}
+          />
+        ) : (
+          <>
+            <Text className="text-lg font-semibold text-slate-900">
+              {statusQuery.isLoading
+                ? "Checking…"
+                : status?.hasAccess
+                  ? `Pro · ${status.status.replace("_", " ")}`
+                  : "Free"}
+            </Text>
+            {activeGrant ? (
+              <Text className="text-sm text-slate-600">
+                Managed by {activeGrant.provider === "stripe" ? "Stripe" : "your app store"}
+              </Text>
+            ) : null}
+          </>
+        )}
       </Section>
 
       <View className="gap-3">

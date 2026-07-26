@@ -157,6 +157,15 @@ export function LoadingScreen({ label = "Loading…" }: { label?: string }) {
   );
 }
 
+export function QueryError({ message, onRetry }: { message: string; onRetry?: () => void }) {
+  return (
+    <View className="gap-3">
+      <StatusText>{message}</StatusText>
+      {onRetry ? <Button label="Try again" onPress={onRetry} variant="secondary" /> : null}
+    </View>
+  );
+}
+
 export function ConfirmDialog({
   visible,
   title,

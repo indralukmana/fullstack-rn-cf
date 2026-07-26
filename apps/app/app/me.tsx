@@ -6,6 +6,7 @@ import { Platform, Text, View } from "react-native";
 import {
   Button,
   LoadingScreen,
+  QueryError,
   QuietLinkText,
   Screen,
   ScreenTitle,
@@ -53,7 +54,12 @@ export default function MeScreen() {
       <ScreenTitle>Account</ScreenTitle>
 
       <Section title="Signed in as">
-        {session?.user ? (
+        {session?.user && meQuery.isError ? (
+          <QueryError
+            message="Could not load account details."
+            onRetry={() => void meQuery.refetch()}
+          />
+        ) : session?.user ? (
           <View className="gap-1">
             <Text className="text-lg font-semibold text-slate-900">{session.user.name}</Text>
             <Text className="text-base text-slate-600">{session.user.email}</Text>
@@ -64,9 +70,16 @@ export default function MeScreen() {
       </Section>
 
       <Section title="Subscription">
-        <Text className="text-lg font-semibold text-slate-900">
-          {billingQuery.isLoading ? "Checking…" : billingStatus?.hasAccess ? "Pro" : "Free"}
-        </Text>
+        {session?.user && billingQuery.isError ? (
+          <QueryError
+            message="Could not load subscription status."
+            onRetry={() => void billingQuery.refetch()}
+          />
+        ) : (
+          <Text className="text-lg font-semibold text-slate-900">
+            {billingQuery.isLoading ? "Checking…" : billingStatus?.hasAccess ? "Pro" : "Free"}
+          </Text>
+        )}
       </Section>
 
       {signOutError ? <StatusText>{signOutError}</StatusText> : null}

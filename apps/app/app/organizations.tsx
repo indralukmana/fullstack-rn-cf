@@ -6,6 +6,7 @@ import {
   Button,
   Field,
   LoadingScreen,
+  QueryError,
   QuietLinkText,
   Screen,
   ScreenLead,
@@ -87,6 +88,21 @@ export default function OrganizationsScreen() {
 
   if (sessionPending || organizations.isPending || activeOrganization.isPending) {
     return <LoadingScreen label="Loading organizations…" />;
+  }
+
+  if (organizations.error || activeOrganization.error) {
+    return (
+      <Screen centered>
+        <ScreenTitle>Organizations</ScreenTitle>
+        <QueryError
+          message="Could not load organizations."
+          onRetry={() => {
+            void organizations.refetch();
+            void activeOrganization.refetch();
+          }}
+        />
+      </Screen>
+    );
   }
 
   if (!session?.user) {
