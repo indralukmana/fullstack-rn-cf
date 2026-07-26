@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from "react";
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type PressableProps = ComponentProps<typeof Pressable>;
 type TextInputProps = ComponentProps<typeof TextInput>;
@@ -22,22 +23,27 @@ export function Screen({
 
   if (scroll) {
     return (
-      <ScrollView
-        className="flex-1 bg-slate-50"
-        contentContainerClassName={contentClassName}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View className="w-full max-w-lg gap-5 self-center">{children}</View>
-      </ScrollView>
+      <SafeAreaView className="flex-1 bg-slate-50" edges={["bottom", "left", "right"]}>
+        <ScrollView
+          className="flex-1"
+          contentContainerClassName={contentClassName}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View className="w-full max-w-lg gap-5 self-center">{children}</View>
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View className={`flex-1 bg-slate-50 ${centered ? "justify-center" : ""} px-6 py-8`}>
+    <SafeAreaView
+      className={`flex-1 bg-slate-50 ${centered ? "justify-center" : ""} px-6 py-8`}
+      edges={["bottom", "left", "right"]}
+    >
       <View className={`w-full max-w-lg gap-5 self-center ${centered ? "" : "flex-1"}`}>
         {children}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -142,9 +148,12 @@ export function QuietLinkText({ children }: { children: ReactNode }) {
 
 export function LoadingScreen({ label = "Loading…" }: { label?: string }) {
   return (
-    <View className="flex-1 items-center justify-center bg-slate-50 px-6">
+    <SafeAreaView
+      className="flex-1 items-center justify-center bg-slate-50 px-6"
+      edges={["bottom", "left", "right"]}
+    >
       <Text className="text-base text-slate-600">{label}</Text>
-    </View>
+    </SafeAreaView>
   );
 }
 
