@@ -23,7 +23,7 @@ test("forgot password flow reaches check-email", async ({ page, request }) => {
   });
 
   await page.goto("/forgot-password");
-  await page.getByPlaceholder("Email").fill(email);
+  await page.getByLabel("Email").fill(email);
   await page.getByRole("button", { name: "Send reset link" }).click();
 
   await expect(page).toHaveURL(/\/check-email/);
@@ -49,9 +49,9 @@ test("duplicate sign-up follows the check-email path without leaking accounts", 
   expect(firstSignUp.ok()).toBeTruthy();
 
   await page.goto("/sign-up");
-  await page.getByPlaceholder("Name").fill("Another User");
-  await page.getByPlaceholder("Email").fill(email);
-  await page.getByPlaceholder("Password").fill(TEST_PASSWORD);
+  await page.getByLabel("Name").fill("Another User");
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password").fill(TEST_PASSWORD);
   await page.getByRole("button", { name: "Create account" }).click();
 
   // Enumeration protection: UI continues as if signup succeeded.
