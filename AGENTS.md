@@ -5,7 +5,8 @@ This file is the canonical repository-wide contract for coding agents. Read the 
 override this file.
 
 For architecture, auth, billing, Expo, Worker, environment, migration, code-generation, or release
-work, load `.agents/skills/launchpad-architecture/SKILL.md` before the relevant vendor skill.
+work, load `.agents/skills/launchpad-architecture/SKILL.md` before the relevant vendor skill. For
+Expo UI / visual work, also read `apps/app/DESIGN.md` before generic frontend or deslop skills.
 
 ## Repository map
 

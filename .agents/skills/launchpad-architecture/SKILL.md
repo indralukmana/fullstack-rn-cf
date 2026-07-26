@@ -95,6 +95,10 @@ For D1 changes:
 - Use Expo development builds for RevenueCat and other native modules; Expo Go is insufficient.
 - Preserve web, iOS, and Android behavior or use explicit `.native`/`.web` modules.
 - Use Uniwind classes and its official skill; do not apply NativeWind setup instructions.
+- For visual or layout work, read `apps/app/DESIGN.md` first. Vendor UI skills
+  (`baseline-ui`, `improve-ui`, `frontend-ui-engineering`, accessibility packs) polish within that
+  system — they must not replace Uniwind, invent a web-only stack, or introduce banned AI-default
+  aesthetics documented there.
 - Treat public Expo values as bundle-visible. Server/provider secrets must never enter native code.
 - Use RevenueCat public SDK keys from Varlock/EAS and clear SDK identity on sign-out.
 - OTA updates cannot change native dependencies, permissions, billing SDKs, or privacy manifests.

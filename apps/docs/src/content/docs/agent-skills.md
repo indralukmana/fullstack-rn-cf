@@ -17,11 +17,17 @@ a task matches, keeping normal context small.
 | Stripe                   | Billing/security practices, documentation lookup, SDK/API upgrades     |
 | Better Auth              | Core/security, email-password, and organization guidance               |
 | Uniwind                  | Tailwind CSS v4 styling and troubleshooting for React Native           |
+| UI polish (ibelick)      | `baseline-ui`, `improve-ui`, `create-design-md`, accessibility fixes   |
+| Frontend UI engineering  | Structure and interaction quality (Addy Osmani)                        |
+| Accessibility            | WCAG-oriented audits for interactive surfaces                          |
 | Varlock                  | Secret-safe schema, validation, and environment workflows              |
 | Orval                    | OpenAPI-generated fetch, TanStack Query, MSW, and Faker clients        |
 | Hono creator skill       | Routing, middleware, Worker runtime, and request testing               |
 | Drizzle ORM              | Schema, queries, and Kit workflows (D1/RQB v2 overrides in launchpad)  |
 | `launchpad-architecture` | Repository-specific invariants and conflict resolution                 |
+
+Product visual intent for the Expo app lives in `apps/app/DESIGN.md`. Generic UI skills must
+follow that file and Uniwind constraints.
 
 The source and content hash for downloaded skills are recorded in `skills-lock.json`. The
 launchpad skill is maintained locally because no vendor skill knows the unified billing ledger,
