@@ -3,6 +3,7 @@ import { Link } from "expo-router";
 import { useState } from "react";
 import { Platform, View } from "react-native";
 
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import {
   BodyText,
   Button,
@@ -85,6 +86,13 @@ export default function MeScreen() {
             {billingQuery.isLoading ? "Checking…" : billingStatus?.hasAccess ? "Pro" : "Free"}
           </BodyText>
         )}
+      </Section>
+
+      <Section title="Appearance">
+        <BodyText className="text-sm text-foreground-secondary">
+          Choose system, light, or dark. The canvas and controls follow Uniwind theme tokens.
+        </BodyText>
+        <ThemeSwitcher />
       </Section>
 
       {signOutError ? <StatusText>{signOutError}</StatusText> : null}
