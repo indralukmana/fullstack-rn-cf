@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
-import { copyFileSync, existsSync } from "node:fs";
+import { randomBytes } from "node:crypto";
+import { existsSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -18,18 +19,29 @@ function run(command, args) {
   }
 }
 
-function copyEnvIfMissing(examplePath, targetPath) {
-  if (existsSync(targetPath)) {
-    console.log(`Skipped ${targetPath} (already exists)`);
+function prepareLocalEnv(workspace, initialValues) {
+  const legacyPath = join(workspace, ".env");
+  const localPath = join(workspace, ".env.local");
+
+  if (existsSync(legacyPath) && !existsSync(localPath)) {
+    renameSync(legacyPath, localPath);
+    console.log(`Migrated ${legacyPath} to ${localPath}`);
     return;
   }
 
-  copyFileSync(examplePath, targetPath);
-  console.log(`Created ${targetPath}`);
+  if (existsSync(legacyPath)) {
+    console.warn(`Both ${legacyPath} and ${localPath} exist; review and remove the legacy file`);
+  }
+  if (existsSync(localPath) || initialValues.length === 0) {
+    return;
+  }
+
+  writeFileSync(localPath, `${initialValues.join("\n")}\n`, { mode: 0o600 });
+  console.log(`Created ${localPath}`);
 }
 
-copyEnvIfMissing(join(root, "apps/app/.env.example"), join(root, "apps/app/.env"));
-copyEnvIfMissing(join(root, "apps/api/.env.example"), join(root, "apps/api/.env"));
+prepareLocalEnv(join(root, "apps/app"), []);
+prepareLocalEnv(join(root, "apps/api"), [`BETTER_AUTH_SECRET=${randomBytes(32).toString("hex")}`]);
 
 console.log("Applying local D1 migrations...");
 run("pnpm", ["--filter", "@rn-cf/api", "db:migrate:local"]);

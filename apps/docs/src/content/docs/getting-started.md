@@ -16,6 +16,10 @@ pnpm setup
 pnpm dev
 ```
 
+`pnpm setup` creates an ignored API `.env.local` containing a random development auth secret.
+Safe defaults come from each committed `.env.schema`; add only machine-specific overrides to
+`.env.local`.
+
 | Surface   | URL                   |
 | --------- | --------------------- |
 | App (web) | http://localhost:8081 |

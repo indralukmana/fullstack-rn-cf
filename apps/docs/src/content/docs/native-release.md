@@ -24,6 +24,9 @@ store app.
    agreements are incomplete.
 7. Add protected `EXPO_TOKEN` and store credential variables in GitLab. Never commit an App Store
    Connect API key, Google service-account JSON, signing certificate, or EAS token.
+8. Configure each EAS environment with the non-sensitive Expo API URL, app URL, RevenueCat public
+   SDK key, entitlement, and offering. Metro compiles these values into the app bundle; keep all
+   provider secret keys in the Worker environment.
 
 ## Privacy and store declarations
 

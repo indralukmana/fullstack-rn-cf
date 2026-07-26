@@ -81,25 +81,26 @@ packages/
 
 ## Common Commands
 
-| Command             | Purpose                                                  |
-| ------------------- | -------------------------------------------------------- |
-| `pnpm setup`        | Copy env templates, migrate local D1, install Playwright |
-| `pnpm format`       | Format with oxfmt                                        |
-| `pnpm format:check` | Check formatting                                         |
-| `pnpm lint`         | Fix lint issues with oxlint                              |
-| `pnpm lint:check`   | Lint without writing                                     |
-| `pnpm typecheck`    | Run workspace type checks                                |
-| `pnpm test`         | Run workspace smoke tests                                |
-| `pnpm test:e2e`     | Run Playwright smoke tests                               |
-| `pnpm codegen`      | Export OpenAPI + regenerate api-client                   |
-| `pnpm build`        | Build all workspaces                                     |
-| `pnpm ci:check`     | Run local CI-equivalent checks                           |
+| Command             | Purpose                                                         |
+| ------------------- | --------------------------------------------------------------- |
+| `pnpm setup`        | Prepare local Varlock overrides, migrate D1, install Playwright |
+| `pnpm format`       | Format with oxfmt                                               |
+| `pnpm format:check` | Check formatting                                                |
+| `pnpm lint`         | Fix lint issues with oxlint                                     |
+| `pnpm lint:check`   | Lint without writing                                            |
+| `pnpm typecheck`    | Run workspace type checks                                       |
+| `pnpm test`         | Run workspace smoke tests                                       |
+| `pnpm test:e2e`     | Run Playwright smoke tests                                      |
+| `pnpm codegen`      | Export OpenAPI + regenerate api-client                          |
+| `pnpm build`        | Build all workspaces                                            |
+| `pnpm ci:check`     | Run local CI-equivalent checks                                  |
 
 ## Cloudflare notes
 
 1. Create a D1 database: `pnpm --filter @rn-cf/api exec wrangler d1 create rn-cf`
 2. Put the returned `database_id` into `apps/api/wrangler.toml`
-3. Configure `apps/api/.env` (see `.env.example` / `.env.schema`) — secrets are validated by varlock
+3. Configure environment contracts in `.env.schema`, developer overrides in ignored `.env.local`
+   files, and deployed secrets through CI or a Varlock secret-provider function
 4. Deploy API: `pnpm --filter @rn-cf/api deploy` (`varlock-wrangler`)
 5. Export and deploy web: `pnpm --filter @rn-cf/app deploy`
 

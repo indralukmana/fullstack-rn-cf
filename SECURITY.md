@@ -30,9 +30,12 @@ Suggested rules:
 
 ## Secrets
 
-- Local: copy `apps/api/.env.example` → `apps/api/.env` (`pnpm setup`)
-- Deploy: `pnpm --filter @rn-cf/api deploy` uses `varlock-wrangler`, which uploads non-sensitive values as Workers vars and sensitive values as secrets
-- Never commit `.env` or `.env.keys`
+- Local: `pnpm setup` creates an ignored `apps/api/.env.local` with a random development auth
+  secret; add only machine-specific overrides there
+- Deploy: `pnpm --filter @rn-cf/api deploy` uses `varlock-wrangler`, which uploads
+  non-sensitive values as Workers vars and sensitive values as secrets
+- Prefer CI environment variables or Varlock secret-provider functions for deployed secrets
+- Never commit `.env*` overrides or `.env.keys`; `.env.schema` is the only committed env file
 
 ## Reporting
 
