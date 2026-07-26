@@ -4,6 +4,7 @@ import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-nativ
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { fontDisplay, fontSans, fontSansSemiBold } from "@/lib/fonts";
+import { useThemeColors } from "@/lib/theme-colors";
 
 type PressableProps = ComponentProps<typeof Pressable>;
 type TextInputProps = ComponentProps<typeof TextInput>;
@@ -77,11 +78,14 @@ export function Field({
   label,
   error,
   className,
+  style,
   ...rest
 }: TextInputProps & {
   label: string;
   error?: string | null;
 }) {
+  const { placeholder } = useThemeColors();
+
   return (
     <View className="gap-1.5">
       <Text
@@ -93,8 +97,8 @@ export function Field({
       <TextInput
         accessibilityLabel={label}
         className={className ? `${fieldClassName} ${className}` : fieldClassName}
-        placeholderTextColor="#94a3b8"
-        style={{ fontFamily: fontSans }}
+        placeholderTextColor={placeholder}
+        style={[{ fontFamily: fontSans }, style]}
         {...rest}
       />
       {error ? <StatusText>{error}</StatusText> : null}
