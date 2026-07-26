@@ -12,7 +12,7 @@ describe("personal billing API", () => {
     const email = `billing-${crypto.randomUUID()}@example.com`;
     const account = await signUpVerifiedUser({ email });
     const db = createDb(env.DB);
-    const storedUser = await db.query.user.findFirst({ where: eq(user.email, email) });
+    const storedUser = await db.query.user.findFirst({ where: { email } });
     if (!storedUser) {
       throw new Error("missing test user");
     }

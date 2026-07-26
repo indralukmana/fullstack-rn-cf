@@ -12,6 +12,8 @@ database_name = "rn-cf"
 # Replace with the id from `wrangler d1 create rn-cf`
 database_id = "00000000-0000-0000-0000-000000000000"
 migrations_dir = "drizzle"
+# Drizzle Kit 1 nests each migration as `<folder>/migration.sql`
+migrations_pattern = "drizzle/*/migration.sql"
 
 [[send_email]]
 name = "EMAIL"

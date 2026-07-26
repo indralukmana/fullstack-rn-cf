@@ -1,4 +1,4 @@
-import { relations, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { check, index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const billingCustomer = sqliteTable(
@@ -296,34 +296,3 @@ export const billingAudit = sqliteTable(
     ),
   ],
 );
-
-export const billingCustomerRelations = relations(billingCustomer, ({ many }) => ({
-  subscriptions: many(subscription),
-}));
-
-export const subscriptionRelations = relations(subscription, ({ one, many }) => ({
-  customer: one(billingCustomer, {
-    fields: [subscription.billingCustomerId],
-    references: [billingCustomer.id],
-  }),
-  entitlements: many(entitlement),
-  grants: many(providerGrant),
-}));
-
-export const entitlementRelations = relations(entitlement, ({ one }) => ({
-  subscription: one(subscription, {
-    fields: [entitlement.sourceSubscriptionId],
-    references: [subscription.id],
-  }),
-}));
-
-export const providerGrantRelations = relations(providerGrant, ({ one }) => ({
-  customer: one(billingCustomer, {
-    fields: [providerGrant.billingCustomerId],
-    references: [billingCustomer.id],
-  }),
-  subscription: one(subscription, {
-    fields: [providerGrant.subscriptionId],
-    references: [subscription.id],
-  }),
-}));

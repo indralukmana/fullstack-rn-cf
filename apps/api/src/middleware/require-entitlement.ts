@@ -1,11 +1,9 @@
-import { and, eq, gt, isNull, or } from "drizzle-orm";
 import { createMiddleware } from "hono/factory";
 
 import type { AuthEnv } from "../lib/better-auth";
 import type { AuthVariables } from "./require-auth";
 
 import { createDb } from "../db/client";
-import { entitlement } from "../db/schema";
 
 export function requireEntitlement(key: string) {
   return createMiddleware<{
@@ -13,13 +11,13 @@ export function requireEntitlement(key: string) {
     Variables: AuthVariables;
   }>(async (c, next) => {
     const access = await createDb(c.env.DB).query.entitlement.findFirst({
-      where: and(
-        eq(entitlement.subjectType, "user"),
-        eq(entitlement.subjectId, c.var.user.id),
-        eq(entitlement.key, key),
-        or(eq(entitlement.status, "active"), eq(entitlement.status, "grace_period")),
-        or(isNull(entitlement.expiresAt), gt(entitlement.expiresAt, new Date())),
-      ),
+      where: {
+        subjectType: "user",
+        subjectId: c.var.user.id,
+        key,
+        status: { in: ["active", "grace_period"] },
+        OR: [{ expiresAt: { isNull: true } }, { expiresAt: { gt: new Date() } }],
+      },
       columns: { id: true },
     });
     if (!access) {

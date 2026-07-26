@@ -5,12 +5,11 @@ import {
   DeleteAccountRequestSchema,
   ErrorResponseSchema,
 } from "@rn-cf/types";
-import { and, eq, gt, inArray, isNull, or } from "drizzle-orm";
 
 import type { AppEnv } from "../app-env";
 
 import { createDb } from "../db/client";
-import { billingAudit, member, providerGrant, user } from "../db/schema";
+import { billingAudit } from "../db/schema";
 import { getRuntimeConfig } from "../lib/config";
 import { requireAuth } from "../middleware/require-auth";
 import { requireVerifiedAuth } from "../middleware/require-verified-auth";
@@ -40,14 +39,14 @@ accountRoutes.openapi(exportRoute, async (c) => {
   const config = getRuntimeConfig(c.env);
   const providerEnvironment = config.isProduction ? "production" : "sandbox";
   const [account, memberships, grants] = await Promise.all([
-    db.query.user.findFirst({ where: eq(user.id, c.var.user.id) }),
-    db.query.member.findMany({ where: eq(member.userId, c.var.user.id) }),
+    db.query.user.findFirst({ where: { id: c.var.user.id } }),
+    db.query.member.findMany({ where: { userId: c.var.user.id } }),
     db.query.providerGrant.findMany({
-      where: and(
-        eq(providerGrant.subjectType, "user"),
-        eq(providerGrant.subjectId, c.var.user.id),
-        eq(providerGrant.providerEnvironment, providerEnvironment),
-      ),
+      where: {
+        subjectType: "user",
+        subjectId: c.var.user.id,
+        providerEnvironment,
+      },
     }),
   ]);
   if (!account) {
@@ -127,13 +126,13 @@ accountRoutes.openapi(deleteRoute, async (c) => {
   const config = getRuntimeConfig(c.env);
   const providerEnvironment = config.isProduction ? "production" : "sandbox";
   const activeGrants = await db.query.providerGrant.findMany({
-    where: and(
-      eq(providerGrant.subjectType, "user"),
-      eq(providerGrant.subjectId, c.var.user.id),
-      eq(providerGrant.providerEnvironment, providerEnvironment),
-      inArray(providerGrant.status, ["active", "grace_period"]),
-      or(isNull(providerGrant.expiresAt), gt(providerGrant.expiresAt, new Date())),
-    ),
+    where: {
+      subjectType: "user",
+      subjectId: c.var.user.id,
+      providerEnvironment,
+      status: { in: ["active", "grace_period"] },
+      OR: [{ expiresAt: { isNull: true } }, { expiresAt: { gt: new Date() } }],
+    },
   });
   if (activeGrants.length > 0) {
     await db.insert(billingAudit).values({

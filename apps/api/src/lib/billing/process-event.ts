@@ -4,7 +4,7 @@ import type { Database } from "../../db/client";
 import type { AppBindings } from "../config";
 import type { ProviderEnvironment } from "./providers/types";
 
-import { billingCustomer, billingEvent } from "../../db/schema";
+import { billingEvent } from "../../db/schema";
 import { getBillingCatalog } from "./catalog";
 import { projectProviderGrants } from "./project-grants";
 import { retrieveRevenueCatGrants } from "./providers/revenuecat";
@@ -96,10 +96,10 @@ async function processStripeEvent(
     return;
   }
   const customer = await db.query.billingCustomer.findFirst({
-    where: and(
-      eq(billingCustomer.provider, "stripe"),
-      eq(billingCustomer.providerCustomerId, target.customerId),
-    ),
+    where: {
+      provider: "stripe",
+      providerCustomerId: target.customerId,
+    },
   });
   if (!customer || customer.subjectType !== "user") {
     throw new Error("Stripe event references an unknown customer");
@@ -140,7 +140,7 @@ export async function processBillingEvent(
 ): Promise<"processed" | "already_processed"> {
   const startedAt = Date.now();
   const event = await db.query.billingEvent.findFirst({
-    where: eq(billingEvent.id, eventId),
+    where: { id: eventId },
   });
   if (!event) {
     throw new Error("Billing event was not found");

@@ -1,20 +1,20 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import Database from "better-sqlite3";
 
+import { listNestedMigrationFiles } from "./read-d1-migrations.mjs";
+
 const apiRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const migrationsDir = join(apiRoot, "drizzle");
-const migrations = readdirSync(migrationsDir)
-  .filter((name) => /^\d+.*\.sql$/.test(name))
-  .toSorted();
+const migrations = listNestedMigrationFiles(migrationsDir);
 const db = new Database(":memory:");
 db.pragma("foreign_keys = ON");
 
 try {
   for (const migration of migrations) {
-    const statements = readFileSync(join(migrationsDir, migration), "utf8")
+    const statements = readFileSync(migration.path, "utf8")
       .split("--> statement-breakpoint")
       .map((statement) => statement.trim())
       .filter(Boolean);
@@ -24,7 +24,7 @@ try {
         db.exec(statement);
       }
     } catch (error) {
-      throw new Error(`Migration ${migration} failed: ${error.message}`, { cause: error });
+      throw new Error(`Migration ${migration.name} failed: ${error.message}`, { cause: error });
     }
   }
 

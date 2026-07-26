@@ -1,12 +1,10 @@
 import type { OrganizationRole } from "@rn-cf/types";
-import { and, eq } from "drizzle-orm";
 import { createMiddleware } from "hono/factory";
 
 import type { AuthEnv } from "../lib/better-auth";
 import type { AuthVariables } from "./require-auth";
 
 import { createDb } from "../db/client";
-import { member } from "../db/schema";
 import { getSession } from "../lib/auth/session";
 
 export type OrganizationContext = {
@@ -48,7 +46,10 @@ export const requireOrganization = createMiddleware<{
 
   const db = createDb(c.env.DB);
   const membership = await db.query.member.findFirst({
-    where: and(eq(member.organizationId, organizationId), eq(member.userId, session.user.id)),
+    where: {
+      organizationId,
+      userId: session.user.id,
+    },
     columns: {
       organizationId: true,
       role: true,

@@ -15,6 +15,16 @@ allowBuilds:
 overrides:
   zod: "^4.4.3"
   "@cloudflare/vitest-pool-workers>zod": "3.25.76"
+  # Better Auth still peers ^0.45.2; API uses Drizzle ORM 1 RC. Force one copy.
+  drizzle-orm: "1.0.0-rc.4"
+
+packageExtensions:
+  better-auth:
+    peerDependencies:
+      drizzle-orm: ">=0.45.2 || >=1.0.0-rc.0"
+  "@better-auth/drizzle-adapter":
+    peerDependencies:
+      drizzle-orm: ">=0.45.2 || >=1.0.0-rc.0"
 
 minimumReleaseAgeExclude:
   - "@typescript/native-preview-darwin-arm64@7.0.0-dev.20260618.1"

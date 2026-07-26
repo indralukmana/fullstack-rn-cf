@@ -39,8 +39,10 @@ export async function ingestBillingEvent(
   }
 
   const existing = await db.query.billingEvent.findFirst({
-    where: (table, { and, eq }) =>
-      and(eq(table.provider, input.provider), eq(table.providerEventId, input.providerEventId)),
+    where: {
+      provider: input.provider,
+      providerEventId: input.providerEventId,
+    },
     columns: { id: true },
   });
   if (!existing) {

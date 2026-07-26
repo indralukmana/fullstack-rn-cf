@@ -1,9 +1,8 @@
 import { env } from "cloudflare:workers";
-import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
 import { createDb } from "../../src/db/client";
-import { billingAudit, providerGrant, user } from "../../src/db/schema";
+import { providerGrant } from "../../src/db/schema";
 import { deleteApi, getApi } from "../helpers/api-request";
 import { signUpVerifiedUser } from "../helpers/email-auth";
 
@@ -20,7 +19,7 @@ describe("account privacy lifecycle", () => {
       billingGrants: [],
     });
     const audit = await createDb(env.DB).query.billingAudit.findFirst({
-      where: eq(billingAudit.action, "account_exported"),
+      where: { action: "account_exported" },
     });
     expect(audit?.subjectUserId).toBeTruthy();
   });
@@ -29,7 +28,7 @@ describe("account privacy lifecycle", () => {
     const email = `subscribed-${crypto.randomUUID()}@example.com`;
     const account = await signUpVerifiedUser({ email });
     const db = createDb(env.DB);
-    const storedUser = await db.query.user.findFirst({ where: eq(user.email, email) });
+    const storedUser = await db.query.user.findFirst({ where: { email } });
     if (!storedUser) {
       throw new Error("missing test user");
     }
@@ -53,14 +52,14 @@ describe("account privacy lifecycle", () => {
       confirmation: "DELETE",
     });
     expect(response.status).toBe(409);
-    expect(await db.query.user.findFirst({ where: eq(user.id, storedUser.id) })).toBeTruthy();
+    expect(await db.query.user.findFirst({ where: { id: storedUser.id } })).toBeTruthy();
   });
 
   it("deletes an unsubscribed account while retaining a minimal audit", async () => {
     const email = `delete-${crypto.randomUUID()}@example.com`;
     const account = await signUpVerifiedUser({ email });
     const db = createDb(env.DB);
-    const storedUser = await db.query.user.findFirst({ where: eq(user.email, email) });
+    const storedUser = await db.query.user.findFirst({ where: { email } });
     if (!storedUser) {
       throw new Error("missing test user");
     }
@@ -70,10 +69,10 @@ describe("account privacy lifecycle", () => {
     });
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({ deleted: true });
-    expect(await db.query.user.findFirst({ where: eq(user.id, storedUser.id) })).toBeUndefined();
+    expect(await db.query.user.findFirst({ where: { id: storedUser.id } })).toBeUndefined();
     expect(
       await db.query.billingAudit.findFirst({
-        where: eq(billingAudit.subjectUserId, storedUser.id),
+        where: { subjectUserId: storedUser.id },
       }),
     ).toMatchObject({ action: "account_deleted" });
   });

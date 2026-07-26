@@ -77,7 +77,7 @@ describe("billing event processing", () => {
       interval: "monthly",
     });
     const storedEvent = await db.query.billingEvent.findFirst({
-      where: eq(billingEvent.id, eventId),
+      where: { id: eventId },
     });
     expect(storedEvent).toMatchObject({ state: "processed", attempts: 1 });
   });
@@ -101,7 +101,7 @@ describe("billing event processing", () => {
 
     await expect(processBillingEvent(db, env, eventId)).rejects.toThrow("unknown app");
     const storedEvent = await db.query.billingEvent.findFirst({
-      where: eq(billingEvent.id, eventId),
+      where: { id: eventId },
     });
     expect(storedEvent?.state).toBe("failed");
   });

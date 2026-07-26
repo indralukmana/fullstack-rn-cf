@@ -6,19 +6,13 @@ import {
   ErrorResponseSchema,
   ReconciliationResponseSchema,
 } from "@rn-cf/types";
-import { and, eq, gt, inArray, isNull, lt, or } from "drizzle-orm";
+import { and, eq, lt } from "drizzle-orm";
 import Stripe from "stripe";
 
 import type { AppEnv } from "../app-env";
 
 import { createDb } from "../db/client";
-import {
-  billingAudit,
-  billingCustomer,
-  entitlement,
-  providerGrant,
-  purchaseAttempt,
-} from "../db/schema";
+import { billingAudit, billingCustomer, purchaseAttempt } from "../db/schema";
 import { getBillingCatalog } from "../lib/billing/catalog";
 import { reconcileBillingCustomer } from "../lib/billing/reconcile-customer";
 import { getRuntimeConfig } from "../lib/config";
@@ -66,19 +60,19 @@ billingRoutes.openapi(statusRoute, async (c) => {
   const providerEnvironment = config.isProduction ? "production" : "sandbox";
   const [aggregate, grants] = await Promise.all([
     db.query.entitlement.findFirst({
-      where: and(
-        eq(entitlement.subjectType, "user"),
-        eq(entitlement.subjectId, c.var.user.id),
-        eq(entitlement.key, config.billingEntitlementKey),
-      ),
+      where: {
+        subjectType: "user",
+        subjectId: c.var.user.id,
+        key: config.billingEntitlementKey,
+      },
     }),
     db.query.providerGrant.findMany({
-      where: and(
-        eq(providerGrant.subjectType, "user"),
-        eq(providerGrant.subjectId, c.var.user.id),
-        eq(providerGrant.entitlementKey, config.billingEntitlementKey),
-        eq(providerGrant.providerEnvironment, providerEnvironment),
-      ),
+      where: {
+        subjectType: "user",
+        subjectId: c.var.user.id,
+        entitlementKey: config.billingEntitlementKey,
+        providerEnvironment,
+      },
     }),
   ]);
   const hasAccess =
@@ -148,14 +142,14 @@ billingRoutes.openapi(checkoutRoute, async (c) => {
     );
 
   const activeGrant = await db.query.providerGrant.findFirst({
-    where: and(
-      eq(providerGrant.subjectType, "user"),
-      eq(providerGrant.subjectId, c.var.user.id),
-      eq(providerGrant.entitlementKey, catalog.entitlementKey),
-      eq(providerGrant.providerEnvironment, providerEnvironment),
-      inArray(providerGrant.status, ["active", "grace_period"]),
-      or(isNull(providerGrant.expiresAt), gt(providerGrant.expiresAt, now)),
-    ),
+    where: {
+      subjectType: "user",
+      subjectId: c.var.user.id,
+      entitlementKey: catalog.entitlementKey,
+      providerEnvironment,
+      status: { in: ["active", "grace_period"] },
+      OR: [{ expiresAt: { isNull: true } }, { expiresAt: { gt: now } }],
+    },
     columns: { provider: true },
   });
   if (activeGrant) {
@@ -170,11 +164,11 @@ billingRoutes.openapi(checkoutRoute, async (c) => {
 
   const stripe = stripeClient(c.env.STRIPE_SECRET_KEY);
   const pending = await db.query.purchaseAttempt.findFirst({
-    where: and(
-      eq(purchaseAttempt.userId, c.var.user.id),
-      eq(purchaseAttempt.state, "pending"),
-      gt(purchaseAttempt.expiresAt, now),
-    ),
+    where: {
+      userId: c.var.user.id,
+      state: "pending",
+      expiresAt: { gt: now },
+    },
   });
   if (pending?.providerSessionId) {
     const existingSession = await stripe.checkout.sessions.retrieve(pending.providerSessionId);
@@ -190,11 +184,11 @@ billingRoutes.openapi(checkoutRoute, async (c) => {
   }
 
   let customer = await db.query.billingCustomer.findFirst({
-    where: and(
-      eq(billingCustomer.subjectType, "user"),
-      eq(billingCustomer.subjectId, c.var.user.id),
-      eq(billingCustomer.provider, "stripe"),
-    ),
+    where: {
+      subjectType: "user",
+      subjectId: c.var.user.id,
+      provider: "stripe",
+    },
   });
   if (!customer) {
     const stripeCustomer = await stripe.customers.create(
@@ -287,11 +281,11 @@ const portalRoute = createRoute({
 
 billingRoutes.openapi(portalRoute, async (c) => {
   const customer = await createDb(c.env.DB).query.billingCustomer.findFirst({
-    where: and(
-      eq(billingCustomer.subjectType, "user"),
-      eq(billingCustomer.subjectId, c.var.user.id),
-      eq(billingCustomer.provider, "stripe"),
-    ),
+    where: {
+      subjectType: "user",
+      subjectId: c.var.user.id,
+      provider: "stripe",
+    },
   });
   if (!customer) {
     return c.json(
@@ -324,11 +318,11 @@ const reconcileRoute = createRoute({
 billingRoutes.openapi(reconcileRoute, async (c) => {
   const db = createDb(c.env.DB);
   const stripeCustomer = await db.query.billingCustomer.findFirst({
-    where: and(
-      eq(billingCustomer.subjectType, "user"),
-      eq(billingCustomer.subjectId, c.var.user.id),
-      eq(billingCustomer.provider, "stripe"),
-    ),
+    where: {
+      subjectType: "user",
+      subjectId: c.var.user.id,
+      provider: "stripe",
+    },
   });
   const targets = [
     {

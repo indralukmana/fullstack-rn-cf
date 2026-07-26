@@ -3,7 +3,7 @@ import { and, eq, notInArray } from "drizzle-orm";
 import type { Database } from "../../db/client";
 import type { NormalizedProviderGrant, ProviderEnvironment } from "./providers/types";
 
-import { billingCustomer, providerGrant, subscription, user } from "../../db/schema";
+import { billingCustomer, providerGrant, subscription } from "../../db/schema";
 import { recomputeEntitlement } from "./recompute-entitlement";
 
 type ProjectProviderGrantsInput = {
@@ -35,7 +35,7 @@ export async function projectProviderGrants(
   input: ProjectProviderGrantsInput,
 ): Promise<void> {
   const existingUser = await db.query.user.findFirst({
-    where: eq(user.id, input.userId),
+    where: { id: input.userId },
     columns: { id: true },
   });
   if (!existingUser) {

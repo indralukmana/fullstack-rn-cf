@@ -127,7 +127,7 @@ describe("billing ledger invariants", () => {
     });
 
     const projected = await db.query.entitlement.findFirst({
-      where: (table, { eq }) => eq(table.subjectId, subjectId),
+      where: { subjectId },
     });
     expect(projected).toMatchObject({
       status: "active",
@@ -160,7 +160,7 @@ describe("billing ledger invariants", () => {
     });
     expect(
       await db.query.entitlement.findFirst({
-        where: (table, { eq: equals }) => equals(table.subjectId, subjectId),
+        where: { subjectId },
       }),
     ).toMatchObject({ status: "active", source: "revenuecat" });
 
@@ -179,7 +179,7 @@ describe("billing ledger invariants", () => {
     });
     expect(
       await db.query.entitlement.findFirst({
-        where: (table, { eq: equals }) => equals(table.subjectId, subjectId),
+        where: { subjectId },
       }),
     ).toMatchObject({ status: "expired" });
   });
@@ -213,7 +213,7 @@ describe("billing ledger invariants", () => {
     });
 
     const projected = await db.query.entitlement.findFirst({
-      where: (table, { eq }) => eq(table.subjectId, subjectId),
+      where: { subjectId },
     });
     expect(projected?.status).toBe("revoked");
   });

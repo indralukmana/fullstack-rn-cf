@@ -23,7 +23,7 @@
     "@scalar/hono-api-reference": "^0.9.10",
     "@varlock/cloudflare-integration": "^1.2.1",
     "better-auth": "^1.6.23",
-    "drizzle-orm": "^0.45.2",
+    "drizzle-orm": "1.0.0-rc.4",
     "hono": "^4.12.23",
     "stripe": "^22.3.2",
     "varlock": "^1.10.0",
@@ -34,7 +34,7 @@
     "@cloudflare/workers-types": "^5.20260724.1",
     "@types/better-sqlite3": "^7.6.13",
     "better-sqlite3": "^12.11.1",
-    "drizzle-kit": "^0.31.10",
+    "drizzle-kit": "1.0.0-rc.4",
     "vitest": "^4.1.8",
     "wrangler": "^4.90.0"
   }
