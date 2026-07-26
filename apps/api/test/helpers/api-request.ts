@@ -1,14 +1,14 @@
 import { createExecutionContext, waitOnExecutionContext } from "cloudflare:test";
 import { env } from "cloudflare:workers";
 
-import app from "../../src/index";
+import worker from "../../src/index";
 
 const webOrigin = "http://127.0.0.1:8081";
 const apiOrigin = "http://127.0.0.1:8787";
 
 export async function postAuth(path: string, body: Record<string, string>) {
   const ctx = createExecutionContext();
-  const response = await app.fetch(
+  const response = await worker.fetch(
     new Request(`${apiOrigin}${path}`, {
       method: "POST",
       headers: {
@@ -80,7 +80,7 @@ async function requestApi(
     headers["Content-Type"] = "application/json";
   }
 
-  const response = await app.fetch(
+  const response = await worker.fetch(
     new Request(`${apiOrigin}${path}`, {
       method,
       headers,

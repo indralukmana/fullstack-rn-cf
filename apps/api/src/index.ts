@@ -30,7 +30,7 @@ import { billingWebhooks } from "./routes/billing-webhooks";
 
 await initVarlockIfPresent();
 
-const app = new OpenAPIHono<AppEnv>();
+export const app = new OpenAPIHono<AppEnv>();
 
 app.use("*", requestContext);
 

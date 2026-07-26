@@ -44,7 +44,7 @@ describe("security hardening", () => {
 
   it("omits CORS allow-origin for disallowed origins", async () => {
     const { env } = await import("cloudflare:workers");
-    const app = (await import("../../src/index")).default;
+    const { app } = await import("../../src/index");
     const response = await app.request(
       "/health",
       {

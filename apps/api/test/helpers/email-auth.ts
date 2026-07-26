@@ -1,7 +1,7 @@
 import { createExecutionContext, waitOnExecutionContext } from "cloudflare:test";
 import { env } from "cloudflare:workers";
 
-import app from "../../src/index";
+import worker from "../../src/index";
 import { extractLink } from "../../src/lib/email/outbox";
 import { clearOutboundEmails } from "../../src/lib/email/send";
 import { getSessionCookie, postAuth } from "./api-request";
@@ -16,7 +16,7 @@ type MailboxResponse = {
 export async function clearMailbox() {
   clearOutboundEmails();
   const ctx = createExecutionContext();
-  const response = await app.fetch(
+  const response = await worker.fetch(
     new Request(`${apiOrigin}/api/dev/mailbox`, { method: "DELETE" }),
     env,
     ctx,
@@ -30,7 +30,7 @@ export async function getMailbox(to?: string) {
   const url = to
     ? `${apiOrigin}/api/dev/mailbox?to=${encodeURIComponent(to)}`
     : `${apiOrigin}/api/dev/mailbox`;
-  const response = await app.fetch(new Request(url), env, ctx);
+  const response = await worker.fetch(new Request(url), env, ctx);
   await waitOnExecutionContext(ctx);
   const body: MailboxResponse = await response.json();
   return body;
@@ -39,7 +39,7 @@ export async function getMailbox(to?: string) {
 /** Verify without callbackURL so Better Auth returns JSON instead of redirecting. */
 export async function verifyEmailToken(token: string) {
   const ctx = createExecutionContext();
-  const response = await app.fetch(
+  const response = await worker.fetch(
     new Request(`${apiOrigin}/api/auth/verify-email?token=${encodeURIComponent(token)}`, {
       method: "GET",
       headers: { Origin: webOrigin },

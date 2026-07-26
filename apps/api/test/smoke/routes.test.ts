@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
 import { describe, expect, it } from "vitest";
 
-import app from "../../src/index";
+import { app } from "../../src/index";
 
 describe("API smoke", () => {
   it("GET /health returns 200", async () => {

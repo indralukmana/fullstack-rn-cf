@@ -3,7 +3,7 @@ import { env } from "cloudflare:workers";
 import { and, eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
-import app from "../../src";
+import worker from "../../src";
 import { createDb } from "../../src/db/client";
 import { billingEvent } from "../../src/db/schema";
 
@@ -34,7 +34,7 @@ async function postWebhook(
   headers: Record<string, string>,
 ) {
   const ctx = createExecutionContext();
-  const response = await app.fetch(
+  const response = await worker.fetch(
     new Request(`${apiOrigin}/api/webhooks/${provider}`, {
       method: "POST",
       headers: {

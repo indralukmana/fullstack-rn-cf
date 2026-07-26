@@ -35,10 +35,6 @@ function isMailboxResponse(value: unknown): value is MailboxResponse {
   return Array.isArray(messages) && messages.every(isMailboxMessage);
 }
 
-export async function clearMailbox(request: APIRequestContext) {
-  await request.delete(`${API_ORIGIN}/api/dev/mailbox`);
-}
-
 export async function getMailbox(request: APIRequestContext, to?: string) {
   const url = to
     ? `${API_ORIGIN}/api/dev/mailbox?to=${encodeURIComponent(to)}`
@@ -57,6 +53,15 @@ export async function verifyEmailFromMailbox(
   page: Page,
   email: string,
 ) {
+  await expect
+    .poll(
+      async () => {
+        const mailbox = await getMailbox(request, email);
+        return mailbox.messages.some((message) => /verify/i.test(message.subject));
+      },
+      { timeout: 5_000 },
+    )
+    .toBe(true);
   const mailbox = await getMailbox(request, email);
   const verification = mailbox.messages.find((message) => /verify/i.test(message.subject));
   expect(verification).toBeDefined();
@@ -89,7 +94,6 @@ export async function registerViaUi(
   const name = options.name ?? "E2E Author";
   const password = options.password ?? TEST_PASSWORD;
 
-  await clearMailbox(request);
   await page.goto("/sign-up");
   await page.getByPlaceholder("Name").fill(name);
   await page.getByPlaceholder("Email").fill(email);
