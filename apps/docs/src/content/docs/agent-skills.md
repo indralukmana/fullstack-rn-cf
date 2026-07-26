@@ -29,6 +29,22 @@ a task matches, keeping normal context small.
 Product visual intent for the Expo app lives in `apps/app/DESIGN.md`. Generic UI skills must
 follow that file and Uniwind constraints.
 
+### UI skill overrides (Expo / Uniwind)
+
+Vendor UI skills (`baseline-ui`, `improve-ui`, `frontend-ui-engineering`, `fixing-accessibility`)
+often assume DOM stacks (Base UI / Radix, `motion/react`, `text-balance`, CSS Grid dashboards).
+For `apps/app`, prefer:
+
+- Uniwind + React Native primitives (`Pressable`, `TextInput`, `Modal`) from
+  `apps/app/components/ui.tsx`
+- Semantic theme tokens in `apps/app/global.css` (not purple/glow marketing kits)
+- RN accessibility props (`accessibilityLabel`, `accessibilityRole`) alongside web ARIA where
+  Expo web maps them
+- No NativeWind, shadcn/Next layout kits, or DOM-only animation libraries on shared screens
+
+When a vendor UI example conflicts with `DESIGN.md` or `launchpad-architecture`, keep the
+launchpad pattern and note the conflict instead of copying the web-only recipe.
+
 The source and content hash for downloaded skills are recorded in `skills-lock.json`. The
 launchpad skill is maintained locally because no vendor skill knows the unified billing ledger,
 code-generation boundary, D1 migration policy, or release gates.
