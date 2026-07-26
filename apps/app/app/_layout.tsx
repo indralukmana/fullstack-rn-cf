@@ -5,8 +5,9 @@ import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 
 import "../global.css";
-import { Platform } from "react-native";
+import { Platform, View } from "react-native";
 
+import { OfflineBanner } from "@/components/offline-banner";
 import { authClient } from "@/lib/auth-client";
 import { env } from "@/lib/env";
 
@@ -30,27 +31,30 @@ export default function RootLayout() {
       {/* expo-status-bar uses `style` as light|dark|auto, not a RN style object */}
       {/* oxlint-disable-next-line react/style-prop-object */}
       <StatusBar style="auto" />
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: "#f8fafc" },
-          headerShadowVisible: false,
-          headerTintColor: "#0f172a",
-          headerTitleStyle: { fontWeight: "600" },
-          contentStyle: { backgroundColor: "#f8fafc" },
-        }}
-      >
-        <Stack.Screen name="index" options={{ title: "RN CF" }} />
-        <Stack.Screen name="sign-in" options={{ title: "Sign in" }} />
-        <Stack.Screen name="sign-up" options={{ title: "Register" }} />
-        <Stack.Screen name="check-email" options={{ title: "Check email" }} />
-        <Stack.Screen name="forgot-password" options={{ title: "Forgot password" }} />
-        <Stack.Screen name="reset-password" options={{ title: "Reset password" }} />
-        <Stack.Screen name="accept-invitation" options={{ title: "Organization invitation" }} />
-        <Stack.Screen name="organizations" options={{ title: "Organizations" }} />
-        <Stack.Screen name="me" options={{ title: "Account" }} />
-        <Stack.Screen name="subscription" options={{ title: "Pro subscription" }} />
-        <Stack.Screen name="account-data" options={{ title: "Account data" }} />
-      </Stack>
+      <View className="flex-1 bg-slate-50">
+        <OfflineBanner />
+        <Stack
+          screenOptions={{
+            headerStyle: { backgroundColor: "#f8fafc" },
+            headerShadowVisible: false,
+            headerTintColor: "#0f172a",
+            headerTitleStyle: { fontWeight: "600" },
+            contentStyle: { backgroundColor: "#f8fafc" },
+          }}
+        >
+          <Stack.Screen name="index" options={{ title: "RN CF" }} />
+          <Stack.Screen name="sign-in" options={{ title: "Sign in" }} />
+          <Stack.Screen name="sign-up" options={{ title: "Register" }} />
+          <Stack.Screen name="check-email" options={{ title: "Check email" }} />
+          <Stack.Screen name="forgot-password" options={{ title: "Forgot password" }} />
+          <Stack.Screen name="reset-password" options={{ title: "Reset password" }} />
+          <Stack.Screen name="accept-invitation" options={{ title: "Organization invitation" }} />
+          <Stack.Screen name="organizations" options={{ title: "Organizations" }} />
+          <Stack.Screen name="me" options={{ title: "Account" }} />
+          <Stack.Screen name="subscription" options={{ title: "Pro subscription" }} />
+          <Stack.Screen name="account-data" options={{ title: "Account data" }} />
+        </Stack>
+      </View>
     </QueryClientProvider>
   );
 }
