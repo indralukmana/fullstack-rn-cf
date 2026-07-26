@@ -30,7 +30,8 @@ override this file.
 3. Add or update tests for behavior and security boundaries.
 4. Run focused checks first, then the broader workspace gate when warranted.
 5. Review the complete diff for secrets, generated churn, and unrelated files.
-6. Commit each verified logical change separately when commits are requested.
+6. Commit each verified logical change separately after checks pass. Do not wait to be asked
+   to commit finished, reviewable work; leave unrelated WIP unstaged.
 
 Use concise commit messages that explain why. Keep migrations with their schema change and
 generated API artifacts with their contract change; those pairs are one review unit.

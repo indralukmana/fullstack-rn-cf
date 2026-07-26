@@ -12,4 +12,5 @@ Read `AGENTS.md` and the nearest scoped `AGENTS.md`; they are canonical.
 - Deploys, pushes, remote migrations, billing/secret changes, and destructive Git require
   explicit user approval.
 - Add focused tests, run relevant checks, and inspect the complete diff.
-- Keep requested commits small and independently reviewable.
+- Commit each verified logical change separately after checks pass; leave unrelated WIP
+  unstaged. Do not wait to be asked to commit finished, reviewable work.
