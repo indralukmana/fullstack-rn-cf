@@ -17,6 +17,7 @@ import {
   StatusText,
 } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
+import { validateEmail } from "@/lib/validation";
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -26,8 +27,19 @@ export default function OrganizationsScreen() {
   const activeOrganization = authClient.useActiveOrganization();
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<"member" | "admin">("member");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [inviteMessage, setInviteMessage] = useState<string | null>(null);
+
+  const members = activeOrganization.data?.members ?? [];
+  const invitations = activeOrganization.data?.invitations ?? [];
+  const pendingInvitations = invitations.filter((invitation) => invitation.status === "pending");
+  const canManageMembers = members.some(
+    (member) =>
+      member.userId === session?.user.id && (member.role === "owner" || member.role === "admin"),
+  );
 
   async function onCreate() {
     const normalizedName = name.trim();
@@ -77,6 +89,7 @@ export default function OrganizationsScreen() {
   async function onSelect(organizationId: string) {
     setPending(true);
     setError(null);
+    setInviteMessage(null);
     const selected = await authClient.organization.setActive({ organizationId });
     setPending(false);
 
@@ -85,6 +98,48 @@ export default function OrganizationsScreen() {
       return;
     }
 
+    await activeOrganization.refetch();
+  }
+
+  async function onInvite() {
+    const emailError = validateEmail(inviteEmail);
+    if (emailError) {
+      setError(emailError);
+      return;
+    }
+    if (!activeOrganization.data?.id) {
+      setError("Select an organization before inviting members.");
+      return;
+    }
+
+    setPending(true);
+    setError(null);
+    setInviteMessage(null);
+    const invited = await authClient.organization.inviteMember({
+      email: inviteEmail.trim(),
+      role: inviteRole,
+    });
+    setPending(false);
+
+    if (invited.error) {
+      setError(invited.error.message ?? "Could not send the invitation.");
+      return;
+    }
+
+    setInviteEmail("");
+    setInviteMessage(`Invitation sent to ${inviteEmail.trim()}.`);
+    await activeOrganization.refetch();
+  }
+
+  async function onCancelInvitation(invitationId: string) {
+    setPending(true);
+    setError(null);
+    const cancelled = await authClient.organization.cancelInvitation({ invitationId });
+    setPending(false);
+    if (cancelled.error) {
+      setError(cancelled.error.message ?? "Could not cancel the invitation.");
+      return;
+    }
     await activeOrganization.refetch();
   }
 
@@ -158,6 +213,99 @@ export default function OrganizationsScreen() {
         )}
       </Section>
 
+      {activeOrganization.data ? (
+        <Section title="Members">
+          {members.length ? (
+            <View className="gap-2">
+              {members.map((member) => (
+                <View
+                  key={member.id}
+                  className="rounded-lg border border-border bg-elevated px-4 py-3"
+                >
+                  <BodyText className="text-foreground" weight="semibold">
+                    {member.user.name}
+                  </BodyText>
+                  <BodyText className="text-sm text-foreground-muted">
+                    {member.user.email} · {member.role}
+                  </BodyText>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <EmptyState
+              title="No members loaded"
+              description="Refresh by reselecting the organization."
+            />
+          )}
+        </Section>
+      ) : null}
+
+      {activeOrganization.data && canManageMembers ? (
+        <Section title="Invite member">
+          <View className="gap-3">
+            <Field
+              autoCapitalize="none"
+              autoComplete="email"
+              keyboardType="email-address"
+              label="Email"
+              onChangeText={setInviteEmail}
+              placeholder="teammate@example.com"
+              value={inviteEmail}
+            />
+            <View className="flex-row gap-2">
+              {(["member", "admin"] as const).map((role) => {
+                const selected = inviteRole === role;
+                return (
+                  <Pressable
+                    key={role}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected }}
+                    className={`rounded-lg border px-3 py-2 ${
+                      selected ? "border-foreground bg-selected" : "border-border bg-elevated"
+                    }`}
+                    onPress={() => setInviteRole(role)}
+                  >
+                    <BodyText className="capitalize text-foreground" weight="semibold">
+                      {role}
+                    </BodyText>
+                  </Pressable>
+                );
+              })}
+            </View>
+            {inviteMessage ? <StatusText tone="success">{inviteMessage}</StatusText> : null}
+            <Button
+              disabled={pending}
+              label={pending ? "Sending…" : "Send invitation"}
+              onPress={onInvite}
+            />
+          </View>
+          {pendingInvitations.length ? (
+            <View className="mt-3 gap-2">
+              <BodyText className="text-sm text-foreground-muted" weight="semibold">
+                Pending invitations
+              </BodyText>
+              {pendingInvitations.map((invitation) => (
+                <View
+                  key={invitation.id}
+                  className="gap-2 rounded-lg border border-border bg-elevated px-4 py-3"
+                >
+                  <BodyText className="text-foreground">{invitation.email}</BodyText>
+                  <BodyText className="text-sm text-foreground-muted">
+                    Role: {invitation.role}
+                  </BodyText>
+                  <Button
+                    disabled={pending}
+                    label="Cancel invitation"
+                    onPress={() => void onCancelInvitation(invitation.id)}
+                    variant="secondary"
+                  />
+                </View>
+              ))}
+            </View>
+          ) : null}
+        </Section>
+      ) : null}
+
       <Section title="Create organization">
         <View className="gap-3">
           <Field
@@ -175,7 +323,6 @@ export default function OrganizationsScreen() {
             placeholder="organization-slug"
             value={slug}
           />
-          {error ? <StatusText>{error}</StatusText> : null}
           <Button
             disabled={pending}
             label={pending ? "Saving…" : "Create organization"}
@@ -183,6 +330,8 @@ export default function OrganizationsScreen() {
           />
         </View>
       </Section>
+
+      {error ? <StatusText>{error}</StatusText> : null}
 
       <QuietLink href="/me">Back to account</QuietLink>
     </Screen>
