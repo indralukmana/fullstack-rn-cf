@@ -31,9 +31,9 @@ authorization model.
 2. Insert the event into `billing_event` using `(provider, provider_event_id)` as the
    idempotency boundary.
 3. Process the durable event with retry-safe domain logic.
-4. Project normalized customer and subscription state.
-5. Upsert one entitlement per `(subject_type, subject_id, key)`.
-6. Authorize paid capabilities from the server-side entitlement projection.
+4. Project one normalized provider grant per subscription or transaction.
+5. Atomically recompute one aggregate entitlement per `(subject_type, subject_id, key)`.
+6. Authorize paid capabilities from the aggregate server-side entitlement.
 
 The schema separates users and organizations with an explicit subject type. This allows one
 person to have a personal mobile plan while belonging to organizations with independent Stripe
@@ -44,7 +44,10 @@ plans.
 - Duplicate provider events cannot create duplicate ledger entries.
 - A provider customer maps to one subject, and a subject has at most one customer per provider.
 - Subscription and entitlement states are constrained at the database boundary.
-- Entitlements record their source and optional source subscription.
+- Provider grants retain provider environment, interval, occurrence time, expiry, management URL,
+  and last-applied provider state. Sandbox grants never unlock production access.
+- The entitlement row is a derived cache. Access is active when any unexpired production grant is
+  active, or in grace only when no active grant exists and an unexpired grace grant does.
 - `active` and `grace_period` are the only states that may grant access; the domain policy must
   still consider expiration.
 - Clients may display store state but cannot grant server capabilities.
