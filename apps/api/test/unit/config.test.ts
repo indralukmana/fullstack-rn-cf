@@ -18,6 +18,19 @@ const productionEnv: AppBindings = {
   STRIPE_SECRET_KEY: "stripe-secret",
   STRIPE_WEBHOOK_SECRET: "stripe-webhook-secret",
   REVENUECAT_WEBHOOK_AUTHORIZATION: "Bearer revenuecat-webhook-secret",
+  REVENUECAT_SECRET_API_KEY: "revenuecat-secret",
+  BILLING_ENTITLEMENT_KEY: "pro",
+  BILLING_GRACE_PERIOD_DAYS: 3,
+  STRIPE_PRICE_MONTHLY: "price_monthly",
+  STRIPE_PRICE_YEARLY: "price_yearly",
+  REVENUECAT_ENTITLEMENT_ID: "pro",
+  REVENUECAT_OFFERING_ID: "default",
+  REVENUECAT_IOS_APP_ID: "app_ios",
+  REVENUECAT_ANDROID_APP_ID: "app_android",
+  REVENUECAT_IOS_PRODUCT_MONTHLY: "ios_pro_monthly",
+  REVENUECAT_IOS_PRODUCT_YEARLY: "ios_pro_yearly",
+  REVENUECAT_ANDROID_PRODUCT_MONTHLY: "android_pro_monthly",
+  REVENUECAT_ANDROID_PRODUCT_YEARLY: "android_pro_yearly",
 };
 
 describe("getRuntimeConfig", () => {
@@ -108,6 +121,17 @@ describe("getRuntimeConfig", () => {
     "STRIPE_SECRET_KEY",
     "STRIPE_WEBHOOK_SECRET",
     "REVENUECAT_WEBHOOK_AUTHORIZATION",
+    "REVENUECAT_SECRET_API_KEY",
+    "STRIPE_PRICE_MONTHLY",
+    "STRIPE_PRICE_YEARLY",
+    "REVENUECAT_ENTITLEMENT_ID",
+    "REVENUECAT_OFFERING_ID",
+    "REVENUECAT_IOS_APP_ID",
+    "REVENUECAT_ANDROID_APP_ID",
+    "REVENUECAT_IOS_PRODUCT_MONTHLY",
+    "REVENUECAT_IOS_PRODUCT_YEARLY",
+    "REVENUECAT_ANDROID_PRODUCT_MONTHLY",
+    "REVENUECAT_ANDROID_PRODUCT_YEARLY",
   ] as const)("requires the %s billing credential in production", (name) => {
     expect(() =>
       getRuntimeConfig({
@@ -125,6 +149,8 @@ describe("getRuntimeConfig", () => {
       authSecret: productionEnv.BETTER_AUTH_SECRET,
       appUrl: "https://app.example.com",
       corsOrigins: ["https://app.example.com"],
+      billingEntitlementKey: "pro",
+      billingGracePeriodDays: 3,
     });
   });
 });

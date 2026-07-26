@@ -15,6 +15,19 @@ export type AppBindings = {
   STRIPE_SECRET_KEY?: string;
   STRIPE_WEBHOOK_SECRET?: string;
   REVENUECAT_WEBHOOK_AUTHORIZATION?: string;
+  REVENUECAT_SECRET_API_KEY?: string;
+  BILLING_ENTITLEMENT_KEY?: string;
+  BILLING_GRACE_PERIOD_DAYS?: string | number;
+  STRIPE_PRICE_MONTHLY?: string;
+  STRIPE_PRICE_YEARLY?: string;
+  REVENUECAT_ENTITLEMENT_ID?: string;
+  REVENUECAT_OFFERING_ID?: string;
+  REVENUECAT_IOS_APP_ID?: string;
+  REVENUECAT_ANDROID_APP_ID?: string;
+  REVENUECAT_IOS_PRODUCT_MONTHLY?: string;
+  REVENUECAT_IOS_PRODUCT_YEARLY?: string;
+  REVENUECAT_ANDROID_PRODUCT_MONTHLY?: string;
+  REVENUECAT_ANDROID_PRODUCT_YEARLY?: string;
   EMAIL?: {
     send(message: {
       from: string;
@@ -94,6 +107,8 @@ export type RuntimeConfig = {
   authRateLimitMax: number;
   emailProvider: "console" | "cloudflare";
   emailFrom: string;
+  billingEntitlementKey: string;
+  billingGracePeriodDays: number;
 };
 
 export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
@@ -109,6 +124,11 @@ export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
   const appUrl = parseAbsoluteUrl(env.APP_URL, "APP_URL");
   const emailProvider = env.EMAIL_PROVIDER;
   const emailFrom = requireNonEmpty(env.EMAIL_FROM, "EMAIL_FROM");
+  const billingEntitlementKey = requireNonEmpty(
+    env.BILLING_ENTITLEMENT_KEY,
+    "BILLING_ENTITLEMENT_KEY",
+  );
+  const billingGracePeriodDays = parsePositiveInt(env.BILLING_GRACE_PERIOD_DAYS, 3);
 
   if (emailProvider !== "console" && emailProvider !== "cloudflare") {
     throw new Error("EMAIL_PROVIDER must be either console or cloudflare");
@@ -146,6 +166,17 @@ export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
     requireNonEmpty(env.STRIPE_SECRET_KEY, "STRIPE_SECRET_KEY");
     requireNonEmpty(env.STRIPE_WEBHOOK_SECRET, "STRIPE_WEBHOOK_SECRET");
     requireNonEmpty(env.REVENUECAT_WEBHOOK_AUTHORIZATION, "REVENUECAT_WEBHOOK_AUTHORIZATION");
+    requireNonEmpty(env.REVENUECAT_SECRET_API_KEY, "REVENUECAT_SECRET_API_KEY");
+    requireNonEmpty(env.STRIPE_PRICE_MONTHLY, "STRIPE_PRICE_MONTHLY");
+    requireNonEmpty(env.STRIPE_PRICE_YEARLY, "STRIPE_PRICE_YEARLY");
+    requireNonEmpty(env.REVENUECAT_ENTITLEMENT_ID, "REVENUECAT_ENTITLEMENT_ID");
+    requireNonEmpty(env.REVENUECAT_OFFERING_ID, "REVENUECAT_OFFERING_ID");
+    requireNonEmpty(env.REVENUECAT_IOS_APP_ID, "REVENUECAT_IOS_APP_ID");
+    requireNonEmpty(env.REVENUECAT_ANDROID_APP_ID, "REVENUECAT_ANDROID_APP_ID");
+    requireNonEmpty(env.REVENUECAT_IOS_PRODUCT_MONTHLY, "REVENUECAT_IOS_PRODUCT_MONTHLY");
+    requireNonEmpty(env.REVENUECAT_IOS_PRODUCT_YEARLY, "REVENUECAT_IOS_PRODUCT_YEARLY");
+    requireNonEmpty(env.REVENUECAT_ANDROID_PRODUCT_MONTHLY, "REVENUECAT_ANDROID_PRODUCT_MONTHLY");
+    requireNonEmpty(env.REVENUECAT_ANDROID_PRODUCT_YEARLY, "REVENUECAT_ANDROID_PRODUCT_YEARLY");
   }
 
   for (const origin of corsOrigins) {
@@ -178,5 +209,7 @@ export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
     authRateLimitMax: parsePositiveInt(env.AUTH_RATE_LIMIT_MAX, 30),
     emailProvider,
     emailFrom,
+    billingEntitlementKey,
+    billingGracePeriodDays,
   };
 }

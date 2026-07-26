@@ -3,8 +3,27 @@ title: Billing and entitlements
 description: Provider events, subscriptions, and paid-feature authorization
 ---
 
-The billing core supports Stripe for web and organization commerce and RevenueCat for native
-Apple/Google subscriptions. Provider SDK objects are not the authorization model.
+The default B2C catalog has one `pro` entitlement with monthly and yearly products. Stripe owns
+web checkout and RevenueCat owns native Apple/Google purchases. Provider SDK objects are not the
+authorization model.
+
+## Product and identity policy
+
+- A verified account is required before any checkout or native purchase UI is shown.
+- Better Auth's immutable `user.id` is the RevenueCat App User ID and Stripe metadata subject.
+  Email addresses are mutable and must never identify purchases.
+- Product and app identifiers are allowlisted in the server environment. Unknown products, apps,
+  environments, and users fail closed instead of creating access.
+- Native builds use the platform store through RevenueCat. Do not globally steer native customers
+  to Stripe; only show web checkout where current App Store and Play policies permit it.
+- RevenueCat restore uses the signed-in `user.id`. Configure the RevenueCat project to transfer
+  purchases to the latest identified account, and warn support that a transfer can remove access
+  from the previous account.
+- Cancellation preserves access through the paid period. Billing issues grant only the configured
+  provider grace period. Refunds, chargebacks, and expiration revoke that provider grant, but
+  another active Stripe or RevenueCat grant continues to unlock `pro`.
+- Apple and Google remain responsible for native refunds and subscription cancellation. Account
+  deletion must explain this and must not claim to cancel a store subscription.
 
 ## Data flow
 

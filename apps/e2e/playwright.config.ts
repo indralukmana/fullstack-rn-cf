@@ -17,6 +17,8 @@ const apiEnv = {
   AUTH_RATE_LIMIT_MAX: "10000",
   EMAIL_PROVIDER: "console",
   EMAIL_FROM: "RN CF <noreply@localhost>",
+  BILLING_ENTITLEMENT_KEY: "pro",
+  BILLING_GRACE_PERIOD_DAYS: "3",
 };
 
 export default defineConfig({
