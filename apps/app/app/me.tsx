@@ -67,9 +67,6 @@ export default function MeScreen() {
         <Text className="text-lg font-semibold text-slate-900">
           {billingQuery.isLoading ? "Checking…" : billingStatus?.hasAccess ? "Pro" : "Free"}
         </Text>
-        <Link href="./subscription">
-          <Text className="text-base font-semibold text-slate-700">View subscription</Text>
-        </Link>
       </Section>
 
       {signOutError ? <StatusText>{signOutError}</StatusText> : null}
@@ -78,7 +75,7 @@ export default function MeScreen() {
         {session?.user ? (
           <>
             <Link href="./subscription" asChild>
-              <Button label="Subscription" />
+              <Button label="Manage subscription" />
             </Link>
             <Link href="./organizations" asChild>
               <Button label="Organizations" variant="secondary" />
