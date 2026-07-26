@@ -103,6 +103,101 @@
         },
         "required": ["accepted"]
       },
+      "AccountExportResponse": {
+        "type": "object",
+        "properties": {
+          "exportedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "account": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": ["id", "name", "email", "createdAt"]
+          },
+          "memberships": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "organizationId": {
+                  "type": "string"
+                },
+                "role": {
+                  "type": "string",
+                  "enum": ["owner", "admin", "member"]
+                }
+              },
+              "required": ["organizationId", "role"]
+            }
+          },
+          "billingGrants": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "provider": {
+                  "type": "string",
+                  "enum": ["stripe", "revenuecat"]
+                },
+                "productId": {
+                  "type": "string"
+                },
+                "interval": {
+                  "type": "string",
+                  "enum": ["monthly", "yearly"]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["active", "grace_period", "revoked", "expired"]
+                },
+                "expiresAt": {
+                  "type": "string",
+                  "nullable": true,
+                  "format": "date-time"
+                }
+              },
+              "required": ["provider", "productId", "interval", "status", "expiresAt"]
+            }
+          }
+        },
+        "required": ["exportedAt", "account", "memberships", "billingGrants"]
+      },
+      "AccountDeletedResponse": {
+        "type": "object",
+        "properties": {
+          "deleted": {
+            "type": "boolean",
+            "enum": [true]
+          }
+        },
+        "required": ["deleted"]
+      },
+      "DeleteAccountRequest": {
+        "type": "object",
+        "properties": {
+          "confirmation": {
+            "type": "string",
+            "enum": ["DELETE"]
+          }
+        },
+        "required": ["confirmation"]
+      },
       "HealthResponse": {
         "type": "object",
         "properties": {
@@ -342,6 +437,92 @@
           },
           "403": {
             "description": "Verified account or billing eligibility required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/export": {
+      "get": {
+        "operationId": "exportAccountData",
+        "tags": ["Account"],
+        "responses": {
+          "200": {
+            "description": "Portable account, membership, and billing data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountExportResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account": {
+      "delete": {
+        "operationId": "deleteAccount",
+        "tags": ["Account"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteAccountRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Local account data deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDeletedResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Verified account required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Active store or Stripe subscription must be managed first",
             "content": {
               "application/json": {
                 "schema": {

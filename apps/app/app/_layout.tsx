@@ -13,9 +13,9 @@ import { env } from "@/lib/env";
 configureApiClient({
   baseUrl: env.apiUrl,
   credentials: Platform.OS === "web" ? "include" : "omit",
-  getHeaders: () => {
+  getHeaders: (): Record<string, string> => {
     if (Platform.OS === "web") {
-      return {} as Record<string, string>;
+      return {};
     }
     const cookie = authClient.getCookie();
     return cookie ? { Cookie: cookie } : {};
@@ -47,6 +47,7 @@ export default function RootLayout() {
         <Stack.Screen name="organizations" options={{ title: "Organizations" }} />
         <Stack.Screen name="me" options={{ title: "Account" }} />
         <Stack.Screen name="subscription" options={{ title: "Pro subscription" }} />
+        <Stack.Screen name="account-data" options={{ title: "Account data" }} />
       </Stack>
     </QueryClientProvider>
   );

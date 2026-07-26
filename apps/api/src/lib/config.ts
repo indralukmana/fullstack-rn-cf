@@ -17,6 +17,8 @@ export type AppBindings = {
   RATE_LIMIT_MAX?: string | number;
   AUTH_RATE_LIMIT_TTL?: string | number;
   AUTH_RATE_LIMIT_MAX?: string | number;
+  WEBHOOK_RATE_LIMIT_TTL?: string | number;
+  WEBHOOK_RATE_LIMIT_MAX?: string | number;
   EMAIL_PROVIDER?: string;
   EMAIL_FROM?: string;
   STRIPE_SECRET_KEY?: string;
@@ -115,6 +117,8 @@ export type RuntimeConfig = {
   rateLimitMax: number;
   authRateLimitTtlMs: number;
   authRateLimitMax: number;
+  webhookRateLimitTtlMs: number;
+  webhookRateLimitMax: number;
   emailProvider: "console" | "cloudflare";
   emailFrom: string;
   billingEntitlementKey: string;
@@ -224,6 +228,8 @@ export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
     rateLimitMax: parsePositiveInt(env.RATE_LIMIT_MAX, 120),
     authRateLimitTtlMs: parsePositiveInt(env.AUTH_RATE_LIMIT_TTL, 900_000),
     authRateLimitMax: parsePositiveInt(env.AUTH_RATE_LIMIT_MAX, 30),
+    webhookRateLimitTtlMs: parsePositiveInt(env.WEBHOOK_RATE_LIMIT_TTL, 60_000),
+    webhookRateLimitMax: parsePositiveInt(env.WEBHOOK_RATE_LIMIT_MAX, 300),
     emailProvider,
     emailFrom,
     billingEntitlementKey,

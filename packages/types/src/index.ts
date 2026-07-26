@@ -84,6 +84,48 @@ export type BillingStatusResponse = z.infer<typeof BillingStatusResponseSchema>;
 export type CreateCheckoutRequest = z.infer<typeof CreateCheckoutRequestSchema>;
 export type BillingUrlResponse = z.infer<typeof BillingUrlResponseSchema>;
 
+export const AccountExportResponseSchema = z
+  .object({
+    exportedAt: z.iso.datetime(),
+    account: z.object({
+      id: z.string(),
+      name: z.string(),
+      email: z.email(),
+      createdAt: z.iso.datetime(),
+    }),
+    memberships: z.array(
+      z.object({
+        organizationId: z.string(),
+        role: OrganizationRoleSchema,
+      }),
+    ),
+    billingGrants: z.array(
+      z.object({
+        provider: z.enum(["stripe", "revenuecat"]),
+        productId: z.string(),
+        interval: BillingIntervalSchema,
+        status: BillingGrantStatusSchema,
+        expiresAt: z.iso.datetime().nullable(),
+      }),
+    ),
+  })
+  .openapi("AccountExportResponse");
+
+export const AccountDeletedResponseSchema = z
+  .object({
+    deleted: z.literal(true),
+  })
+  .openapi("AccountDeletedResponse");
+
+export const DeleteAccountRequestSchema = z
+  .object({
+    confirmation: z.literal("DELETE"),
+  })
+  .openapi("DeleteAccountRequest");
+
+export type AccountExportResponse = z.infer<typeof AccountExportResponseSchema>;
+export type AccountDeletedResponse = z.infer<typeof AccountDeletedResponseSchema>;
+
 export const ErrorResponseSchema = z
   .object({
     error: z.string().openapi({ example: "unauthorized" }),

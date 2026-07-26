@@ -30,3 +30,11 @@ dead_letter_queue = "rn-cf-billing-events-dlq"
 
 [triggers]
 crons = ["*/10 * * * *"]
+
+[observability]
+enabled = true
+head_sampling_rate = 0.1
+
+[observability.logs]
+enabled = true
+invocation_logs = true

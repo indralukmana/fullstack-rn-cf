@@ -50,6 +50,8 @@ function revenueCatTarget(payload: Record<string, unknown>, env: AppBindings) {
   if (!userId || !appId || (environmentValue !== "sandbox" && environmentValue !== "production")) {
     throw new Error("RevenueCat event is missing identity, app, or environment");
   }
+  const providerEnvironment: ProviderEnvironment =
+    environmentValue === "sandbox" ? "sandbox" : "production";
 
   const catalog = getBillingCatalog(env);
   if (appId !== catalog.revenueCat.apps.ios && appId !== catalog.revenueCat.apps.android) {
@@ -67,7 +69,7 @@ function revenueCatTarget(payload: Record<string, unknown>, env: AppBindings) {
 
   return {
     userId,
-    providerEnvironment: environmentValue as ProviderEnvironment,
+    providerEnvironment,
   };
 }
 
@@ -136,6 +138,7 @@ export async function processBillingEvent(
   env: AppBindings,
   eventId: string,
 ): Promise<"processed" | "already_processed"> {
+  const startedAt = Date.now();
   const event = await db.query.billingEvent.findFirst({
     where: eq(billingEvent.id, eventId),
   });
@@ -169,6 +172,17 @@ export async function processBillingEvent(
       .update(billingEvent)
       .set({ state: "processed", processedAt: new Date(), lastError: null })
       .where(eq(billingEvent.id, eventId));
+    console.info(
+      JSON.stringify({
+        level: "info",
+        event: "billing_event_processed",
+        billingEventId: event.id,
+        provider: event.provider,
+        eventType: event.eventType,
+        attempts: event.attempts + 1,
+        durationMs: Date.now() - startedAt,
+      }),
+    );
     return "processed";
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown billing processing error";
@@ -176,6 +190,18 @@ export async function processBillingEvent(
       .update(billingEvent)
       .set({ state: "failed", lastError: message.slice(0, 500) })
       .where(eq(billingEvent.id, eventId));
+    console.error(
+      JSON.stringify({
+        level: "error",
+        event: "billing_event_failed",
+        billingEventId: event.id,
+        provider: event.provider,
+        eventType: event.eventType,
+        attempts: event.attempts + 1,
+        durationMs: Date.now() - startedAt,
+        error: message.slice(0, 500),
+      }),
+    );
     throw error;
   }
 }

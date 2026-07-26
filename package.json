@@ -32,7 +32,7 @@
     "orval": "^8.20.0",
     "oxfmt": "^0.55.0",
     "oxlint": "^1.66.0",
-    "oxlint-tsgolint": "^0.23.0",
+    "oxlint-tsgolint": "^7.0.2001",
     "varlock": "^1.10.0"
   },
   "engines": {

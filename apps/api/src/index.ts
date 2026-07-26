@@ -20,15 +20,19 @@ import { getRuntimeConfig, type BillingQueueMessage } from "./lib/config";
 import { clearOutboundEmails, listOutboundEmails } from "./lib/email/send";
 import { initVarlockIfPresent } from "./lib/varlock-init";
 import { rateLimit } from "./middleware/rate-limit";
+import { requestContext } from "./middleware/request-context";
 import { requireAuth } from "./middleware/require-auth";
 import { requireEntitlement } from "./middleware/require-entitlement";
 import { requireOrganization } from "./middleware/require-organization";
+import { accountRoutes } from "./routes/account";
 import { billingRoutes } from "./routes/billing";
 import { billingWebhooks } from "./routes/billing-webhooks";
 
 await initVarlockIfPresent();
 
 const app = new OpenAPIHono<AppEnv>();
+
+app.use("*", requestContext);
 
 app.onError((error, c) => {
   console.error(error);
@@ -94,7 +98,7 @@ app.use("/api/auth/*", async (c, next) => {
 });
 
 app.use("*", async (c, next) => {
-  if (c.req.path.startsWith("/api/auth/")) {
+  if (c.req.path.startsWith("/api/auth/") || c.req.path.startsWith("/api/webhooks/")) {
     return next();
   }
 
@@ -106,8 +110,18 @@ app.use("*", async (c, next) => {
   })(c, next);
 });
 
+app.use("/api/webhooks/*", async (c, next) => {
+  const config = getRuntimeConfig(c.env);
+  return rateLimit({
+    keyPrefix: "webhook",
+    windowMs: config.webhookRateLimitTtlMs,
+    max: config.webhookRateLimitMax,
+  })(c, next);
+});
+
 app.route("/api/webhooks", billingWebhooks);
 app.route("/api/billing", billingRoutes);
+app.route("/api/account", accountRoutes);
 
 app.on(["GET", "POST"], "/api/auth/*", async (c) => {
   try {

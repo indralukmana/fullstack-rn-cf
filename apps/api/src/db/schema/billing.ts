@@ -269,6 +269,34 @@ export const purchaseAttempt = sqliteTable(
   ],
 );
 
+export const billingAudit = sqliteTable(
+  "billing_audit",
+  {
+    id: text("id").primaryKey(),
+    actorUserId: text("actor_user_id").notNull(),
+    subjectUserId: text("subject_user_id").notNull(),
+    action: text("action", {
+      enum: [
+        "reconciliation_requested",
+        "account_exported",
+        "account_deletion_blocked",
+        "account_deleted",
+      ],
+    }).notNull(),
+    metadata: text("metadata", { mode: "json" }).$type<Record<string, unknown>>().notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+  },
+  (table) => [
+    index("billing_audit_subject_created_idx").on(table.subjectUserId, table.createdAt),
+    check(
+      "billing_audit_action_check",
+      sql`${table.action} in ('reconciliation_requested', 'account_exported', 'account_deletion_blocked', 'account_deleted')`,
+    ),
+  ],
+);
+
 export const billingCustomerRelations = relations(billingCustomer, ({ many }) => ({
   subscriptions: many(subscription),
 }));

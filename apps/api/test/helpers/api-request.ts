@@ -49,8 +49,12 @@ export async function patchApi(
   return requestApi("PATCH", path, { body, cookie });
 }
 
-export async function deleteApi(path: string, cookie?: string | null) {
-  return requestApi("DELETE", path, { cookie });
+export async function deleteApi(
+  path: string,
+  cookie?: string | null,
+  body?: Record<string, unknown>,
+) {
+  return requestApi("DELETE", path, { body, cookie });
 }
 
 async function requestApi(

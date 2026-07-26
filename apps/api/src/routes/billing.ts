@@ -12,7 +12,13 @@ import Stripe from "stripe";
 import type { AppEnv } from "../app-env";
 
 import { createDb } from "../db/client";
-import { billingCustomer, entitlement, providerGrant, purchaseAttempt } from "../db/schema";
+import {
+  billingAudit,
+  billingCustomer,
+  entitlement,
+  providerGrant,
+  purchaseAttempt,
+} from "../db/schema";
 import { getBillingCatalog } from "../lib/billing/catalog";
 import { reconcileBillingCustomer } from "../lib/billing/reconcile-customer";
 import { getRuntimeConfig } from "../lib/config";
@@ -333,6 +339,16 @@ billingRoutes.openapi(reconcileRoute, async (c) => {
     },
     ...(stripeCustomer ? [stripeCustomer] : []),
   ];
+  await db.insert(billingAudit).values({
+    id: crypto.randomUUID(),
+    actorUserId: c.var.user.id,
+    subjectUserId: c.var.user.id,
+    action: "reconciliation_requested",
+    metadata: {
+      requestId: c.var.requestId,
+      providers: targets.map((target) => target.provider),
+    },
+  });
   c.executionCtx.waitUntil(
     Promise.all(targets.map((target) => reconcileBillingCustomer(db, c.env, target))).then(
       () => undefined,

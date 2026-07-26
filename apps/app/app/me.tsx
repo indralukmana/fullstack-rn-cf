@@ -94,6 +94,14 @@ export default function MeScreen() {
                 <Text className="font-semibold text-slate-900">Organizations</Text>
               </Pressable>
             </Link>
+            <Link href="./account-data" asChild>
+              <Pressable
+                accessibilityRole="button"
+                className="rounded-lg border border-slate-300 bg-white px-5 py-3"
+              >
+                <Text className="font-semibold text-slate-900">Account data</Text>
+              </Pressable>
+            </Link>
             <Pressable
               accessibilityRole="button"
               className="rounded-lg border border-slate-300 bg-white px-5 py-3"
