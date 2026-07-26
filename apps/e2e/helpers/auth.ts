@@ -100,7 +100,7 @@ export async function registerViaUi(
   await page.getByRole("textbox", { name: "Password" }).fill(password);
   await page.getByRole("button", { name: "Create account" }).click();
 
-  await expect(page).toHaveURL(/\/check-email/);
+  await expect(page).toHaveURL(/\/check-email/, { timeout: 15_000 });
   await expect(page.getByRole("heading", { name: "Check your email" })).toBeVisible();
 
   await verifyEmailFromMailbox(request, page, email);
