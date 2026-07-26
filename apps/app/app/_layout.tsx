@@ -23,6 +23,11 @@ configureApiClient({
   },
 });
 
+/** Keep the back control; page `ScreenTitle` owns the visible heading. */
+function withBodyTitle(title: string) {
+  return { title, headerTitle: "" };
+}
+
 export default function RootLayout() {
   const [queryClient] = useState(() => new QueryClient());
 
@@ -42,17 +47,20 @@ export default function RootLayout() {
             contentStyle: { backgroundColor: "#f8fafc" },
           }}
         >
-          <Stack.Screen name="index" options={{ title: "RN CF" }} />
-          <Stack.Screen name="sign-in" options={{ title: "Sign in" }} />
-          <Stack.Screen name="sign-up" options={{ title: "Register" }} />
-          <Stack.Screen name="check-email" options={{ title: "Check email" }} />
-          <Stack.Screen name="forgot-password" options={{ title: "Forgot password" }} />
-          <Stack.Screen name="reset-password" options={{ title: "Reset password" }} />
-          <Stack.Screen name="accept-invitation" options={{ title: "Organization invitation" }} />
-          <Stack.Screen name="organizations" options={{ title: "Organizations" }} />
-          <Stack.Screen name="me" options={{ title: "Account" }} />
-          <Stack.Screen name="subscription" options={{ title: "Pro subscription" }} />
-          <Stack.Screen name="account-data" options={{ title: "Account data" }} />
+          <Stack.Screen name="index" options={{ title: "RN CF", headerShown: false }} />
+          <Stack.Screen name="sign-in" options={withBodyTitle("Sign in")} />
+          <Stack.Screen name="sign-up" options={withBodyTitle("Get started")} />
+          <Stack.Screen name="check-email" options={withBodyTitle("Check your email")} />
+          <Stack.Screen name="forgot-password" options={withBodyTitle("Forgot password")} />
+          <Stack.Screen name="reset-password" options={withBodyTitle("Choose a new password")} />
+          <Stack.Screen
+            name="accept-invitation"
+            options={withBodyTitle("Organization invitation")}
+          />
+          <Stack.Screen name="organizations" options={withBodyTitle("Organizations")} />
+          <Stack.Screen name="me" options={withBodyTitle("Account")} />
+          <Stack.Screen name="subscription" options={withBodyTitle("Pro subscription")} />
+          <Stack.Screen name="account-data" options={withBodyTitle("Account data")} />
         </Stack>
       </View>
     </QueryClientProvider>
