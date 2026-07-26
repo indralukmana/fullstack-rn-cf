@@ -46,6 +46,7 @@ export default function RootLayout() {
         <Stack.Screen name="accept-invitation" options={{ title: "Organization invitation" }} />
         <Stack.Screen name="organizations" options={{ title: "Organizations" }} />
         <Stack.Screen name="me" options={{ title: "Account" }} />
+        <Stack.Screen name="subscription" options={{ title: "Pro subscription" }} />
       </Stack>
     </QueryClientProvider>
   );

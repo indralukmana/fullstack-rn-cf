@@ -49,6 +49,10 @@ export default function SignInScreen() {
         });
         return;
       }
+      if (returnUrl.origin === "https://app.local" && returnUrl.pathname === "/subscription") {
+        router.replace("./subscription");
+        return;
+      }
     }
 
     router.replace("/me");

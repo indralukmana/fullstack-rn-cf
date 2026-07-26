@@ -30,6 +30,22 @@
       "output": "static",
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-router", "expo-secure-store", "expo-status-bar", "expo-web-browser"]
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-status-bar",
+      "expo-web-browser",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "16.4"
+          },
+          "android": {
+            "minSdkVersion": 24
+          }
+        }
+      ]
+    ]
   }
 }

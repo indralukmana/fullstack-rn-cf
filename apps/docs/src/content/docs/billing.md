@@ -101,3 +101,17 @@ Checkout reuses one Stripe Customer per Better Auth user, sets immutable `user.i
 enforces one pending attempt, and uses the persisted attempt ID as Stripe's idempotency key.
 Existing active/grace grants block a second checkout. Customer apps must authorize from the
 status endpoint; `requireEntitlement("pro")` is the matching server middleware for paid routes.
+
+## Universal app behavior
+
+`/subscription` is account-protected and never renders purchase controls for an unverified user.
+Web launches Stripe Checkout or Portal from server-issued URLs. Native builds configure
+RevenueCat only after authentication with Better Auth `user.id`, load monthly/yearly packages
+from the configured offering, expose user-initiated restore, and use RevenueCat Customer Center
+for management.
+
+After purchase or restore, the app requests reconciliation and refreshes
+`GET /api/billing/status`. Local RevenueCat `CustomerInfo` can improve feedback but never unlocks
+paid UI or APIs. Signing out clears the RevenueCat identity. Native purchase testing requires an
+Expo development build; Expo Go's RevenueCat UI is preview-only and cannot complete real store
+transactions.
