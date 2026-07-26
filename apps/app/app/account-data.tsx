@@ -95,7 +95,7 @@ export default function AccountDataScreen() {
       <Button disabled={pending} label="Export my data" onPress={onExport} variant="secondary" />
 
       <Section title="Delete account">
-        <Text className="text-sm leading-5 text-slate-600">
+        <Text className="text-sm leading-5 text-foreground-secondary">
           Apple, Google, and Stripe subscriptions must be managed first. Deleting this account never
           cancels store billing.
         </Text>

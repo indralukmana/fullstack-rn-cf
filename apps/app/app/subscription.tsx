@@ -171,7 +171,7 @@ export default function SubscriptionScreen() {
           />
         ) : (
           <>
-            <Text className="text-lg font-semibold text-slate-900">
+            <Text className="text-lg font-semibold text-foreground">
               {statusQuery.isLoading
                 ? "Checking…"
                 : status?.hasAccess
@@ -179,7 +179,7 @@ export default function SubscriptionScreen() {
                   : "Free"}
             </Text>
             {activeGrant ? (
-              <Text className="text-sm text-slate-600">
+              <Text className="text-sm text-foreground-secondary">
                 Managed by {activeGrant.provider === "stripe" ? "Stripe" : "your app store"}
               </Text>
             ) : null}

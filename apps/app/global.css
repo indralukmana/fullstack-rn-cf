@@ -1,2 +1,46 @@
 @import "tailwindcss";
 @import "uniwind";
+
+@layer theme {
+  :root {
+    @variant light {
+      --color-canvas: #f8fafc;
+      --color-elevated: #ffffff;
+      --color-selected: #f1f5f9;
+      --color-foreground: #0f172a;
+      --color-foreground-secondary: #475569;
+      --color-foreground-muted: #64748b;
+      --color-border: #cbd5e1;
+      --color-border-subtle: #e2e8f0;
+      --color-action: #0f172a;
+      --color-on-action: #ffffff;
+      --color-danger: #dc2626;
+      --color-danger-strong: #b91c1c;
+      --color-success: #047857;
+      --color-warning-canvas: #fffbeb;
+      --color-warning-border: #fde68a;
+      --color-warning-foreground: #451a03;
+      --color-scrim: rgb(15 23 42 / 0.4);
+    }
+
+    @variant dark {
+      --color-canvas: #0f172a;
+      --color-elevated: #1e293b;
+      --color-selected: #334155;
+      --color-foreground: #f8fafc;
+      --color-foreground-secondary: #cbd5e1;
+      --color-foreground-muted: #94a3b8;
+      --color-border: #475569;
+      --color-border-subtle: #334155;
+      --color-action: #f8fafc;
+      --color-on-action: #0f172a;
+      --color-danger: #f87171;
+      --color-danger-strong: #ef4444;
+      --color-success: #34d399;
+      --color-warning-canvas: #422006;
+      --color-warning-border: #854d0e;
+      --color-warning-foreground: #fef3c7;
+      --color-scrim: rgb(2 6 23 / 0.65);
+    }
+  }
+}

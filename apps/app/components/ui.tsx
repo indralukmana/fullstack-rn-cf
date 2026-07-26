@@ -7,7 +7,7 @@ type PressableProps = ComponentProps<typeof Pressable>;
 type TextInputProps = ComponentProps<typeof TextInput>;
 
 const fieldClassName =
-  "rounded-lg border border-slate-300 bg-white px-4 py-3.5 text-base text-slate-900";
+  "rounded-lg border border-border bg-elevated px-4 py-3.5 text-base text-foreground";
 
 export function Screen({
   children,
@@ -24,7 +24,7 @@ export function Screen({
 
   if (scroll) {
     return (
-      <SafeAreaView className="flex-1 bg-slate-50" edges={["bottom", "left", "right"]}>
+      <SafeAreaView className="flex-1 bg-canvas" edges={["bottom", "left", "right"]}>
         <ScrollView
           className="flex-1"
           contentContainerClassName={contentClassName}
@@ -38,7 +38,7 @@ export function Screen({
 
   return (
     <SafeAreaView
-      className={`flex-1 bg-slate-50 ${centered ? "justify-center" : ""} px-6 py-8`}
+      className={`flex-1 bg-canvas ${centered ? "justify-center" : ""} px-6 py-8`}
       edges={["bottom", "left", "right"]}
     >
       <View className={`w-full max-w-lg gap-5 self-center ${centered ? "" : "flex-1"}`}>
@@ -50,14 +50,14 @@ export function Screen({
 
 export function ScreenTitle({ children }: { children: ReactNode }) {
   return (
-    <Text accessibilityRole="header" className="text-3xl font-bold text-slate-900">
+    <Text accessibilityRole="header" className="text-3xl font-bold text-foreground">
       {children}
     </Text>
   );
 }
 
 export function ScreenLead({ children }: { children: ReactNode }) {
-  return <Text className="text-base leading-6 text-slate-600">{children}</Text>;
+  return <Text className="text-base leading-6 text-foreground-secondary">{children}</Text>;
 }
 
 export function Field({
@@ -71,10 +71,11 @@ export function Field({
 }) {
   return (
     <View className="gap-1.5">
-      <Text className="text-sm font-medium text-slate-700">{label}</Text>
+      <Text className="text-sm font-medium text-foreground-muted">{label}</Text>
       <TextInput
         accessibilityLabel={label}
         className={className ? `${fieldClassName} ${className}` : fieldClassName}
+        placeholderTextColor="#94a3b8"
         {...rest}
       />
       {error ? <StatusText>{error}</StatusText> : null}
@@ -94,14 +95,14 @@ export function Button({
 }) {
   const variantClassName =
     variant === "secondary"
-      ? "border border-slate-300 bg-white"
+      ? "border border-border bg-elevated"
       : variant === "danger"
-        ? "bg-red-700"
-        : "bg-slate-900";
+        ? "bg-danger-strong"
+        : "bg-action";
   const labelClassName =
     variant === "secondary"
-      ? "text-center font-semibold text-slate-900"
-      : "text-center font-semibold text-white";
+      ? "text-center font-semibold text-foreground"
+      : "text-center font-semibold text-on-action";
 
   return (
     <Pressable
@@ -123,7 +124,11 @@ export function StatusText({
   tone?: "danger" | "success" | "muted";
 }) {
   const toneClassName =
-    tone === "success" ? "text-emerald-700" : tone === "muted" ? "text-slate-600" : "text-red-600";
+    tone === "success"
+      ? "text-success"
+      : tone === "muted"
+        ? "text-foreground-secondary"
+        : "text-danger";
   return (
     <Text
       accessibilityRole={tone === "danger" ? "alert" : undefined}
@@ -136,15 +141,15 @@ export function StatusText({
 
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <View className="gap-3 border-t border-slate-200 pt-5">
-      <Text className="text-sm font-semibold text-slate-500">{title}</Text>
+    <View className="gap-3 border-t border-border-subtle pt-5">
+      <Text className="text-sm font-semibold text-foreground-muted">{title}</Text>
       {children}
     </View>
   );
 }
 
 export function QuietLinkText({ children }: { children: ReactNode }) {
-  return <Text className="text-center text-base text-slate-600">{children}</Text>;
+  return <Text className="text-center text-base text-foreground-secondary">{children}</Text>;
 }
 
 export function QuietLink({ href, children }: { href: Href; children: ReactNode }) {
@@ -160,10 +165,10 @@ export function QuietLink({ href, children }: { href: Href; children: ReactNode 
 export function LoadingScreen({ label = "Loading…" }: { label?: string }) {
   return (
     <SafeAreaView
-      className="flex-1 items-center justify-center bg-slate-50 px-6"
+      className="flex-1 items-center justify-center bg-canvas px-6"
       edges={["bottom", "left", "right"]}
     >
-      <Text className="text-base text-slate-600">{label}</Text>
+      <Text className="text-base text-foreground-secondary">{label}</Text>
     </SafeAreaView>
   );
 }
@@ -200,16 +205,16 @@ export function ConfirmDialog({
 }) {
   return (
     <Modal animationType="fade" onRequestClose={onCancel} transparent visible={visible}>
-      <View className="flex-1 items-center justify-center bg-slate-900/40 px-6">
+      <View className="flex-1 items-center justify-center bg-scrim px-6">
         <View
           accessibilityRole="summary"
           accessibilityViewIsModal
-          className="w-full max-w-md gap-4 rounded-lg border border-slate-200 bg-white p-5"
+          className="w-full max-w-md gap-4 rounded-lg border border-border bg-elevated p-5"
         >
-          <Text accessibilityRole="header" className="text-xl font-bold text-slate-900">
+          <Text accessibilityRole="header" className="text-xl font-bold text-foreground">
             {title}
           </Text>
-          <Text className="text-base leading-6 text-slate-600">{message}</Text>
+          <Text className="text-base leading-6 text-foreground-secondary">{message}</Text>
           <View className="gap-3">
             <Button
               disabled={pending}

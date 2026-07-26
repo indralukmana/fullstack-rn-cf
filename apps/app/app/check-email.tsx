@@ -92,7 +92,7 @@ export default function CheckEmailScreen() {
           ? "If an account exists for that address, we sent a password reset link."
           : "We sent a verification link. Open it to finish creating your account."}
       </ScreenLead>
-      {email ? <Text className="text-base font-medium text-slate-900">{email}</Text> : null}
+      {email ? <Text className="text-base font-medium text-foreground">{email}</Text> : null}
       {message ? <StatusText tone="success">{message}</StatusText> : null}
       {error ? <StatusText>{error}</StatusText> : null}
       {email ? (
@@ -105,9 +105,11 @@ export default function CheckEmailScreen() {
         />
       ) : null}
       {showDevMailbox ? (
-        <View className="gap-3 border-t border-amber-200 pt-5">
-          <Text className="text-sm font-semibold text-amber-950">Local mailbox (dev only)</Text>
-          <Text className="text-sm leading-5 text-amber-900">
+        <View className="gap-3 border-t border-warning-border pt-5">
+          <Text className="text-sm font-semibold text-warning-foreground">
+            Local mailbox (dev only)
+          </Text>
+          <Text className="text-sm leading-5 text-warning-foreground">
             Emails are logged by the API console provider. Open the mailbox JSON or the latest
             message link below.
           </Text>
@@ -118,7 +120,7 @@ export default function CheckEmailScreen() {
                 void Linking.openURL(mailboxApiUrl);
               }}
             >
-              <Text className="text-sm font-medium text-amber-950 underline">
+              <Text className="text-sm font-medium text-warning-foreground underline">
                 Open /api/dev/mailbox for this address
               </Text>
             </Pressable>
@@ -133,11 +135,15 @@ export default function CheckEmailScreen() {
             />
           ) : null}
           {latestMessage ? (
-            <Text className="text-xs text-amber-900">Latest subject: {latestMessage.subject}</Text>
+            <Text className="text-xs text-warning-foreground">
+              Latest subject: {latestMessage.subject}
+            </Text>
           ) : null}
           {mailboxError ? <StatusText>{mailboxError}</StatusText> : null}
           <Pressable accessibilityRole="button" onPress={() => void refreshMailbox()}>
-            <Text className="text-sm font-medium text-amber-950 underline">Refresh mailbox</Text>
+            <Text className="text-sm font-medium text-warning-foreground underline">
+              Refresh mailbox
+            </Text>
           </Pressable>
         </View>
       ) : null}

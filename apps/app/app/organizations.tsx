@@ -132,13 +132,13 @@ export default function OrganizationsScreen() {
                   accessibilityRole="button"
                   accessibilityState={{ selected: active, disabled: pending }}
                   className={`rounded-lg border px-4 py-3.5 ${
-                    active ? "border-slate-900 bg-slate-100" : "border-slate-300 bg-white"
+                    active ? "border-foreground bg-selected" : "border-border bg-elevated"
                   }`}
                   disabled={pending || active}
                   onPress={() => onSelect(organization.id)}
                 >
-                  <Text className="font-semibold text-slate-900">{organization.name}</Text>
-                  <Text className="text-sm text-slate-500">
+                  <Text className="font-semibold text-foreground">{organization.name}</Text>
+                  <Text className="text-sm text-foreground-muted">
                     {organization.slug}
                     {active ? " · active" : ""}
                   </Text>
@@ -147,7 +147,9 @@ export default function OrganizationsScreen() {
             })}
           </View>
         ) : (
-          <Text className="text-base text-slate-600">Create your first organization below.</Text>
+          <Text className="text-base text-foreground-secondary">
+            Create your first organization below.
+          </Text>
         )}
       </Section>
 

@@ -3,13 +3,18 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
+import { Platform, View } from "react-native";
+import { useUniwind } from "uniwind";
 
 import "../global.css";
-import { Platform, View } from "react-native";
-
 import { OfflineBanner } from "@/components/offline-banner";
 import { authClient } from "@/lib/auth-client";
 import { env } from "@/lib/env";
+
+const canvasLight = "#f8fafc";
+const canvasDark = "#0f172a";
+const foregroundLight = "#0f172a";
+const foregroundDark = "#f8fafc";
 
 configureApiClient({
   baseUrl: env.apiUrl,
@@ -30,21 +35,25 @@ function withBodyTitle(title: string) {
 
 export default function RootLayout() {
   const [queryClient] = useState(() => new QueryClient());
+  const { theme } = useUniwind();
+  const dark = theme === "dark";
+  const canvas = dark ? canvasDark : canvasLight;
+  const foreground = dark ? foregroundDark : foregroundLight;
 
   return (
     <QueryClientProvider client={queryClient}>
       {/* expo-status-bar uses `style` as light|dark|auto, not a RN style object */}
       {/* oxlint-disable-next-line react/style-prop-object */}
       <StatusBar style="auto" />
-      <View className="flex-1 bg-slate-50">
+      <View className="flex-1 bg-canvas">
         <OfflineBanner />
         <Stack
           screenOptions={{
-            headerStyle: { backgroundColor: "#f8fafc" },
+            headerStyle: { backgroundColor: canvas },
             headerShadowVisible: false,
-            headerTintColor: "#0f172a",
+            headerTintColor: foreground,
             headerTitleStyle: { fontWeight: "600" },
-            contentStyle: { backgroundColor: "#f8fafc" },
+            contentStyle: { backgroundColor: canvas },
           }}
         >
           <Stack.Screen name="index" options={{ title: "RN CF", headerShown: false }} />

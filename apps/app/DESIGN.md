@@ -1,18 +1,26 @@
 ---
 version: alpha
 name: RN CF App
-description: Universal Expo app UI for the RN CF launchpad — utilitarian slate surfaces today, with anti-slop constraints for future visual work.
+description: Universal Expo app UI for the RN CF launchpad — utilitarian slate surfaces with light/dark semantic tokens and anti-slop constraints.
 colors:
-  background-primary: "#f8fafc"
-  background-elevated: "#ffffff"
-  foreground-primary: "#0f172a"
+  canvas: "#f8fafc"
+  canvas-dark: "#0f172a"
+  elevated: "#ffffff"
+  elevated-dark: "#1e293b"
+  foreground: "#0f172a"
+  foreground-dark: "#f8fafc"
   foreground-secondary: "#475569"
-  foreground-muted: "#334155"
-  border-muted: "#cbd5e1"
-  action-primary: "#0f172a"
-  action-on-primary: "#ffffff"
-  feedback-danger: "#dc2626"
-  feedback-success: "#047857"
+  foreground-secondary-dark: "#cbd5e1"
+  foreground-muted: "#64748b"
+  foreground-muted-dark: "#94a3b8"
+  border: "#cbd5e1"
+  border-dark: "#475569"
+  action: "#0f172a"
+  action-dark: "#f8fafc"
+  on-action: "#ffffff"
+  on-action-dark: "#0f172a"
+  danger: "#dc2626"
+  success: "#047857"
 typography:
   sans:
     fontFamily: system-ui
@@ -23,8 +31,8 @@ rounded:
 ## Overview
 
 RN CF App is the customer-facing Expo Router surface (web, iOS, Android) for a Cloudflare Workers
-API. Current screens are scaffold-utilitarian: centered forms and account flows on a light slate
-canvas with near-black primary actions. That restraint is intentional for a launchpad, not an
+API. Current screens are scaffold-utilitarian: centered forms and account flows on a slate canvas
+with high-contrast primary actions. That restraint is intentional for a launchpad, not an
 invitation to invent a flashy marketing system.
 
 Product UI work must stay universal (React Native + Uniwind). Prefer composition and hierarchy
@@ -33,11 +41,11 @@ AI-generated clusters listed under Don'ts.
 
 ## Colors
 
-Use the slate canvas (`background-primary`) for full-screen scaffolds and
-`background-elevated` for bordered secondary controls. Primary CTAs use `action-primary` on
-`action-on-primary`. Body copy uses `foreground-secondary` or `foreground-muted`; titles use
-`foreground-primary`. Errors and success copy use the feedback tokens only for status text, not
-as brand accents.
+Semantic Uniwind tokens live in `global.css` (`canvas`, `elevated`, `foreground*`, `border*`,
+`action`, `on-action`, feedback, and warning). Prefer those utilities over raw `slate-*` so light
+and dark both work. Primary CTAs use `bg-action` / `text-on-action`. Errors and success copy use
+feedback tokens only for status text, not as brand accents. Dev-only warning surfaces use the
+`warning-*` tokens.
 
 ## Typography
 
@@ -61,8 +69,8 @@ treatments without a shared primitive.
 
 ## Components
 
-Primary button: filled `action-primary`, medium padding, semibold label. Secondary button: white
-elevated surface, muted border, dark label. Prefer `Pressable` + Uniwind classes over nested card
+Primary button: filled `action`, medium padding, semibold label. Secondary button: elevated
+surface, muted border, foreground label. Prefer `Pressable` + Uniwind classes over nested card
 wrappers. Cards, chips, and badge clusters are allowed only when they contain a real interaction
 or status the user must act on — not as default section chrome.
 

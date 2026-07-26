@@ -61,11 +61,11 @@ export default function MeScreen() {
           />
         ) : session?.user ? (
           <View className="gap-1">
-            <Text className="text-lg font-semibold text-slate-900">{session.user.name}</Text>
-            <Text className="text-base text-slate-600">{session.user.email}</Text>
+            <Text className="text-lg font-semibold text-foreground">{session.user.name}</Text>
+            <Text className="text-base text-foreground-secondary">{session.user.email}</Text>
           </View>
         ) : (
-          <Text className="text-base text-slate-600">Signed out</Text>
+          <Text className="text-base text-foreground-secondary">Signed out</Text>
         )}
       </Section>
 
@@ -76,7 +76,7 @@ export default function MeScreen() {
             onRetry={() => void billingQuery.refetch()}
           />
         ) : (
-          <Text className="text-lg font-semibold text-slate-900">
+          <Text className="text-lg font-semibold text-foreground">
             {billingQuery.isLoading ? "Checking…" : billingStatus?.hasAccess ? "Pro" : "Free"}
           </Text>
         )}

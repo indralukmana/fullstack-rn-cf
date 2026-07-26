@@ -38,8 +38,11 @@ export function OfflineBanner() {
   }
 
   return (
-    <View accessibilityRole="alert" className="border-b border-amber-200 bg-amber-50 px-4 py-2.5">
-      <Text className="text-center text-sm font-medium text-amber-950">
+    <View
+      accessibilityRole="alert"
+      className="border-b border-warning-border bg-warning-canvas px-4 py-2.5"
+    >
+      <Text className="text-center text-sm font-medium text-warning-foreground">
         You are offline. Some actions may fail until you reconnect.
       </Text>
     </View>
