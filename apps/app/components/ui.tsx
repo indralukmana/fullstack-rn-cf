@@ -173,7 +173,7 @@ export function PasswordField({
           value={value}
         />
         <Pressable
-          accessibilityLabel={visible ? "Hide password" : "Show password"}
+          accessibilityLabel={visible ? "Hide characters" : "Show characters"}
           accessibilityRole="button"
           className="absolute inset-y-0 right-0 justify-center px-3"
           onPress={() => setVisible((current) => !current)}

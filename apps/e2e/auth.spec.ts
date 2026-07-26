@@ -49,9 +49,9 @@ test("duplicate sign-up follows the check-email path without leaking accounts", 
   expect(firstSignUp.ok()).toBeTruthy();
 
   await page.goto("/sign-up");
-  await page.getByLabel("Name").fill("Another User");
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Password").fill(TEST_PASSWORD);
+  await page.getByLabel("Name", { exact: true }).fill("Another User");
+  await page.getByLabel("Email", { exact: true }).fill(email);
+  await page.getByRole("textbox", { name: "Password" }).fill(TEST_PASSWORD);
   await page.getByRole("button", { name: "Create account" }).click();
 
   // Enumeration protection: UI continues as if signup succeeded.
