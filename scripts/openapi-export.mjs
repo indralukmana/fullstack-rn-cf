@@ -64,8 +64,10 @@ try {
   try {
     if (process.platform === "win32") {
       child.kill("SIGTERM");
-    } else {
+    } else if (child.pid !== undefined) {
       process.kill(-child.pid, "SIGTERM");
+    } else {
+      child.kill("SIGTERM");
     }
   } catch {
     // The development server may already have exited after an export failure.
