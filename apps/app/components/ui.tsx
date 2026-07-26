@@ -1,6 +1,15 @@
 import { Link, type Href } from "expo-router";
-import type { ComponentProps, ReactNode } from "react";
-import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { useEffect, useId, type ComponentProps, type ReactNode } from "react";
+import {
+  AccessibilityInfo,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { fontDisplay, fontSans, fontSansSemiBold } from "@/lib/fonts";
@@ -288,6 +297,66 @@ export function ConfirmDialog({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const reactId = useId().replace(/:/g, "");
+  const dialogId = `confirm-dialog-${reactId}`;
+  const confirmId = `confirm-action-${reactId}`;
+
+  useEffect(() => {
+    if (!visible) {
+      return undefined;
+    }
+
+    AccessibilityInfo.announceForAccessibility(`${title}. ${message}`);
+
+    if (Platform.OS !== "web" || typeof document === "undefined") {
+      return undefined;
+    }
+
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const frame = requestAnimationFrame(() => {
+      document.getElementById(confirmId)?.focus();
+    });
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onCancel();
+        return;
+      }
+      if (event.key !== "Tab") {
+        return;
+      }
+      const root = document.getElementById(dialogId);
+      if (!root) {
+        return;
+      }
+      const focusable = Array.from(
+        root.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => !element.hasAttribute("disabled"));
+      if (focusable.length === 0) {
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("keydown", onKeyDown);
+      previous?.focus();
+    };
+  }, [visible, title, message, dialogId, confirmId, onCancel]);
+
   return (
     <Modal animationType="fade" onRequestClose={onCancel} transparent visible={visible}>
       <View className="flex-1 items-center justify-center bg-scrim px-6">
@@ -295,6 +364,7 @@ export function ConfirmDialog({
           accessibilityRole="summary"
           accessibilityViewIsModal
           className="w-full max-w-md gap-4 rounded-lg border border-border bg-elevated p-5"
+          nativeID={dialogId}
         >
           <Text
             accessibilityRole="header"
@@ -313,6 +383,7 @@ export function ConfirmDialog({
             <Button
               disabled={pending}
               label={pending ? "Working…" : confirmLabel}
+              nativeID={confirmId}
               onPress={onConfirm}
               variant={destructive ? "danger" : "primary"}
             />
