@@ -1,5 +1,6 @@
 import { configureApiClient } from "@rn-cf/api-client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
@@ -10,6 +11,7 @@ import "../global.css";
 import { OfflineBanner } from "@/components/offline-banner";
 import { authClient } from "@/lib/auth-client";
 import { env } from "@/lib/env";
+import { appFonts } from "@/lib/fonts";
 
 const canvasLight = "#f8fafc";
 const canvasDark = "#0f172a";
@@ -35,10 +37,15 @@ function withBodyTitle(title: string) {
 
 export default function RootLayout() {
   const [queryClient] = useState(() => new QueryClient());
+  const [fontsLoaded] = useFonts(appFonts);
   const { theme } = useUniwind();
   const dark = theme === "dark";
   const canvas = dark ? canvasDark : canvasLight;
   const foreground = dark ? foregroundDark : foregroundLight;
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

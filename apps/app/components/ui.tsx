@@ -3,6 +3,8 @@ import type { ComponentProps, ReactNode } from "react";
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { fontDisplay, fontSans, fontSansSemiBold } from "@/lib/fonts";
+
 type PressableProps = ComponentProps<typeof Pressable>;
 type TextInputProps = ComponentProps<typeof TextInput>;
 
@@ -50,14 +52,25 @@ export function Screen({
 
 export function ScreenTitle({ children }: { children: ReactNode }) {
   return (
-    <Text accessibilityRole="header" className="text-3xl font-bold text-foreground">
+    <Text
+      accessibilityRole="header"
+      className="text-3xl font-bold text-foreground"
+      style={{ fontFamily: fontDisplay }}
+    >
       {children}
     </Text>
   );
 }
 
 export function ScreenLead({ children }: { children: ReactNode }) {
-  return <Text className="text-base leading-6 text-foreground-secondary">{children}</Text>;
+  return (
+    <Text
+      className="text-base leading-6 text-foreground-secondary"
+      style={{ fontFamily: fontSans }}
+    >
+      {children}
+    </Text>
+  );
 }
 
 export function Field({
@@ -71,11 +84,17 @@ export function Field({
 }) {
   return (
     <View className="gap-1.5">
-      <Text className="text-sm font-medium text-foreground-muted">{label}</Text>
+      <Text
+        className="text-sm font-medium text-foreground-muted"
+        style={{ fontFamily: fontSansSemiBold }}
+      >
+        {label}
+      </Text>
       <TextInput
         accessibilityLabel={label}
         className={className ? `${fieldClassName} ${className}` : fieldClassName}
         placeholderTextColor="#94a3b8"
+        style={{ fontFamily: fontSans }}
         {...rest}
       />
       {error ? <StatusText>{error}</StatusText> : null}
@@ -111,7 +130,9 @@ export function Button({
       disabled={disabled}
       {...props}
     >
-      <Text className={labelClassName}>{label}</Text>
+      <Text className={labelClassName} style={{ fontFamily: fontSansSemiBold }}>
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -133,6 +154,7 @@ export function StatusText({
     <Text
       accessibilityRole={tone === "danger" ? "alert" : undefined}
       className={`text-sm ${toneClassName}`}
+      style={{ fontFamily: fontSans }}
     >
       {children}
     </Text>
@@ -142,14 +164,26 @@ export function StatusText({
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <View className="gap-3 border-t border-border-subtle pt-5">
-      <Text className="text-sm font-semibold text-foreground-muted">{title}</Text>
+      <Text
+        className="text-sm font-semibold text-foreground-muted"
+        style={{ fontFamily: fontSansSemiBold }}
+      >
+        {title}
+      </Text>
       {children}
     </View>
   );
 }
 
 export function QuietLinkText({ children }: { children: ReactNode }) {
-  return <Text className="text-center text-base text-foreground-secondary">{children}</Text>;
+  return (
+    <Text
+      className="text-center text-base text-foreground-secondary"
+      style={{ fontFamily: fontSans }}
+    >
+      {children}
+    </Text>
+  );
 }
 
 export function QuietLink({ href, children }: { href: Href; children: ReactNode }) {
@@ -168,7 +202,9 @@ export function LoadingScreen({ label = "Loading…" }: { label?: string }) {
       className="flex-1 items-center justify-center bg-canvas px-6"
       edges={["bottom", "left", "right"]}
     >
-      <Text className="text-base text-foreground-secondary">{label}</Text>
+      <Text className="text-base text-foreground-secondary" style={{ fontFamily: fontSans }}>
+        {label}
+      </Text>
     </SafeAreaView>
   );
 }
@@ -211,10 +247,19 @@ export function ConfirmDialog({
           accessibilityViewIsModal
           className="w-full max-w-md gap-4 rounded-lg border border-border bg-elevated p-5"
         >
-          <Text accessibilityRole="header" className="text-xl font-bold text-foreground">
+          <Text
+            accessibilityRole="header"
+            className="text-xl font-bold text-foreground"
+            style={{ fontFamily: fontDisplay }}
+          >
             {title}
           </Text>
-          <Text className="text-base leading-6 text-foreground-secondary">{message}</Text>
+          <Text
+            className="text-base leading-6 text-foreground-secondary"
+            style={{ fontFamily: fontSans }}
+          >
+            {message}
+          </Text>
           <View className="gap-3">
             <Button
               disabled={pending}

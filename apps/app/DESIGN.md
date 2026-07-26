@@ -22,8 +22,10 @@ colors:
   danger: "#dc2626"
   success: "#047857"
 typography:
+  display:
+    fontFamily: Source Serif 4
   sans:
-    fontFamily: system-ui
+    fontFamily: Source Sans 3
 rounded:
   base: 0.5rem
 ---
@@ -49,10 +51,9 @@ feedback tokens only for status text, not as brand accents. Dev-only warning sur
 
 ## Typography
 
-Screens currently rely on the platform system UI stack. Titles are large and bold; supporting
-copy is medium weight and secondary-colored. Prefer one expressive display face only after it is
-added as a shared Uniwind/theme choice for all platforms — do not introduce Inter, Roboto, Arial,
-or ad-hoc web-only font stacks on individual screens.
+Load shared faces through `lib/fonts.ts` / `expo-font`: Source Serif 4 for screen titles and
+Source Sans 3 for body, labels, and controls. Do not introduce Inter, Roboto, Arial, or ad-hoc
+web-only font stacks on individual screens.
 
 ## Layout
 
