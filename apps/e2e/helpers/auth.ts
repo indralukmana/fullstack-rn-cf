@@ -81,7 +81,7 @@ export async function verifyEmailFromMailbox(
   await expect(page.getByRole("heading", { name: "Account" }).last()).toBeVisible();
 }
 
-async function fillTextbox(page: Page, label: string, value: string) {
+export async function fillTextbox(page: Page, label: string, value: string) {
   const input = page.getByRole("textbox", { name: label });
   await input.click();
   await input.fill(value);

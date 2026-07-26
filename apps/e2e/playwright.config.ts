@@ -24,6 +24,8 @@ const apiEnv = {
 export default defineConfig({
   testDir: ".",
   fullyParallel: true,
+  // Local wrangler/workerd is unstable under heavy parallel signup load.
+  workers: process.env.CI ? 2 : 2,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? "github" : "list",

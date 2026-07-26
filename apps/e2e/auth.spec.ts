@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { registerViaUi, uniqueEmail } from "./helpers/auth";
+import { fillTextbox, registerViaUi, uniqueEmail } from "./helpers/auth";
 import { API_ORIGIN, TEST_PASSWORD, WEB_ORIGIN } from "./helpers/constants";
 
 test("register requires email verification before account access", async ({ page, request }) => {
@@ -49,9 +49,9 @@ test("duplicate sign-up follows the check-email path without leaking accounts", 
   expect(firstSignUp.ok()).toBeTruthy();
 
   await page.goto("/sign-up");
-  await page.getByRole("textbox", { name: "Name" }).fill("Another User");
-  await page.getByRole("textbox", { name: "Email" }).fill(email);
-  await page.getByRole("textbox", { name: "Password" }).fill(TEST_PASSWORD);
+  await fillTextbox(page, "Name", "Another User");
+  await fillTextbox(page, "Email", email);
+  await fillTextbox(page, "Password", TEST_PASSWORD);
   await page.getByRole("button", { name: "Create account" }).click();
 
   // Enumeration protection: UI continues as if signup succeeded.

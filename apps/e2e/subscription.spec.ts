@@ -13,7 +13,7 @@ test.describe("personal subscription", () => {
     request,
   }) => {
     await registerViaUi(page, request);
-    await page.getByRole("button", { name: "Manage subscription" }).click();
+    await page.getByRole("link", { name: "Manage subscription" }).click();
 
     await expect(page.getByRole("heading", { name: "Pro subscription" }).last()).toBeVisible();
     await expect(page.getByText("Free", { exact: true }).last()).toBeVisible();
@@ -33,7 +33,7 @@ test.describe("personal subscription", () => {
         }),
       });
     });
-    await page.getByRole("button", { name: "Manage subscription" }).click();
+    await page.getByRole("link", { name: "Manage subscription" }).click();
     await page.getByRole("button", { name: "Choose monthly" }).click();
 
     await expect(page).toHaveURL(/\/me\?checkout=success/);
