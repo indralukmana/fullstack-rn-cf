@@ -140,6 +140,9 @@ export default function MeScreen() {
             <Link href="./subscription" asChild>
               <Button label={canManageBilling ? "Manage subscription" : "View subscription"} />
             </Link>
+            <Link href="./pro" asChild>
+              <Button label="Paid example" variant="secondary" />
+            </Link>
             <Link href="./organizations" asChild>
               <Button label="Organizations" variant="secondary" />
             </Link>

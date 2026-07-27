@@ -45,7 +45,9 @@ when deriving products that will need org-owned billing later. See
 3. Enqueue only the durable event ID and process it with retry-safe domain logic.
 4. Project one normalized provider grant per subscription or transaction.
 5. Atomically recompute one aggregate entitlement per `(subject_type, subject_id, key)`.
-6. Authorize paid capabilities from the aggregate server-side entitlement.
+6. Authorize paid capabilities from the aggregate server-side entitlement via `requireEntitlement()`
+   (see `apps/api/src/middleware/require-entitlement.ts`). App UI may use `EntitlementGate` for
+   display only — never as the sole authorization decision.
 
 The schema already separates subjects with `subject_type` (`user` | `organization`). The target
 domain uses Organization as the commercial subject (including an Organization of one). Hybrid
