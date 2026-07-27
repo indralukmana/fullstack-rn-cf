@@ -79,6 +79,7 @@ export default function RootLayout() {
           <Stack.Screen name="me" options={withBodyTitle("Account")} />
           <Stack.Screen name="subscription" options={withBodyTitle("Pro subscription")} />
           <Stack.Screen name="pro" options={withBodyTitle("Paid example")} />
+          <Stack.Screen name="notes" options={withBodyTitle("Notes")} />
           <Stack.Screen name="account-data" options={withBodyTitle("Account data")} />
         </Stack>
       </View>

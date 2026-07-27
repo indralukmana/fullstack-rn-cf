@@ -68,6 +68,29 @@ client.
   when org-owned billing is live). See `GET /api/private/pro`.
 - App: wrap paid screens in `EntitlementGate` and still protect the API. Example: `/pro`.
 
+### Feature modules
+
+Shared org-scoped storage lives in `feature_item` (`/api/features/{featureKey}/items`). Scaffold a
+screen + e2e stub:
+
+```bash
+pnpm scaffold-feature -- --name tasks --title "Tasks"
+```
+
+Then register the Expo route in `_layout.tsx` and link it from Account. The launchpad ships
+`/notes` as the reference screen.
+
+### Demo seed
+
+With the API running locally:
+
+```bash
+pnpm seed:demo
+```
+
+Creates verified `owner@example.com` / `member@example.com` (password printed) and a shared
+`demo-workspace` Organization. Idempotent; disabled in production.
+
 ## Domain vs catalog naming
 
 - Domain: **User**, **Account**, **Organization**, **Subscription**, **Grant**, **Entitlement**,

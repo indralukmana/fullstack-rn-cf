@@ -46,6 +46,18 @@ To rename the scaffold for a new product (preview first):
 pnpm productize -- --dry-run --name "Acme Learn" --slug acme-learn
 ```
 
+Seed local demo users + shared workspace (API must be running):
+
+```bash
+pnpm seed:demo
+```
+
+Scaffold another org-scoped feature screen:
+
+```bash
+pnpm scaffold-feature -- --name tasks --title "Tasks"
+```
+
 ### Start the scaffold
 
 ```bash

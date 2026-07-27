@@ -143,6 +143,9 @@ export default function MeScreen() {
             <Link href="./pro" asChild>
               <Button label="Paid example" variant="secondary" />
             </Link>
+            <Link href="./notes" asChild>
+              <Button label="Notes" variant="secondary" />
+            </Link>
             <Link href="./organizations" asChild>
               <Button label="Organizations" variant="secondary" />
             </Link>

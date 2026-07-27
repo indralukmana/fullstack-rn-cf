@@ -39,7 +39,7 @@ test("accepts an organization invitation as a member", async ({ browser, request
 
     await ownerPage.getByRole("textbox", { name: "Email" }).fill(memberEmail);
     await ownerPage.getByRole("button", { name: "Send invitation" }).click();
-    await expect(ownerPage.getByText(memberEmail)).toBeVisible();
+    await expect(ownerPage.getByText(memberEmail, { exact: true })).toBeVisible();
 
     await expect
       .poll(

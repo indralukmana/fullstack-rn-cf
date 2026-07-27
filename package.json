@@ -30,6 +30,8 @@
     "setup": "node scripts/setup.mjs",
     "productize": "node scripts/productize.mjs",
     "productize:test": "node --test scripts/productize-lib.test.mjs",
+    "scaffold-feature": "node scripts/scaffold-feature.mjs",
+    "seed:demo": "node scripts/seed-demo.mjs",
     "prepare": "lefthook install"
   },
   "devDependencies": {
