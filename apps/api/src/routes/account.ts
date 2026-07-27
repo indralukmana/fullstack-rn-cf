@@ -11,6 +11,7 @@ import type { AppEnv } from "../app-env";
 import { createDb } from "../db/client";
 import { billingAudit } from "../db/schema";
 import { getRuntimeConfig } from "../lib/config";
+import { listSoleOwnedOrganizationIds } from "../lib/organization/lifecycle";
 import { requireAuth } from "../middleware/require-auth";
 import { requireVerifiedAuth } from "../middleware/require-verified-auth";
 
@@ -161,6 +162,7 @@ accountRoutes.openapi(deleteRoute, async (c) => {
       action: "account_deletion_blocked",
       metadata: {
         requestId: c.var.requestId,
+        reason: "active_subscription",
         organizationIds: [...new Set(activeGrants.map((grant) => grant.subjectId))],
         providers: [...new Set(activeGrants.map((grant) => grant.provider))],
       },
@@ -170,6 +172,29 @@ accountRoutes.openapi(deleteRoute, async (c) => {
         error: "active_subscription",
         message:
           "Manage active organization subscriptions with Stripe, Apple, or Google before deleting this account",
+      },
+      409,
+    );
+  }
+
+  const soleOwnedOrganizationIds = await listSoleOwnedOrganizationIds(db, c.var.user.id);
+  if (soleOwnedOrganizationIds.length > 0) {
+    await db.insert(billingAudit).values({
+      id: crypto.randomUUID(),
+      actorUserId: c.var.user.id,
+      subjectUserId: c.var.user.id,
+      action: "account_deletion_blocked",
+      metadata: {
+        requestId: c.var.requestId,
+        reason: "sole_owner",
+        organizationIds: soleOwnedOrganizationIds,
+      },
+    });
+    return c.json(
+      {
+        error: "sole_owner_organization",
+        message:
+          "Close or transfer ownership of every organization you solely own before deleting this account",
       },
       409,
     );

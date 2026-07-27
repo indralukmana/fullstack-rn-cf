@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { createDb } from "../../src/db/client";
 import { providerGrant } from "../../src/db/schema";
-import { deleteApi, getApi } from "../helpers/api-request";
+import { deleteApi, getApi, postApi } from "../helpers/api-request";
 import { signUpVerifiedUser } from "../helpers/email-auth";
 
 describe("account privacy lifecycle", () => {
@@ -58,10 +58,23 @@ describe("account privacy lifecycle", () => {
       confirmation: "DELETE",
     });
     expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toMatchObject({ error: "active_subscription" });
     expect(await db.query.user.findFirst({ where: { id: storedUser.id } })).toBeTruthy();
   });
 
-  it("deletes an unsubscribed account while retaining a minimal audit", async () => {
+  it("blocks account deletion while the user solely owns an organization", async () => {
+    const email = `sole-owner-${crypto.randomUUID()}@example.com`;
+    const account = await signUpVerifiedUser({ email });
+    const response = await deleteApi("/api/account", account.cookie, {
+      confirmation: "DELETE",
+    });
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toMatchObject({
+      error: "sole_owner_organization",
+    });
+  });
+
+  it("deletes an account after the sole-owned organization is closed", async () => {
     const email = `delete-${crypto.randomUUID()}@example.com`;
     const account = await signUpVerifiedUser({ email });
     const db = createDb(env.DB);
@@ -69,6 +82,19 @@ describe("account privacy lifecycle", () => {
     if (!storedUser) {
       throw new Error("missing test user");
     }
+    const membership = await db.query.member.findFirst({
+      where: { userId: storedUser.id, role: "owner" },
+    });
+    if (!membership) {
+      throw new Error("missing owned organization");
+    }
+
+    const closed = await postApi(
+      "/api/auth/organization/delete",
+      { organizationId: membership.organizationId },
+      account.cookie,
+    );
+    expect(closed.status).toBe(200);
 
     const response = await deleteApi("/api/account", account.cookie, {
       confirmation: "DELETE",
@@ -78,8 +104,52 @@ describe("account privacy lifecycle", () => {
     expect(await db.query.user.findFirst({ where: { id: storedUser.id } })).toBeUndefined();
     expect(
       await db.query.billingAudit.findFirst({
-        where: { subjectUserId: storedUser.id },
+        where: { subjectUserId: storedUser.id, action: "account_deleted" },
       }),
-    ).toMatchObject({ action: "account_deleted" });
+    ).toBeTruthy();
+  });
+});
+
+describe("organization close blockers", () => {
+  it("rejects closing an organization with an active subscription", async () => {
+    const email = `close-blocked-${crypto.randomUUID()}@example.com`;
+    const account = await signUpVerifiedUser({ email });
+    const db = createDb(env.DB);
+    const storedUser = await db.query.user.findFirst({ where: { email } });
+    if (!storedUser) {
+      throw new Error("missing test user");
+    }
+    const membership = await db.query.member.findFirst({
+      where: { userId: storedUser.id, role: "owner" },
+    });
+    if (!membership) {
+      throw new Error("missing owned organization");
+    }
+
+    await db.insert(providerGrant).values({
+      id: crypto.randomUUID(),
+      subjectType: "organization",
+      subjectId: membership.organizationId,
+      entitlementKey: "pro",
+      provider: "stripe",
+      providerEnvironment: "sandbox",
+      providerGrantId: `sub_${crypto.randomUUID()}`,
+      productId: "price_monthly",
+      interval: "monthly",
+      status: "active",
+      occurredAt: new Date(),
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      lastProviderState: "active",
+    });
+
+    const response = await postApi(
+      "/api/auth/organization/delete",
+      { organizationId: membership.organizationId },
+      account.cookie,
+    );
+    expect(response.status).toBeGreaterThanOrEqual(400);
+    expect(
+      await db.query.organization.findFirst({ where: { id: membership.organizationId } }),
+    ).toBeTruthy();
   });
 });

@@ -97,9 +97,10 @@ export default function AccountDataScreen() {
 
       <Section title="Delete account">
         <BodyText className="text-sm leading-5 text-foreground-secondary">
-          Apple, Google, and Stripe subscriptions must be managed first. Deleting this account never
-          cancels store billing.
+          Close or transfer every organization you solely own, and manage Apple, Google, and Stripe
+          subscriptions first. Deleting this account never cancels store billing.
         </BodyText>
+        <QuietLink href="./organizations">Manage organizations</QuietLink>
         <QuietLink href="./subscription">Manage subscriptions</QuietLink>
         <View className="gap-3">
           <Field

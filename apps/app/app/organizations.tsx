@@ -5,6 +5,7 @@ import { Pressable, View } from "react-native";
 import {
   BodyText,
   Button,
+  ConfirmDialog,
   EmptyState,
   Field,
   LoadingScreen,
@@ -32,14 +33,22 @@ export default function OrganizationsScreen() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [inviteMessage, setInviteMessage] = useState<string | null>(null);
+  const [confirmDeleteOrg, setConfirmDeleteOrg] = useState(false);
+  const [confirmLeaveOrg, setConfirmLeaveOrg] = useState(false);
+  const [memberPendingRemoval, setMemberPendingRemoval] = useState<{
+    id: string;
+    label: string;
+  } | null>(null);
 
   const members = activeOrganization.data?.members ?? [];
   const invitations = activeOrganization.data?.invitations ?? [];
   const pendingInvitations = invitations.filter((invitation) => invitation.status === "pending");
-  const canManageMembers = members.some(
-    (member) =>
-      member.userId === session?.user.id && (member.role === "owner" || member.role === "admin"),
-  );
+  const myMembership = members.find((member) => member.userId === session?.user.id);
+  const canManageMembers = myMembership?.role === "owner" || myMembership?.role === "admin";
+  const isOwner = myMembership?.role === "owner";
+  const ownerCount = members.filter((member) => member.role === "owner").length;
+  const canLeave = Boolean(myMembership) && !(isOwner && ownerCount <= 1);
+  const canDeleteOrganization = isOwner;
 
   async function onCreate() {
     const normalizedName = name.trim();
@@ -143,6 +152,62 @@ export default function OrganizationsScreen() {
     await activeOrganization.refetch();
   }
 
+  async function onLeaveOrganization() {
+    if (!activeOrganization.data?.id) {
+      return;
+    }
+    setPending(true);
+    setError(null);
+    const left = await authClient.organization.leave({
+      organizationId: activeOrganization.data.id,
+    });
+    setPending(false);
+    setConfirmLeaveOrg(false);
+    if (left.error) {
+      setError(left.error.message ?? "Could not leave the organization.");
+      return;
+    }
+    await organizations.refetch();
+    await activeOrganization.refetch();
+  }
+
+  async function onDeleteOrganization() {
+    if (!activeOrganization.data?.id) {
+      return;
+    }
+    setPending(true);
+    setError(null);
+    const deleted = await authClient.organization.delete({
+      organizationId: activeOrganization.data.id,
+    });
+    setPending(false);
+    setConfirmDeleteOrg(false);
+    if (deleted.error) {
+      setError(
+        deleted.error.message ??
+          "Could not close the organization. Cancel any active subscription first.",
+      );
+      return;
+    }
+    await organizations.refetch();
+    await activeOrganization.refetch();
+  }
+
+  async function onRemoveMember(memberId: string) {
+    setPending(true);
+    setError(null);
+    const removed = await authClient.organization.removeMember({
+      memberIdOrEmail: memberId,
+    });
+    setPending(false);
+    setMemberPendingRemoval(null);
+    if (removed.error) {
+      setError(removed.error.message ?? "Could not remove the member.");
+      return;
+    }
+    await activeOrganization.refetch();
+  }
+
   if (sessionPending || organizations.isPending || activeOrganization.isPending) {
     return <LoadingScreen label="Loading organizations…" />;
   }
@@ -217,19 +282,37 @@ export default function OrganizationsScreen() {
         <Section title="Members">
           {members.length ? (
             <View className="gap-2">
-              {members.map((member) => (
-                <View
-                  key={member.id}
-                  className="rounded-lg border border-border bg-elevated px-4 py-3"
-                >
-                  <BodyText className="text-foreground" weight="semibold">
-                    {member.user.name}
-                  </BodyText>
-                  <BodyText className="text-sm text-foreground-muted">
-                    {member.user.email} · {member.role}
-                  </BodyText>
-                </View>
-              ))}
+              {members.map((member) => {
+                const isSelf = member.userId === session?.user.id;
+                const canRemove =
+                  canManageMembers && !isSelf && !(member.role === "owner" && ownerCount <= 1);
+                return (
+                  <View
+                    key={member.id}
+                    className="gap-2 rounded-lg border border-border bg-elevated px-4 py-3"
+                  >
+                    <BodyText className="text-foreground" weight="semibold">
+                      {member.user.name}
+                    </BodyText>
+                    <BodyText className="text-sm text-foreground-muted">
+                      {member.user.email} · {member.role}
+                    </BodyText>
+                    {canRemove ? (
+                      <Button
+                        disabled={pending}
+                        label="Remove member"
+                        onPress={() =>
+                          setMemberPendingRemoval({
+                            id: member.id,
+                            label: member.user.email,
+                          })
+                        }
+                        variant="secondary"
+                      />
+                    ) : null}
+                  </View>
+                );
+              })}
             </View>
           ) : (
             <EmptyState
@@ -237,6 +320,37 @@ export default function OrganizationsScreen() {
               description="Refresh by reselecting the organization."
             />
           )}
+        </Section>
+      ) : null}
+
+      {activeOrganization.data ? (
+        <Section title="Membership actions">
+          <View className="gap-3">
+            <BodyText className="text-sm leading-5 text-foreground-secondary">
+              Leaving ends access to this organization&apos;s Pro entitlement. Closing deletes the
+              organization after any subscription is canceled.
+            </BodyText>
+            {canLeave ? (
+              <Button
+                disabled={pending}
+                label="Leave organization"
+                onPress={() => setConfirmLeaveOrg(true)}
+                variant="secondary"
+              />
+            ) : isOwner ? (
+              <BodyText className="text-sm text-foreground-muted">
+                Transfer ownership or close the organization before leaving as the sole owner.
+              </BodyText>
+            ) : null}
+            {canDeleteOrganization ? (
+              <Button
+                disabled={pending}
+                label="Close organization"
+                onPress={() => setConfirmDeleteOrg(true)}
+                variant="danger"
+              />
+            ) : null}
+          </View>
         </Section>
       ) : null}
 
@@ -334,6 +448,48 @@ export default function OrganizationsScreen() {
       {error ? <StatusText>{error}</StatusText> : null}
 
       <QuietLink href="/me">Back to account</QuietLink>
+
+      <ConfirmDialog
+        cancelLabel="Keep membership"
+        confirmLabel="Leave"
+        destructive
+        message="You will lose access to this organization's entitlement until invited again."
+        onCancel={() => setConfirmLeaveOrg(false)}
+        onConfirm={() => void onLeaveOrganization()}
+        pending={pending}
+        title="Leave organization?"
+        visible={confirmLeaveOrg}
+      />
+      <ConfirmDialog
+        cancelLabel="Keep organization"
+        confirmLabel="Close"
+        destructive
+        message="This permanently removes the organization and memberships. Cancel any active subscription first."
+        onCancel={() => setConfirmDeleteOrg(false)}
+        onConfirm={() => void onDeleteOrganization()}
+        pending={pending}
+        title="Close organization?"
+        visible={confirmDeleteOrg}
+      />
+      <ConfirmDialog
+        cancelLabel="Keep member"
+        confirmLabel="Remove"
+        destructive
+        message={
+          memberPendingRemoval
+            ? `Remove ${memberPendingRemoval.label} from this organization?`
+            : "Remove this member?"
+        }
+        onCancel={() => setMemberPendingRemoval(null)}
+        onConfirm={() => {
+          if (memberPendingRemoval) {
+            void onRemoveMember(memberPendingRemoval.id);
+          }
+        }}
+        pending={pending}
+        title="Remove member?"
+        visible={Boolean(memberPendingRemoval)}
+      />
     </Screen>
   );
 }
