@@ -17,6 +17,7 @@ import { getSession } from "./lib/auth/session";
 import { createAuth, type AuthEnv } from "./lib/better-auth";
 import { handleBillingQueue, handleScheduledBilling } from "./lib/billing/worker-handlers";
 import { getRuntimeConfig, type BillingQueueMessage } from "./lib/config";
+import { seedDemoData } from "./lib/dev/seed-demo";
 import { clearOutboundEmails, listOutboundEmails } from "./lib/email/send";
 import { initVarlockIfPresent } from "./lib/varlock-init";
 import { rateLimit } from "./middleware/rate-limit";
@@ -27,6 +28,7 @@ import { requireOrganization } from "./middleware/require-organization";
 import { accountRoutes } from "./routes/account";
 import { billingRoutes } from "./routes/billing";
 import { billingWebhooks } from "./routes/billing-webhooks";
+import { featureItemRoutes } from "./routes/feature-items";
 
 await initVarlockIfPresent();
 
@@ -122,6 +124,7 @@ app.use("/api/webhooks/*", async (c, next) => {
 app.route("/api/webhooks", billingWebhooks);
 app.route("/api/billing", billingRoutes);
 app.route("/api/account", accountRoutes);
+app.route("/api/features", featureItemRoutes);
 
 app.on(["GET", "POST"], "/api/auth/*", async (c) => {
   try {
@@ -170,6 +173,17 @@ app.delete("/api/dev/mailbox", (c) => {
 
   clearOutboundEmails();
   return c.json({ cleared: true });
+});
+
+/** Dev-only demo accounts: owner, member, shared workspace (idempotent). */
+app.post("/api/dev/seed", async (c) => {
+  const config = getRuntimeConfig(c.env);
+  if (config.isProduction) {
+    return c.json({ error: "not_found", message: "Not found" }, 404);
+  }
+
+  const result = await seedDemoData(c.env);
+  return c.json(result);
 });
 
 const healthRoute = createRoute({

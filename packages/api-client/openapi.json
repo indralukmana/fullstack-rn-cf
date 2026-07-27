@@ -198,6 +198,77 @@
         },
         "required": ["confirmation"]
       },
+      "FeatureItemListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeatureItem"
+            }
+          }
+        },
+        "required": ["items"]
+      },
+      "FeatureItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "item_123"
+          },
+          "organizationId": {
+            "type": "string",
+            "example": "org_123"
+          },
+          "featureKey": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{1,31}$",
+            "example": "notes"
+          },
+          "title": {
+            "type": "string",
+            "example": "First note"
+          },
+          "body": {
+            "type": "string",
+            "nullable": true,
+            "example": "Optional details"
+          },
+          "createdByUserId": {
+            "type": "string",
+            "example": "user_123"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "featureKey",
+          "title",
+          "body",
+          "createdByUserId",
+          "createdAt"
+        ]
+      },
+      "CreateFeatureItemRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 4000
+          }
+        },
+        "required": ["title"]
+      },
       "HealthResponse": {
         "type": "object",
         "properties": {
@@ -523,6 +594,134 @@
           },
           "409": {
             "description": "Active store or Stripe subscription must be managed first",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/features/{featureKey}/items": {
+      "get": {
+        "operationId": "listFeatureItems",
+        "tags": ["Features"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{1,31}$",
+              "example": "notes"
+            },
+            "required": true,
+            "name": "featureKey",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Organization-scoped feature items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureItemListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Organization required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not a member of this organization",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createFeatureItem",
+        "tags": ["Features"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{1,31}$",
+              "example": "notes"
+            },
+            "required": true,
+            "name": "featureKey",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFeatureItemRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created feature item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Organization required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not a member of this organization",
             "content": {
               "application/json": {
                 "schema": {

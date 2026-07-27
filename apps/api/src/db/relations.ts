@@ -44,6 +44,22 @@ export const relations = defineRelations(schema, (r) => ({
       from: r.organization.id,
       to: r.invitation.organizationId,
     }),
+    featureItems: r.many.featureItem({
+      from: r.organization.id,
+      to: r.featureItem.organizationId,
+    }),
+  },
+  featureItem: {
+    organization: r.one.organization({
+      from: r.featureItem.organizationId,
+      to: r.organization.id,
+      optional: false,
+    }),
+    createdBy: r.one.user({
+      from: r.featureItem.createdByUserId,
+      to: r.user.id,
+      optional: false,
+    }),
   },
   member: {
     organization: r.one.organization({

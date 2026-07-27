@@ -126,6 +126,40 @@ export const DeleteAccountRequestSchema = z
 export type AccountExportResponse = z.infer<typeof AccountExportResponseSchema>;
 export type AccountDeletedResponse = z.infer<typeof AccountDeletedResponseSchema>;
 
+export const FeatureKeySchema = z
+  .string()
+  .regex(/^[a-z][a-z0-9-]{1,31}$/)
+  .openapi({ example: "notes" });
+
+export const FeatureItemSchema = z
+  .object({
+    id: z.string().openapi({ example: "item_123" }),
+    organizationId: z.string().openapi({ example: "org_123" }),
+    featureKey: FeatureKeySchema,
+    title: z.string().openapi({ example: "First note" }),
+    body: z.string().nullable().openapi({ example: "Optional details" }),
+    createdByUserId: z.string().openapi({ example: "user_123" }),
+    createdAt: z.iso.datetime(),
+  })
+  .openapi("FeatureItem");
+
+export const FeatureItemListResponseSchema = z
+  .object({
+    items: z.array(FeatureItemSchema),
+  })
+  .openapi("FeatureItemListResponse");
+
+export const CreateFeatureItemRequestSchema = z
+  .object({
+    title: z.string().trim().min(1).max(120),
+    body: z.string().trim().max(4000).optional(),
+  })
+  .openapi("CreateFeatureItemRequest");
+
+export type FeatureItem = z.infer<typeof FeatureItemSchema>;
+export type FeatureItemListResponse = z.infer<typeof FeatureItemListResponseSchema>;
+export type CreateFeatureItemRequest = z.infer<typeof CreateFeatureItemRequestSchema>;
+
 export const ErrorResponseSchema = z
   .object({
     error: z.string().openapi({ example: "unauthorized" }),
