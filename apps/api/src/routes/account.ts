@@ -10,8 +10,8 @@ import type { AppEnv } from "../app-env";
 
 import { createDb } from "../db/client";
 import { billingAudit } from "../db/schema";
+import { deleteAccount } from "../lib/account/delete-account";
 import { getRuntimeConfig } from "../lib/config";
-import { listSoleOwnedOrganizationIds } from "../lib/organization/lifecycle";
 import { requireAuth } from "../middleware/require-auth";
 import { requireVerifiedAuth } from "../middleware/require-verified-auth";
 
@@ -129,91 +129,12 @@ const deleteRoute = createRoute({
 
 accountRoutes.openapi(deleteRoute, async (c) => {
   c.req.valid("json");
-  const db = createDb(c.env.DB);
-  const config = getRuntimeConfig(c.env);
-  const providerEnvironment = config.isProduction ? "production" : "sandbox";
-
-  const ownedMemberships = await db.query.member.findMany({
-    where: {
-      userId: c.var.user.id,
-      role: "owner",
-    },
-    columns: { organizationId: true },
+  const result = await deleteAccount(createDb(c.env.DB), c.env.DB, c.env, {
+    userId: c.var.user.id,
+    requestId: c.var.requestId,
   });
-  const ownedOrganizationIds = ownedMemberships.map((membership) => membership.organizationId);
-  const activeGrants =
-    ownedOrganizationIds.length > 0
-      ? await db.query.providerGrant.findMany({
-          where: {
-            subjectType: "organization",
-            subjectId: { in: ownedOrganizationIds },
-            providerEnvironment,
-            status: { in: ["active", "grace_period"] },
-            OR: [{ expiresAt: { isNull: true } }, { expiresAt: { gt: new Date() } }],
-          },
-        })
-      : [];
-
-  if (activeGrants.length > 0) {
-    await db.insert(billingAudit).values({
-      id: crypto.randomUUID(),
-      actorUserId: c.var.user.id,
-      subjectUserId: c.var.user.id,
-      action: "account_deletion_blocked",
-      metadata: {
-        requestId: c.var.requestId,
-        reason: "active_subscription",
-        organizationIds: [...new Set(activeGrants.map((grant) => grant.subjectId))],
-        providers: [...new Set(activeGrants.map((grant) => grant.provider))],
-      },
-    });
-    return c.json(
-      {
-        error: "active_subscription",
-        message:
-          "Manage active organization subscriptions with Stripe, Apple, or Google before deleting this account",
-      },
-      409,
-    );
+  if (result.status === "blocked") {
+    return c.json({ error: result.error, message: result.message }, 409);
   }
-
-  const soleOwnedOrganizationIds = await listSoleOwnedOrganizationIds(db, c.var.user.id);
-  if (soleOwnedOrganizationIds.length > 0) {
-    await db.insert(billingAudit).values({
-      id: crypto.randomUUID(),
-      actorUserId: c.var.user.id,
-      subjectUserId: c.var.user.id,
-      action: "account_deletion_blocked",
-      metadata: {
-        requestId: c.var.requestId,
-        reason: "sole_owner",
-        organizationIds: soleOwnedOrganizationIds,
-      },
-    });
-    return c.json(
-      {
-        error: "sole_owner_organization",
-        message:
-          "Close or transfer ownership of every organization you solely own before deleting this account",
-      },
-      409,
-    );
-  }
-
-  const now = Date.now();
-  await c.env.DB.batch([
-    c.env.DB.prepare(
-      "INSERT INTO billing_audit (id, actor_user_id, subject_user_id, action, metadata, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-    ).bind(
-      crypto.randomUUID(),
-      c.var.user.id,
-      c.var.user.id,
-      "account_deleted",
-      JSON.stringify({ requestId: c.var.requestId }),
-      now,
-    ),
-    c.env.DB.prepare("DELETE FROM purchase_attempt WHERE user_id = ?").bind(c.var.user.id),
-    c.env.DB.prepare("DELETE FROM user WHERE id = ?").bind(c.var.user.id),
-  ]);
   return c.json({ deleted: true as const }, 200);
 });

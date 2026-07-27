@@ -1,0 +1,98 @@
+import { useState, type ComponentProps } from "react";
+import { Pressable, Text, TextInput, View } from "react-native";
+
+import { fontSans, fontSansSemiBold } from "@/lib/fonts";
+import { useThemeColors } from "@/lib/theme-colors";
+
+import { fieldClassName, StatusText } from "./ui-primitives";
+
+type TextInputProps = ComponentProps<typeof TextInput>;
+
+export function Field({
+  label,
+  error,
+  className,
+  style,
+  ...rest
+}: TextInputProps & {
+  label: string;
+  error?: string | null;
+}) {
+  const { placeholder } = useThemeColors();
+
+  return (
+    <View className="gap-1.5">
+      <Text
+        className="text-sm font-medium text-foreground-muted"
+        style={{ fontFamily: fontSansSemiBold }}
+      >
+        {label}
+      </Text>
+      <TextInput
+        accessibilityLabel={label}
+        className={className ? `${fieldClassName} ${className}` : fieldClassName}
+        placeholderTextColor={placeholder}
+        style={[{ fontFamily: fontSans }, style]}
+        {...rest}
+      />
+      {error ? <StatusText>{error}</StatusText> : null}
+    </View>
+  );
+}
+
+export function PasswordField({
+  label,
+  error,
+  value,
+  onChangeText,
+  placeholder,
+  autoComplete,
+}: {
+  label: string;
+  error?: string | null;
+  value: string;
+  onChangeText: (value: string) => void;
+  placeholder?: string;
+  autoComplete?: TextInputProps["autoComplete"];
+}) {
+  const [visible, setVisible] = useState(false);
+  const { placeholder: placeholderColor } = useThemeColors();
+
+  return (
+    <View className="gap-1.5">
+      <Text
+        className="text-sm font-medium text-foreground-muted"
+        style={{ fontFamily: fontSansSemiBold }}
+      >
+        {label}
+      </Text>
+      <View className="relative">
+        <TextInput
+          accessibilityLabel={label}
+          autoComplete={autoComplete}
+          className={`${fieldClassName} pr-24`}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor={placeholderColor}
+          secureTextEntry={!visible}
+          style={{ fontFamily: fontSans }}
+          value={value}
+        />
+        <Pressable
+          accessibilityLabel={visible ? "Hide characters" : "Show characters"}
+          accessibilityRole="button"
+          className="absolute inset-y-0 right-0 justify-center px-3"
+          onPress={() => setVisible((current) => !current)}
+        >
+          <Text
+            className="text-sm font-semibold text-foreground-muted"
+            style={{ fontFamily: fontSansSemiBold }}
+          >
+            {visible ? "Hide" : "Show"}
+          </Text>
+        </Pressable>
+      </View>
+      {error ? <StatusText>{error}</StatusText> : null}
+    </View>
+  );
+}

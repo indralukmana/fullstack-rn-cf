@@ -1,6 +1,4 @@
 import { useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
-import { Linking, Pressable, View } from "react-native";
 
 import {
   BodyText,
@@ -11,86 +9,26 @@ import {
   ScreenTitle,
   StatusText,
 } from "@/components/ui";
-import { appCallbackUrl } from "@/lib/app-url";
-import { authClient } from "@/lib/auth-client";
-import {
-  type DevMailboxMessage,
-  extractEmailLink,
-  fetchDevMailbox,
-  isDevMailboxUiEnabled,
-  devMailboxUrl,
-} from "@/lib/dev-mailbox";
+
+import { DevMailboxPanel } from "./_parts/check-email/dev-mailbox-panel";
+import { useCheckEmailScreen } from "./_parts/check-email/use-check-email-screen";
 
 export default function CheckEmailScreen() {
   const params = useLocalSearchParams<{ email?: string; purpose?: string }>();
   const email = typeof params.email === "string" ? params.email : "";
   const purpose = params.purpose === "reset" ? "reset" : "verify";
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
-  const [mailboxError, setMailboxError] = useState<string | null>(null);
-  const [latestMessage, setLatestMessage] = useState<DevMailboxMessage | null>(null);
-  const showDevMailbox = isDevMailboxUiEnabled() && Boolean(email);
-  const mailboxApiUrl = email ? devMailboxUrl(email) : null;
-  const latestLink = latestMessage ? extractEmailLink(latestMessage.text) : null;
-
-  const refreshMailbox = useCallback(async () => {
-    if (!showDevMailbox || !email) {
-      return;
-    }
-    try {
-      const messages = await fetchDevMailbox(email);
-      setLatestMessage(messages[0] ?? null);
-      setMailboxError(null);
-    } catch (refreshError) {
-      setLatestMessage(null);
-      setMailboxError(
-        refreshError instanceof Error ? refreshError.message : "Could not load local mailbox",
-      );
-    }
-  }, [email, showDevMailbox]);
-
-  useEffect(() => {
-    void refreshMailbox();
-  }, [refreshMailbox]);
-
-  async function onResend() {
-    if (!email) {
-      setError("Missing email address");
-      return;
-    }
-
-    setPending(true);
-    setError(null);
-    setMessage(null);
-
-    if (purpose === "reset") {
-      const result = await authClient.requestPasswordReset({
-        email,
-        redirectTo: appCallbackUrl("/reset-password"),
-      });
-      setPending(false);
-      if (result.error) {
-        setError(result.error.message ?? "Could not resend reset email");
-        return;
-      }
-      setMessage("If an account exists for that email, another reset link was sent.");
-      await refreshMailbox();
-      return;
-    }
-
-    const result = await authClient.sendVerificationEmail({
-      email,
-      callbackURL: appCallbackUrl("/me"),
-    });
-    setPending(false);
-    if (result.error) {
-      setError(result.error.message ?? "Could not resend verification email");
-      return;
-    }
-    setMessage("Verification email sent again.");
-    await refreshMailbox();
-  }
+  const {
+    message,
+    error,
+    pending,
+    mailboxError,
+    latestMessage,
+    showDevMailbox,
+    mailboxApiUrl,
+    latestLink,
+    refreshMailbox,
+    onResend,
+  } = useCheckEmailScreen(email, purpose);
 
   return (
     <Screen centered scroll>
@@ -117,47 +55,14 @@ export default function CheckEmailScreen() {
         />
       ) : null}
       {showDevMailbox ? (
-        <View className="gap-3 border-t border-warning-border pt-5">
-          <BodyText className="text-sm text-warning-foreground" weight="semibold">
-            Local mailbox (dev only)
-          </BodyText>
-          <BodyText className="text-sm leading-5 text-warning-foreground">
-            Emails are logged by the API console provider. Open the mailbox JSON or the latest
-            message link below.
-          </BodyText>
-          {mailboxApiUrl ? (
-            <Pressable
-              accessibilityRole="link"
-              onPress={() => {
-                void Linking.openURL(mailboxApiUrl);
-              }}
-            >
-              <BodyText className="text-sm text-warning-foreground underline" weight="semibold">
-                Open /api/dev/mailbox for this address
-              </BodyText>
-            </Pressable>
-          ) : null}
-          {latestLink ? (
-            <Button
-              label={`Open latest ${purpose === "reset" ? "reset" : "verification"} link`}
-              onPress={() => {
-                void Linking.openURL(latestLink);
-              }}
-              variant="secondary"
-            />
-          ) : null}
-          {latestMessage ? (
-            <BodyText className="text-xs text-warning-foreground">
-              Latest subject: {latestMessage.subject}
-            </BodyText>
-          ) : null}
-          {mailboxError ? <StatusText>{mailboxError}</StatusText> : null}
-          <Pressable accessibilityRole="button" onPress={() => void refreshMailbox()}>
-            <BodyText className="text-sm text-warning-foreground underline" weight="semibold">
-              Refresh mailbox
-            </BodyText>
-          </Pressable>
-        </View>
+        <DevMailboxPanel
+          latestLink={latestLink}
+          latestMessage={latestMessage}
+          mailboxApiUrl={mailboxApiUrl}
+          mailboxError={mailboxError}
+          onRefresh={() => void refreshMailbox()}
+          purpose={purpose}
+        />
       ) : null}
       <QuietLink href="/sign-in">Back to sign in</QuietLink>
     </Screen>

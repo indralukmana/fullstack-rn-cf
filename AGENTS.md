@@ -48,6 +48,18 @@ generated API artifacts with their contract change; those pairs are one review u
 - API contract changes: `pnpm codegen`, then verify the generated diff
 - Milestone completion: `pnpm ci:check`; run E2E when user-visible flows change
 
+## Code size and modularity
+
+Prefer small, focused modules over large screens or services. Numeric limits live in
+[`.oxlintrc.json`](.oxlintrc.json) (`complexity`, `max-lines-per-function`, `max-lines`,
+`max-statements`, `max-depth`, `max-params`).
+
+- When those rules fail, extract helpers or components into adjacent modules.
+- Do not disable, weaken, or `eslint-disable` / oxlint-ignore modularity rules without explicit
+  human approval.
+- Do not invent one-line wrapper files solely to game line counts; split along real
+  responsibilities (actions, sections, SQL builders, services).
+
 ## Core invariants
 
 - Every tenant-owned operation verifies membership and authorization server-side.

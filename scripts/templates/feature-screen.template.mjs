@@ -1,12 +1,21 @@
-import { LoadingScreen, QuietLink, Screen, ScreenLead, ScreenTitle } from "@/components/ui";
+export function featureScreenTemplate({ title, featureKey }) {
+  const componentName = `${title.replace(/[^a-zA-Z0-9]/g, "")}Screen`;
+
+  return `import {
+  LoadingScreen,
+  QuietLink,
+  Screen,
+  ScreenLead,
+  ScreenTitle,
+} from "@/components/ui";
 
 import { FeatureItemCreateSection } from "./_parts/feature-items/feature-item-create-section";
 import { FeatureItemsListSection } from "./_parts/feature-items/feature-items-list-section";
 import { useFeatureItemsScreen } from "./_parts/feature-items/use-feature-items-screen";
 
-const FEATURE_KEY = "notes";
+const FEATURE_KEY = "${featureKey}";
 
-export default function NotesScreen() {
+export default function ${componentName}() {
   const state = useFeatureItemsScreen(FEATURE_KEY);
   const { session, sessionPending, activeOrganization } = state;
 
@@ -17,8 +26,8 @@ export default function NotesScreen() {
   if (!session?.user) {
     return (
       <Screen centered>
-        <ScreenTitle>Notes</ScreenTitle>
-        <ScreenLead>Sign in to manage notes for your active organization.</ScreenLead>
+        <ScreenTitle>${title}</ScreenTitle>
+        <ScreenLead>Sign in to manage ${title.toLowerCase()} for your active organization.</ScreenLead>
         <QuietLink href="/sign-in">Sign in</QuietLink>
       </Screen>
     );
@@ -27,7 +36,7 @@ export default function NotesScreen() {
   if (!activeOrganization.data) {
     return (
       <Screen centered>
-        <ScreenTitle>Notes</ScreenTitle>
+        <ScreenTitle>${title}</ScreenTitle>
         <ScreenLead>Select an active organization first.</ScreenLead>
         <QuietLink href="/organizations">Organizations</QuietLink>
       </Screen>
@@ -36,14 +45,14 @@ export default function NotesScreen() {
 
   return (
     <Screen scroll>
-      <ScreenTitle>Notes</ScreenTitle>
+      <ScreenTitle>${title}</ScreenTitle>
       <ScreenLead>
-        Org-scoped notes for {activeOrganization.data.name}. Backed by{" "}
-        {`/api/features/${FEATURE_KEY}/items`}.
+        Org-scoped ${title.toLowerCase()} for {activeOrganization.data.name}. Backed by{" "}
+        {\`/api/features/\${FEATURE_KEY}/items\`}.
       </ScreenLead>
 
       <FeatureItemsListSection
-        emptyDescription="Create the first notes item for this organization."
+        emptyDescription="Create the first ${title.toLowerCase()} item for this organization."
         items={state.items}
         listQuery={state.listQuery}
       />
@@ -52,4 +61,6 @@ export default function NotesScreen() {
       <QuietLink href="/me">Back to account</QuietLink>
     </Screen>
   );
+}
+`;
 }
