@@ -40,6 +40,12 @@ pnpm install
 pnpm setup
 ```
 
+To rename the scaffold for a new product (preview first):
+
+```bash
+pnpm productize -- --dry-run --name "Acme Learn" --slug acme-learn
+```
+
 ### Start the scaffold
 
 ```bash

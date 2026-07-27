@@ -12,13 +12,24 @@ Read [Domain language](/domain/) first so product copy and server terms stay ali
 ## Recommended fork shape
 
 1. **Clone or branch** this monorepo (or copy it into a private product repo).
-2. **Rename identity** (app name, scheme, bundle IDs, Worker/Pages project names).
+2. **Rename identity** with `pnpm productize` (app name, scheme, bundle IDs, Worker/Pages/D1/queue
+   names). Preview with `--dry-run`.
 3. **Reskin** via `apps/app/DESIGN.md` and Uniwind tokens — not a parallel UI kit.
 4. **Point env and stores** at product-specific Cloudflare, Stripe, RevenueCat, and EAS projects.
 5. **Add product features** as new routes, screens, and API modules on top of membership and
-   Entitlement checks.
+   Entitlement checks (`requireEntitlement` + `EntitlementGate`).
 6. **Keep launchpad upgrades mergeable** when you still track upstream; avoid rewriting the billing
    ledger or auth stack in the product fork.
+
+### Productize command
+
+```bash
+pnpm productize -- --dry-run --name "Acme Learn" --slug acme-learn
+pnpm productize -- --name "Acme Learn" --slug acme-learn --scheme acmelearn --bundle-id com.acme.learn
+```
+
+`productize` does **not** rename `@rn-cf/*` workspace packages (keeps merges and tooling stable).
+Review the diff after running it.
 
 ## Change these
 
@@ -46,9 +57,16 @@ focused typechecks.
 - Orval codegen path (`packages/types` → `packages/api-client`)
 - Cloudflare bindings generated from Wrangler (do not hand-maintain binding types)
 - Core invariants in root `AGENTS.md` (server-side authz, idempotent webhooks, no secrets in logs)
+- `@rn-cf/*` package names (unless you intentionally leave the launchpad upgrade path)
 
 Products should **call** Entitlement checks and membership helpers, not re-implement them in the
 client.
+
+### Entitlement gates
+
+- API: compose `requireAuth` then `requireEntitlement()` (optional key / `subject: "organization"`
+  when org-owned billing is live). See `GET /api/private/pro`.
+- App: wrap paid screens in `EntitlementGate` and still protect the API. Example: `/pro`.
 
 ## Domain vs catalog naming
 

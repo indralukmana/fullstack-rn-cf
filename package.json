@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "pnpm -r --if-present build",
-    "test": "pnpm -r --if-present test",
+    "test": "pnpm productize:test && pnpm -r --if-present test",
     "test:e2e": "pnpm --filter @rn-cf/e2e test",
     "test:e2e:ui": "pnpm --filter @rn-cf/e2e test:ui",
     "lint": "oxlint --fix .",
@@ -28,6 +28,8 @@
     "migrations:check": "pnpm --filter @rn-cf/api db:validate-migrations",
     "release:check": "pnpm ci:check && pnpm codegen:check && pnpm env:check && pnpm migrations:check && pnpm --filter @rn-cf/app export:web",
     "setup": "node scripts/setup.mjs",
+    "productize": "node scripts/productize.mjs",
+    "productize:test": "node --test scripts/productize-lib.test.mjs",
     "prepare": "lefthook install"
   },
   "devDependencies": {
