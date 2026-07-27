@@ -5,7 +5,7 @@
  *   pnpm scaffold-feature -- --name notes
  *   pnpm scaffold-feature -- --name tasks --title "Tasks"
  */
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -201,6 +201,41 @@ test("${featureKey} feature screen loads for a signed-in user", async ({ page, r
 `;
 }
 
+function wireStackScreen(name, title) {
+  const layoutPath = join(root, "apps/app/app/_layout.tsx");
+  let source = readFileSync(layoutPath, "utf8");
+  if (source.includes(`name="${name}"`)) {
+    return { path: layoutPath, changed: false };
+  }
+  const anchor = `<Stack.Screen name="account-data"`;
+  if (!source.includes(anchor)) {
+    throw new Error(`Could not find account-data Stack.Screen anchor in ${layoutPath}`);
+  }
+  const insertion = `<Stack.Screen name="${name}" options={withBodyTitle("${title}")} />\n          ${anchor}`;
+  source = source.replace(anchor, insertion);
+  writeFileSync(layoutPath, source);
+  return { path: layoutPath, changed: true };
+}
+
+function wireAccountLink(name, title) {
+  const mePath = join(root, "apps/app/app/me.tsx");
+  let source = readFileSync(mePath, "utf8");
+  if (source.includes(`href="./${name}"`)) {
+    return { path: mePath, changed: false };
+  }
+  const anchor = `<Link href="./organizations" asChild>`;
+  if (!source.includes(anchor)) {
+    throw new Error(`Could not find organizations Account link anchor in ${mePath}`);
+  }
+  const insertion = `<Link href="./${name}" asChild>
+              <Button label="${title}" variant="secondary" />
+            </Link>
+            ${anchor}`;
+  source = source.replace(anchor, insertion);
+  writeFileSync(mePath, source);
+  return { path: mePath, changed: true };
+}
+
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help || !args.name) {
@@ -213,7 +248,7 @@ Creates:
   apps/e2e/<name>.spec.ts
 
 Uses shared /api/features/{featureKey}/items (feature_item table).
-Then add a Stack.Screen in apps/app/app/_layout.tsx and a link from Account.`);
+Wires Stack.Screen in _layout.tsx and an Account link in me.tsx when missing.`);
     process.exit(args.help ? 0 : 1);
   }
 
@@ -233,15 +268,25 @@ Then add a Stack.Screen in apps/app/app/_layout.tsx and a link from Account.`);
   mkdirSync(dirname(screenPath), { recursive: true });
   writeFileSync(screenPath, screenTemplate({ title, featureKey }));
   writeFileSync(e2ePath, e2eTemplate({ name, title, featureKey }));
+  const layout = wireStackScreen(name, title);
+  const account = wireAccountLink(name, title);
 
   console.log(`Created ${screenPath}`);
   console.log(`Created ${e2ePath}`);
+  console.log(
+    layout.changed
+      ? `Wired Stack.Screen in ${layout.path}`
+      : `Stack.Screen already present in ${layout.path}`,
+  );
+  console.log(
+    account.changed
+      ? `Wired Account link in ${account.path}`
+      : `Account link already present in ${account.path}`,
+  );
   console.log(`
 Next:
-  1. Add <Stack.Screen name="${name}" options={withBodyTitle("${title}")} /> in apps/app/app/_layout.tsx
-  2. Link to /${name} from Account (or home)
-  3. pnpm codegen   # if OpenAPI client is missing list/create hooks
-  4. pnpm --filter @rn-cf/app typecheck
+  1. pnpm --filter @rn-cf/app typecheck
+  2. pnpm --filter @rn-cf/e2e test ${name}.spec.ts
 `);
 }
 

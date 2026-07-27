@@ -77,7 +77,8 @@ screen + e2e stub:
 pnpm scaffold-feature -- --name tasks --title "Tasks"
 ```
 
-Then register the Expo route in `_layout.tsx` and link it from Account. The launchpad ships
+The script creates the Expo screen and e2e stub, then wires `Stack.Screen` in `_layout.tsx` and an
+Account link in `me.tsx` when those are missing. The launchpad ships
 `/notes` as the reference screen.
 
 ### Demo seed
