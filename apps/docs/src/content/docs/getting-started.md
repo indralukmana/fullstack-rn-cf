@@ -25,3 +25,6 @@ Safe defaults come from each committed `.env.schema`; add only machine-specific 
 | App (web) | http://localhost:8081 |
 | API       | http://localhost:8787 |
 | Docs      | http://localhost:4321 |
+
+Next: [Derive a product](/derive-a-product/) when turning this scaffold into a named app, and
+[Domain language](/domain/) for shared vocabulary.

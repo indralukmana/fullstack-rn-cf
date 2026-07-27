@@ -1,8 +1,11 @@
-# RN CF Launchpad
+---
+title: Domain language
+description: Ubiquitous language for the RN CF launchpad
+---
 
-Ubiquitous language for the B2C launchpad: authenticated people, multi-member organizations, and paid access.
-
-Published for humans in Starlight: `apps/docs/src/content/docs/domain.md`. Keep that page in sync when you change terms here.
+Canonical source for coding agents: repository root `CONTEXT.md`. Keep that file and this page in
+sync when language changes. Architectural decisions live under [ADRs](/adr/0001-organization-owns-subscription/)
+and also as `docs/adr/` at the repository root.
 
 ## Language
 
@@ -59,3 +62,10 @@ _Avoid_: Trial, extension (when you mean post-failure access)
 **Trial**:
 Time-limited access before or without a successful paid period. Not a billing-failure state. How a Trial starts or gets extended (campaigns, challenges, social promos) is product policy, not separate launchpad domain types. A permanent free tier is simply the absence of Entitlement (or fewer features), not a glossary noun.
 _Avoid_: Grace Period, freemium, Free, Campaign (as launchpad ubiquitous language)
+
+## Decisions
+
+- [Organization owns the subscription](/adr/0001-organization-owns-subscription/)
+- [Account deletion blocks on org obligations](/adr/0002-account-deletion-blocks-on-org-obligations/)
+- [Provider customers map to Organization](/adr/0003-provider-customers-map-to-organization/)
+- [Organization close blocked on subscription](/adr/0004-organization-close-blocked-on-subscription/)

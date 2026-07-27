@@ -3,25 +3,37 @@ title: Billing and entitlements
 description: Provider events, subscriptions, and paid-feature authorization
 ---
 
-The default B2C catalog has one `pro` entitlement with monthly and yearly products. Stripe owns
-web checkout and RevenueCat owns native Apple/Google purchases. Provider SDK objects are not the
-authorization model.
+The default B2C catalog has one entitlement capability key (`pro` by default) with monthly and
+yearly products. Stripe owns web checkout and RevenueCat owns native Apple/Google purchases.
+Provider SDK objects are not the authorization model. Catalog key strings are not domain nouns —
+see [Domain language](/domain/).
+
+## Target vs transitional identity
+
+**Target (ADRs):** provider customers and Subscriptions belong to the **Organization**; the User is
+only the actor who checks out. Entitlement is evaluated for the **Active Organization**.
+
+**Current code:** Better Auth's immutable `user.id` is still the RevenueCat App User ID and Stripe
+metadata subject in this scaffold. That is transitional. Do not deepen User-as-payer assumptions
+when deriving products that will need org-owned billing later. See
+[ADR 0001](/adr/0001-organization-owns-subscription/) and
+[ADR 0003](/adr/0003-provider-customers-map-to-organization/).
 
 ## Product and identity policy
 
 - A verified account is required before any checkout or native purchase UI is shown.
-- Better Auth's immutable `user.id` is the RevenueCat App User ID and Stripe metadata subject.
-  Email addresses are mutable and must never identify purchases.
+- Email addresses are mutable and must never identify purchases. Until org-scoped provider identity
+  ships, the launchpad uses `user.id` as the provider subject.
 - Product and app identifiers are allowlisted in the server environment. Unknown products, apps,
   environments, and users fail closed instead of creating access.
 - Native builds use the platform store through RevenueCat. Do not globally steer native customers
   to Stripe; only show web checkout where current App Store and Play policies permit it.
-- RevenueCat restore uses the signed-in `user.id`. Configure the RevenueCat project to transfer
-  purchases to the latest identified account, and warn support that a transfer can remove access
-  from the previous account.
+- RevenueCat restore currently uses the signed-in `user.id` (transitional). Configure the
+  RevenueCat project to transfer purchases to the latest identified subject, and warn support that
+  a transfer can remove access from the previous subject.
 - Cancellation preserves access through the paid period. Billing issues grant only the configured
   provider grace period. Refunds, chargebacks, and expiration revoke that provider grant, but
-  another active Stripe or RevenueCat grant continues to unlock `pro`.
+  another active Stripe or RevenueCat grant continues to unlock the catalog entitlement key.
 - Apple and Google remain responsible for native refunds and subscription cancellation. Account
   deletion must explain this and must not claim to cancel a store subscription.
 
@@ -35,9 +47,9 @@ authorization model.
 5. Atomically recompute one aggregate entitlement per `(subject_type, subject_id, key)`.
 6. Authorize paid capabilities from the aggregate server-side entitlement.
 
-The schema separates users and organizations with an explicit subject type. This allows one
-person to have a personal mobile plan while belonging to organizations with independent Stripe
-plans.
+The schema already separates subjects with `subject_type` (`user` | `organization`). The target
+domain uses Organization as the commercial subject (including an Organization of one). Hybrid
+user-plus-org payer modes are not the launchpad north star.
 
 ## Invariants
 

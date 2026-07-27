@@ -13,6 +13,8 @@ export default defineConfig({
       },
       sidebar: [
         { label: "Getting Started", slug: "getting-started" },
+        { label: "Derive a Product", slug: "derive-a-product" },
+        { label: "Domain Language", slug: "domain" },
         { label: "Environment Configuration", slug: "environment" },
         { label: "Agent Skills", slug: "agent-skills" },
         { label: "Architecture", slug: "architecture" },
@@ -27,6 +29,27 @@ export default defineConfig({
         { label: "CI/CD", slug: "ci-cd" },
         { label: "Deployment", slug: "deployment" },
         { label: "Contributing", slug: "contributing" },
+        {
+          label: "ADRs",
+          items: [
+            {
+              label: "0001 Organization owns subscription",
+              slug: "adr/0001-organization-owns-subscription",
+            },
+            {
+              label: "0002 Account deletion blockers",
+              slug: "adr/0002-account-deletion-blocks-on-org-obligations",
+            },
+            {
+              label: "0003 Provider customers → Organization",
+              slug: "adr/0003-provider-customers-map-to-organization",
+            },
+            {
+              label: "0004 Organization close blockers",
+              slug: "adr/0004-organization-close-blocked-on-subscription",
+            },
+          ],
+        },
       ],
     }),
   ],
