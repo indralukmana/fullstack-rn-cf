@@ -12,6 +12,10 @@ export type EntitlementAccess = {
   refetch: () => void;
 };
 
+function canQueryBillingStatus(hasUser: boolean, organizationId: string | undefined): boolean {
+  return hasUser && Boolean(organizationId);
+}
+
 /**
  * Client display of server Entitlement. Never grant capabilities from this alone —
  * paid API routes must still use requireEntitlement.
@@ -21,10 +25,15 @@ export function useEntitlementAccess(
 ): EntitlementAccess {
   const { data: session, isPending: sessionPending } = authClient.useSession();
   const activeOrganization = authClient.useActiveOrganization();
+  const canQueryBilling = canQueryBillingStatus(
+    Boolean(session?.user),
+    activeOrganization.data?.id,
+  );
+
   const statusQuery = useGetBillingStatus({
     query: {
       queryKey: getGetBillingStatusQueryKey(),
-      enabled: Boolean(session?.user && activeOrganization.data?.id),
+      enabled: canQueryBilling,
     },
   });
 
@@ -34,10 +43,8 @@ export function useEntitlementAccess(
 
   return {
     isPending:
-      sessionPending ||
-      activeOrganization.isPending ||
-      (Boolean(session?.user && activeOrganization.data?.id) && statusQuery.isPending),
-    isError: Boolean(session?.user && activeOrganization.data?.id) && statusQuery.isError,
+      sessionPending || activeOrganization.isPending || (canQueryBilling && statusQuery.isPending),
+    isError: canQueryBilling && statusQuery.isError,
     hasAccess: Boolean(status?.hasAccess && keyMatches),
     status: status?.status ?? null,
     entitlementKey,

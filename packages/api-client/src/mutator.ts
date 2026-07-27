@@ -63,7 +63,7 @@ export async function customFetch<T>(url: string, options: RequestInit): Promise
     return undefined as T;
   }
 
-  const data = await response.json();
+  const data: unknown = await response.json();
 
   return {
     data,

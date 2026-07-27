@@ -127,6 +127,73 @@ export type RuntimeConfig = {
   billingReconciliationLimit: number;
 };
 
+function assertProductionSecrets(env: AppBindings): void {
+  requireNonEmpty(env.STRIPE_SECRET_KEY, "STRIPE_SECRET_KEY");
+  requireNonEmpty(env.STRIPE_WEBHOOK_SECRET, "STRIPE_WEBHOOK_SECRET");
+  requireNonEmpty(env.REVENUECAT_WEBHOOK_AUTHORIZATION, "REVENUECAT_WEBHOOK_AUTHORIZATION");
+  requireNonEmpty(env.REVENUECAT_SECRET_API_KEY, "REVENUECAT_SECRET_API_KEY");
+  requireNonEmpty(env.STRIPE_PRICE_MONTHLY, "STRIPE_PRICE_MONTHLY");
+  requireNonEmpty(env.STRIPE_PRICE_YEARLY, "STRIPE_PRICE_YEARLY");
+  requireNonEmpty(env.REVENUECAT_ENTITLEMENT_ID, "REVENUECAT_ENTITLEMENT_ID");
+  requireNonEmpty(env.REVENUECAT_OFFERING_ID, "REVENUECAT_OFFERING_ID");
+  requireNonEmpty(env.REVENUECAT_IOS_APP_ID, "REVENUECAT_IOS_APP_ID");
+  requireNonEmpty(env.REVENUECAT_ANDROID_APP_ID, "REVENUECAT_ANDROID_APP_ID");
+  requireNonEmpty(env.REVENUECAT_IOS_PRODUCT_MONTHLY, "REVENUECAT_IOS_PRODUCT_MONTHLY");
+  requireNonEmpty(env.REVENUECAT_IOS_PRODUCT_YEARLY, "REVENUECAT_IOS_PRODUCT_YEARLY");
+  requireNonEmpty(env.REVENUECAT_ANDROID_PRODUCT_MONTHLY, "REVENUECAT_ANDROID_PRODUCT_MONTHLY");
+  requireNonEmpty(env.REVENUECAT_ANDROID_PRODUCT_YEARLY, "REVENUECAT_ANDROID_PRODUCT_YEARLY");
+  if (!env.BILLING_QUEUE) {
+    throw new Error("BILLING_QUEUE binding must be configured in production");
+  }
+}
+
+function assertProductionRuntime(
+  env: AppBindings,
+  values: {
+    corsOrigins: string[];
+    authSecret: string;
+    authUrl: URL;
+    appUrl: URL;
+    emailProvider: string;
+    emailFrom: string;
+  },
+): void {
+  if (values.corsOrigins.length === 0) {
+    throw new Error("CORS_ORIGINS must be set in production");
+  }
+  if (values.authSecret.length < 32) {
+    throw new Error("BETTER_AUTH_SECRET must be at least 32 characters in production");
+  }
+  if (values.authUrl.protocol !== "https:") {
+    throw new Error("BETTER_AUTH_URL must use HTTPS in production");
+  }
+  if (values.appUrl.protocol !== "https:") {
+    throw new Error("APP_URL must use HTTPS in production");
+  }
+  if (values.emailProvider !== "cloudflare") {
+    throw new Error("EMAIL_PROVIDER must be cloudflare in production");
+  }
+  if (!env.EMAIL) {
+    throw new Error("EMAIL binding must be configured in production");
+  }
+  if (/@localhost(?:[>\s]|$)/i.test(values.emailFrom)) {
+    throw new Error("EMAIL_FROM must use a verified production domain");
+  }
+  assertProductionSecrets(env);
+}
+
+function assertCorsOrigins(corsOrigins: string[], isProduction: boolean): void {
+  for (const origin of corsOrigins) {
+    const url = parseAbsoluteUrl(origin, "CORS_ORIGINS");
+    if (url.origin !== origin) {
+      throw new Error("CORS_ORIGINS entries must be origins without paths or trailing slashes");
+    }
+    if (isProduction && url.protocol !== "https:") {
+      throw new Error("CORS_ORIGINS entries must use HTTPS in production");
+    }
+  }
+}
+
 export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
   if (env.ENVIRONMENT !== "development" && env.ENVIRONMENT !== "production") {
     throw new Error("ENVIRONMENT must be either development or production");
@@ -152,63 +219,18 @@ export function getRuntimeConfig(env: AppBindings): RuntimeConfig {
     throw new Error("EMAIL_PROVIDER must be either console or cloudflare");
   }
 
-  if (isProduction && corsOrigins.length === 0) {
-    throw new Error("CORS_ORIGINS must be set in production");
-  }
-
-  if (isProduction && authSecret.length < 32) {
-    throw new Error("BETTER_AUTH_SECRET must be at least 32 characters in production");
-  }
-
-  if (isProduction && authUrl.protocol !== "https:") {
-    throw new Error("BETTER_AUTH_URL must use HTTPS in production");
-  }
-
-  if (isProduction && appUrl.protocol !== "https:") {
-    throw new Error("APP_URL must use HTTPS in production");
-  }
-
-  if (isProduction && emailProvider !== "cloudflare") {
-    throw new Error("EMAIL_PROVIDER must be cloudflare in production");
-  }
-
-  if (isProduction && !env.EMAIL) {
-    throw new Error("EMAIL binding must be configured in production");
-  }
-
-  if (isProduction && /@localhost(?:[>\s]|$)/i.test(emailFrom)) {
-    throw new Error("EMAIL_FROM must use a verified production domain");
-  }
-
   if (isProduction) {
-    requireNonEmpty(env.STRIPE_SECRET_KEY, "STRIPE_SECRET_KEY");
-    requireNonEmpty(env.STRIPE_WEBHOOK_SECRET, "STRIPE_WEBHOOK_SECRET");
-    requireNonEmpty(env.REVENUECAT_WEBHOOK_AUTHORIZATION, "REVENUECAT_WEBHOOK_AUTHORIZATION");
-    requireNonEmpty(env.REVENUECAT_SECRET_API_KEY, "REVENUECAT_SECRET_API_KEY");
-    requireNonEmpty(env.STRIPE_PRICE_MONTHLY, "STRIPE_PRICE_MONTHLY");
-    requireNonEmpty(env.STRIPE_PRICE_YEARLY, "STRIPE_PRICE_YEARLY");
-    requireNonEmpty(env.REVENUECAT_ENTITLEMENT_ID, "REVENUECAT_ENTITLEMENT_ID");
-    requireNonEmpty(env.REVENUECAT_OFFERING_ID, "REVENUECAT_OFFERING_ID");
-    requireNonEmpty(env.REVENUECAT_IOS_APP_ID, "REVENUECAT_IOS_APP_ID");
-    requireNonEmpty(env.REVENUECAT_ANDROID_APP_ID, "REVENUECAT_ANDROID_APP_ID");
-    requireNonEmpty(env.REVENUECAT_IOS_PRODUCT_MONTHLY, "REVENUECAT_IOS_PRODUCT_MONTHLY");
-    requireNonEmpty(env.REVENUECAT_IOS_PRODUCT_YEARLY, "REVENUECAT_IOS_PRODUCT_YEARLY");
-    requireNonEmpty(env.REVENUECAT_ANDROID_PRODUCT_MONTHLY, "REVENUECAT_ANDROID_PRODUCT_MONTHLY");
-    requireNonEmpty(env.REVENUECAT_ANDROID_PRODUCT_YEARLY, "REVENUECAT_ANDROID_PRODUCT_YEARLY");
-    if (!env.BILLING_QUEUE) {
-      throw new Error("BILLING_QUEUE binding must be configured in production");
-    }
+    assertProductionRuntime(env, {
+      corsOrigins,
+      authSecret,
+      authUrl,
+      appUrl,
+      emailProvider,
+      emailFrom,
+    });
   }
 
-  for (const origin of corsOrigins) {
-    const url = parseAbsoluteUrl(origin, "CORS_ORIGINS");
-    if (url.origin !== origin) {
-      throw new Error("CORS_ORIGINS entries must be origins without paths or trailing slashes");
-    }
-    if (isProduction && url.protocol !== "https:") {
-      throw new Error("CORS_ORIGINS entries must use HTTPS in production");
-    }
-  }
+  assertCorsOrigins(corsOrigins, isProduction);
 
   const resolvedCors = corsOrigins.length > 0 ? corsOrigins : DEFAULT_DEV_CORS_ORIGINS;
   const trustedOrigins = [

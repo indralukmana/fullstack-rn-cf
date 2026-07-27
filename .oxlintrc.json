@@ -9,22 +9,162 @@
     "browser": true,
     "es2022": true
   },
+  "globals": {
+    "__DEV__": "readonly"
+  },
   "categories": {
     "correctness": "error",
     "suspicious": "error",
     "perf": "error",
-    "style": "off",
-    "restriction": "off"
+    "style": "error",
+    "restriction": "error",
+    "pedantic": "error",
+    "nursery": "warn"
   },
   "rules": {
     "no-console": "warn",
+    "complexity": ["error", 20],
     "typescript/no-explicit-any": "error",
     "react/self-closing-comp": "error",
     "react/react-in-jsx-scope": "off",
     "import/no-cycle": "error",
     "import/no-unassigned-import": ["error", { "allow": ["**/*.css"] }],
     "typescript/no-non-null-assertion": "error",
-    "typescript/no-deprecated": "error"
+    "typescript/no-deprecated": "error",
+
+    "import/no-named-export": "off",
+    "import/prefer-default-export": "off",
+    "import/no-default-export": "off",
+    "import/group-exports": "off",
+    "import/exports-last": "off",
+    "import/no-relative-parent-imports": "off",
+    "import/no-nodejs-modules": "off",
+    "import/max-dependencies": "off",
+    "import/no-namespace": "off",
+    "import/consistent-type-specifier-style": "off",
+    "import/unambiguous": "off",
+    "import/no-commonjs": "off",
+
+    "oxc/no-async-await": "off",
+    "oxc/no-optional-chaining": "off",
+    "oxc/no-rest-spread-properties": "off",
+    "oxc/no-barrel-file": "off",
+
+    "unicorn/no-null": "off",
+    "unicorn/filename-case": "off",
+    "unicorn/no-useless-undefined": "off",
+    "unicorn/prefer-module": "off",
+    "unicorn/import-style": "off",
+    "unicorn/prefer-top-level-await": "off",
+    "unicorn/no-abusive-eslint-disable": "off",
+    "unicorn/prefer-import-meta-properties": "off",
+
+    "typescript/prefer-readonly-parameter-types": "off",
+    "typescript/explicit-function-return-type": "off",
+    "typescript/explicit-module-boundary-types": "off",
+    "typescript/explicit-member-accessibility": "off",
+    "typescript/consistent-type-definitions": "off",
+    "typescript/consistent-type-exports": "off",
+    "typescript/strict-boolean-expressions": "off",
+    "typescript/strict-void-return": "off",
+    "typescript/no-confusing-void-expression": "off",
+    "typescript/no-invalid-void-type": "off",
+    "typescript/method-signature-style": "off",
+    "typescript/array-type": "off",
+    "typescript/promise-function-async": "off",
+    "typescript/return-await": "off",
+    "typescript/prefer-nullish-coalescing": "off",
+    "typescript/prefer-optional-chain": "off",
+    "typescript/prefer-regexp-exec": "off",
+    "typescript/use-unknown-in-catch-callback-variable": "off",
+    "typescript/ban-ts-comment": "off",
+    "typescript/no-require-imports": "off",
+    "typescript/no-unnecessary-condition": "off",
+
+    "eslint/sort-keys": "off",
+    "eslint/sort-imports": "off",
+    "eslint/no-magic-numbers": "off",
+    "eslint/no-ternary": "off",
+    "eslint/no-nested-ternary": "off",
+    "eslint/func-style": "off",
+    "eslint/arrow-body-style": "off",
+    "eslint/id-length": "off",
+    "eslint/no-undefined": "off",
+    "eslint/max-statements": "off",
+    "eslint/max-lines-per-function": "off",
+    "eslint/max-lines": "off",
+    "eslint/no-continue": "off",
+    "eslint/no-void": "off",
+    "eslint/no-plusplus": "off",
+    "eslint/no-negated-condition": "off",
+    "eslint/no-inline-comments": "off",
+    "eslint/capitalized-comments": "off",
+    "eslint/init-declarations": "off",
+    "eslint/prefer-destructuring": "off",
+    "eslint/require-unicode-regexp": "off",
+    "eslint/no-use-before-define": "off",
+    "eslint/curly": "off",
+    "eslint/new-cap": "off",
+    "eslint/func-names": "off",
+    "eslint/no-bitwise": "off",
+    "eslint/no-implicit-coercion": "off",
+    "eslint/prefer-named-capture-group": "off",
+    "eslint/no-await-in-loop": "off",
+    "eslint/prefer-template": "off",
+    "eslint/no-duplicate-imports": "off",
+    "eslint/require-await": "off",
+
+    "react/forbid-component-props": "off",
+    "react/jsx-no-literals": "off",
+    "react/jsx-max-depth": "off",
+    "react/jsx-filename-extension": "off",
+    "react/no-multi-comp": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/only-export-components": "off",
+    "react/jsx-handler-names": "off",
+    "react/react-compiler": "off",
+    "react/hook-use-state": "off",
+
+    "unicorn/no-nested-ternary": "off",
+    "unicorn/no-negated-condition": "off",
+    "unicorn/max-nested-calls": "off",
+    "unicorn/prefer-string-replace-all": "off",
+    "unicorn/prefer-ternary": "off",
+    "unicorn/prefer-number-coercion": "off",
+    "unicorn/prefer-at": "off",
+    "unicorn/prefer-spread": "off",
+    "unicorn/prefer-export-from": "off",
+    "unicorn/prefer-query-selector": "off",
+    "unicorn/prefer-response-static-json": "off",
+    "unicorn/no-await-expression-member": "off",
+    "unicorn/switch-case-braces": "off",
+    "unicorn/no-array-callback-reference": "off",
+    "unicorn/catch-error-name": "off",
+    "unicorn/explicit-length-check": "off",
+    "unicorn/no-anonymous-default-export": "off",
+    "unicorn/numeric-separators-style": "off",
+    "unicorn/no-useless-promise-resolve-reject": "off",
+
+    "vitest/prefer-expect-assertions": "off",
+    "vitest/require-test-timeout": "off",
+    "vitest/require-hook": "off",
+    "vitest/no-importing-vitest-globals": "off",
+    "vitest/prefer-importing-vitest-globals": "off",
+    "vitest/no-conditional-in-test": "off",
+    "vitest/prefer-strict-equal": "off",
+    "vitest/prefer-strict-boolean-matchers": "off",
+    "vitest/max-expects": "off",
+    "vitest/consistent-test-filename": "off",
+    "vitest/prefer-lowercase-title": "off",
+    "vitest/prefer-expect-resolves": "off",
+    "vitest/require-top-level-describe": "off",
+    "vitest/no-hooks": "off",
+    "vitest/prefer-describe-function-title": "off",
+    "vitest/prefer-to-be-truthy": "off",
+    "vitest/prefer-to-be-falsy": "off",
+    "vitest/prefer-called-exactly-once-with": "off",
+    "vitest/prefer-called-times": "off",
+    "vitest/no-import-node-test": "off"
   },
   "ignorePatterns": [
     "**/node_modules/**",
@@ -32,7 +172,11 @@
     "**/build/**",
     "**/.astro/**",
     "**/.expo/**",
-    "**/uniwind-types.d.ts"
+    "**/uniwind-types.d.ts",
+    "packages/api-client/src/generated/**",
+    "apps/api/worker-configuration.d.ts",
+    "apps/api/migrations/**",
+    "apps/api/drizzle/**"
   ],
   "overrides": [
     {
@@ -43,7 +187,17 @@
         "import/no-unassigned-import": "off",
         "typescript/no-explicit-any": "off",
         "typescript/no-unsafe-type-assertion": "off",
-        "vitest/require-mock-type-parameters": "off"
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-return": "off",
+        "typescript/no-misused-promises": "off",
+        "typescript/no-floating-promises": "off",
+        "typescript/require-await": "off",
+        "vitest/require-mock-type-parameters": "off",
+        "complexity": "off",
+        "no-console": "off"
       }
     },
     {
@@ -53,18 +207,24 @@
       }
     },
     {
+      "files": ["**/*.{mjs,cjs,js}", "**/vitest.config.ts", "apps/api/test/setup/**"],
+      "rules": {
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-return": "off",
+        "typescript/no-floating-promises": "off",
+        "typescript/require-await": "off",
+        "no-console": "off"
+      }
+    },
+    {
       "files": ["scripts/**"],
       "env": { "node": true, "browser": false },
       "rules": {
         "no-console": "off",
         "eslint/no-await-in-loop": "off"
-      }
-    },
-    {
-      "files": ["packages/api-client/src/generated/**"],
-      "rules": {
-        "typescript/no-unsafe-type-assertion": "off",
-        "typescript/no-misused-spread": "off"
       }
     },
     {
@@ -80,9 +240,33 @@
       }
     },
     {
+      "files": ["apps/api/src/index.ts"],
+      "rules": {
+        "typescript/no-unsafe-argument": "off"
+      }
+    },
+    {
       "files": ["apps/e2e/**"],
       "rules": {
-        "typescript/no-unsafe-type-assertion": "off"
+        "typescript/no-unsafe-type-assertion": "off",
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-argument": "off",
+        "no-console": "off"
+      }
+    },
+    {
+      "files": ["apps/app/app/**/*.{ts,tsx}"],
+      "rules": {
+        "typescript/no-misused-promises": "off",
+        "complexity": ["error", 40]
+      }
+    },
+    {
+      "files": ["apps/app/**/*.{ts,tsx}"],
+      "rules": {
+        "typescript/no-misused-promises": "off"
       }
     }
   ]

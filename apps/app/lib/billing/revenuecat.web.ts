@@ -8,26 +8,26 @@ function nativeOnly(): never {
   throw new Error("RevenueCat purchases are available only in native builds");
 }
 
-export async function configureNativeBilling(_organizationId: string): Promise<void> {
-  nativeOnly();
-}
-
-export async function clearNativeBillingIdentity(): Promise<void> {
-  return Promise.resolve();
-}
-
-export async function getNativePackages(): Promise<NativePackage[]> {
+export function configureNativeBilling(_organizationId: string): Promise<void> {
   return nativeOnly();
 }
 
-export async function purchaseNativePackage(_packageId: string): Promise<void> {
-  nativeOnly();
+export function clearNativeBillingIdentity(): Promise<void> {
+  return Promise.resolve();
 }
 
-export async function restoreNativePurchases(): Promise<void> {
-  nativeOnly();
+export function getNativePackages(): Promise<NativePackage[]> {
+  return nativeOnly();
 }
 
-export async function presentNativeCustomerCenter(): Promise<void> {
-  nativeOnly();
+export function purchaseNativePackage(_packageId: string): Promise<void> {
+  return nativeOnly();
+}
+
+export function restoreNativePurchases(): Promise<void> {
+  return nativeOnly();
+}
+
+export function presentNativeCustomerCenter(): Promise<void> {
+  return nativeOnly();
 }
