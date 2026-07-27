@@ -3,7 +3,13 @@ import { and, eq as sqlEq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
 import { createDb } from "../../src/db/client";
-import { billingEvent, entitlement, providerGrant, purchaseAttempt } from "../../src/db/schema";
+import {
+  billingEvent,
+  entitlement,
+  organization,
+  providerGrant,
+  purchaseAttempt,
+} from "../../src/db/schema";
 import { recomputeEntitlement } from "../../src/lib/billing/recompute-entitlement";
 
 describe("billing ledger invariants", () => {
@@ -220,9 +226,17 @@ describe("billing ledger invariants", () => {
 
   it("deduplicates purchase attempts by idempotency key", async () => {
     const db = createDb(env.DB);
+    const organizationId = `org_${crypto.randomUUID()}`;
+    await db.insert(organization).values({
+      id: organizationId,
+      name: "Purchase Org",
+      slug: `purchase-${organizationId.slice(0, 12)}`,
+      createdAt: new Date(),
+    });
     const idempotencyKey = `checkout_${crypto.randomUUID()}`;
     const attempt = {
       userId: `user_${crypto.randomUUID()}`,
+      organizationId,
       provider: "stripe" as const,
       providerEnvironment: "sandbox" as const,
       interval: "monthly" as const,

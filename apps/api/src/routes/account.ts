@@ -38,20 +38,26 @@ accountRoutes.openapi(exportRoute, async (c) => {
   const db = createDb(c.env.DB);
   const config = getRuntimeConfig(c.env);
   const providerEnvironment = config.isProduction ? "production" : "sandbox";
-  const [account, memberships, grants] = await Promise.all([
+  const [account, memberships] = await Promise.all([
     db.query.user.findFirst({ where: { id: c.var.user.id } }),
     db.query.member.findMany({ where: { userId: c.var.user.id } }),
-    db.query.providerGrant.findMany({
-      where: {
-        subjectType: "user",
-        subjectId: c.var.user.id,
-        providerEnvironment,
-      },
-    }),
   ]);
   if (!account) {
     return c.json({ error: "account_not_found", message: "Account not found" }, 401);
   }
+
+  const organizationIds = memberships.map((membership) => membership.organizationId);
+  const grants =
+    organizationIds.length > 0
+      ? await db.query.providerGrant.findMany({
+          where: {
+            subjectType: "organization",
+            subjectId: { in: organizationIds },
+            providerEnvironment,
+          },
+        })
+      : [];
+
   await db.insert(billingAudit).values({
     id: crypto.randomUUID(),
     actorUserId: account.id,
@@ -125,15 +131,28 @@ accountRoutes.openapi(deleteRoute, async (c) => {
   const db = createDb(c.env.DB);
   const config = getRuntimeConfig(c.env);
   const providerEnvironment = config.isProduction ? "production" : "sandbox";
-  const activeGrants = await db.query.providerGrant.findMany({
+
+  const ownedMemberships = await db.query.member.findMany({
     where: {
-      subjectType: "user",
-      subjectId: c.var.user.id,
-      providerEnvironment,
-      status: { in: ["active", "grace_period"] },
-      OR: [{ expiresAt: { isNull: true } }, { expiresAt: { gt: new Date() } }],
+      userId: c.var.user.id,
+      role: "owner",
     },
+    columns: { organizationId: true },
   });
+  const ownedOrganizationIds = ownedMemberships.map((membership) => membership.organizationId);
+  const activeGrants =
+    ownedOrganizationIds.length > 0
+      ? await db.query.providerGrant.findMany({
+          where: {
+            subjectType: "organization",
+            subjectId: { in: ownedOrganizationIds },
+            providerEnvironment,
+            status: { in: ["active", "grace_period"] },
+            OR: [{ expiresAt: { isNull: true } }, { expiresAt: { gt: new Date() } }],
+          },
+        })
+      : [];
+
   if (activeGrants.length > 0) {
     await db.insert(billingAudit).values({
       id: crypto.randomUUID(),
@@ -142,6 +161,7 @@ accountRoutes.openapi(deleteRoute, async (c) => {
       action: "account_deletion_blocked",
       metadata: {
         requestId: c.var.requestId,
+        organizationIds: [...new Set(activeGrants.map((grant) => grant.subjectId))],
         providers: [...new Set(activeGrants.map((grant) => grant.provider))],
       },
     });
@@ -149,7 +169,7 @@ accountRoutes.openapi(deleteRoute, async (c) => {
       {
         error: "active_subscription",
         message:
-          "Manage active subscriptions with Stripe, Apple, or Google before deleting this account",
+          "Manage active organization subscriptions with Stripe, Apple, or Google before deleting this account",
       },
       409,
     );
@@ -167,16 +187,7 @@ accountRoutes.openapi(deleteRoute, async (c) => {
       JSON.stringify({ requestId: c.var.requestId }),
       now,
     ),
-    c.env.DB.prepare(
-      "DELETE FROM provider_grant WHERE subject_type = 'user' AND subject_id = ?",
-    ).bind(c.var.user.id),
-    c.env.DB.prepare("DELETE FROM entitlement WHERE subject_type = 'user' AND subject_id = ?").bind(
-      c.var.user.id,
-    ),
     c.env.DB.prepare("DELETE FROM purchase_attempt WHERE user_id = ?").bind(c.var.user.id),
-    c.env.DB.prepare(
-      "DELETE FROM billing_customer WHERE subject_type = 'user' AND subject_id = ?",
-    ).bind(c.var.user.id),
     c.env.DB.prepare("DELETE FROM user WHERE id = ?").bind(c.var.user.id),
   ]);
   return c.json({ deleted: true as const }, 200);

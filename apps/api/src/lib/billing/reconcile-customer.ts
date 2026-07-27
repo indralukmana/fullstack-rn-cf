@@ -19,7 +19,7 @@ export async function reconcileBillingCustomer(
   env: AppBindings,
   customer: BillingCustomerTarget,
 ): Promise<void> {
-  if (customer.subjectType !== "user") {
+  if (customer.subjectType !== "organization") {
     return;
   }
 
@@ -30,7 +30,7 @@ export async function reconcileBillingCustomer(
   const providerEnvironment = getRuntimeConfig(env).isProduction ? "production" : "sandbox";
 
   await projectProviderGrants(db, {
-    userId: customer.subjectId,
+    organizationId: customer.subjectId,
     provider: customer.provider,
     providerEnvironment,
     entitlementKey: getBillingCatalog(env).entitlementKey,

@@ -48,9 +48,9 @@ function normalizeStripeSubscription(
     throw new Error("Stripe subscription references an unknown price");
   }
 
-  const userId = value.metadata.userId;
-  if (!userId) {
-    throw new Error("Stripe subscription is missing immutable user metadata");
+  const organizationId = value.metadata.organizationId;
+  if (!organizationId) {
+    throw new Error("Stripe subscription is missing immutable organization metadata");
   }
   const customerId = typeof value.customer === "string" ? value.customer : value.customer?.id;
   if (!customerId) {
@@ -63,7 +63,7 @@ function normalizeStripeSubscription(
     providerEnvironment: value.livemode ? "production" : "sandbox",
     providerCustomerId: customerId,
     providerGrantId: value.id,
-    userId,
+    subjectId: organizationId,
     productId: typeof item.price.product === "string" ? item.price.product : item.price.product.id,
     priceId,
     interval,

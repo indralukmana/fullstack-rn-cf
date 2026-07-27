@@ -17,9 +17,15 @@ import { getBillingCatalog } from "../lib/billing/catalog";
 import { reconcileBillingCustomer } from "../lib/billing/reconcile-customer";
 import { getRuntimeConfig } from "../lib/config";
 import { requireAuth } from "../middleware/require-auth";
+import { requireOrganization } from "../middleware/require-organization";
+import { requireOrganizationRole } from "../middleware/require-organization-role";
 import { requireVerifiedAuth } from "../middleware/require-verified-auth";
 
 const errorResponses = {
+  400: {
+    content: { "application/json": { schema: ErrorResponseSchema } },
+    description: "Active organization required",
+  },
   401: {
     content: { "application/json": { schema: ErrorResponseSchema } },
     description: "Authentication required",
@@ -44,11 +50,11 @@ const statusRoute = createRoute({
   path: "/status",
   operationId: "getBillingStatus",
   tags: ["Billing"],
-  middleware: [requireAuth] as const,
+  middleware: [requireAuth, requireOrganization] as const,
   responses: {
     200: {
       content: { "application/json": { schema: BillingStatusResponseSchema } },
-      description: "Server-authoritative personal entitlement and provider grants",
+      description: "Server-authoritative organization entitlement and provider grants",
     },
     ...errorResponses,
   },
@@ -57,19 +63,20 @@ const statusRoute = createRoute({
 billingRoutes.openapi(statusRoute, async (c) => {
   const db = createDb(c.env.DB);
   const config = getRuntimeConfig(c.env);
+  const organizationId = c.var.organization.id;
   const providerEnvironment = config.isProduction ? "production" : "sandbox";
   const [aggregate, grants] = await Promise.all([
     db.query.entitlement.findFirst({
       where: {
-        subjectType: "user",
-        subjectId: c.var.user.id,
+        subjectType: "organization",
+        subjectId: organizationId,
         key: config.billingEntitlementKey,
       },
     }),
     db.query.providerGrant.findMany({
       where: {
-        subjectType: "user",
-        subjectId: c.var.user.id,
+        subjectType: "organization",
+        subjectId: organizationId,
         entitlementKey: config.billingEntitlementKey,
         providerEnvironment,
       },
@@ -103,7 +110,12 @@ const checkoutRoute = createRoute({
   path: "/checkout",
   operationId: "createStripeCheckout",
   tags: ["Billing"],
-  middleware: [requireAuth, requireVerifiedAuth] as const,
+  middleware: [
+    requireAuth,
+    requireVerifiedAuth,
+    requireOrganization,
+    requireOrganizationRole("owner", "admin"),
+  ] as const,
   request: {
     body: {
       required: true,
@@ -128,6 +140,7 @@ billingRoutes.openapi(checkoutRoute, async (c) => {
   const db = createDb(c.env.DB);
   const config = getRuntimeConfig(c.env);
   const catalog = getBillingCatalog(c.env);
+  const organizationId = c.var.organization.id;
   const providerEnvironment = config.isProduction ? "production" : "sandbox";
   const now = new Date();
   await db
@@ -135,7 +148,7 @@ billingRoutes.openapi(checkoutRoute, async (c) => {
     .set({ state: "expired", updatedAt: now })
     .where(
       and(
-        eq(purchaseAttempt.userId, c.var.user.id),
+        eq(purchaseAttempt.organizationId, organizationId),
         eq(purchaseAttempt.state, "pending"),
         lt(purchaseAttempt.expiresAt, now),
       ),
@@ -143,8 +156,8 @@ billingRoutes.openapi(checkoutRoute, async (c) => {
 
   const activeGrant = await db.query.providerGrant.findFirst({
     where: {
-      subjectType: "user",
-      subjectId: c.var.user.id,
+      subjectType: "organization",
+      subjectId: organizationId,
       entitlementKey: catalog.entitlementKey,
       providerEnvironment,
       status: { in: ["active", "grace_period"] },
@@ -165,7 +178,7 @@ billingRoutes.openapi(checkoutRoute, async (c) => {
   const stripe = stripeClient(c.env.STRIPE_SECRET_KEY);
   const pending = await db.query.purchaseAttempt.findFirst({
     where: {
-      userId: c.var.user.id,
+      organizationId,
       state: "pending",
       expiresAt: { gt: now },
     },
@@ -185,8 +198,8 @@ billingRoutes.openapi(checkoutRoute, async (c) => {
 
   let customer = await db.query.billingCustomer.findFirst({
     where: {
-      subjectType: "user",
-      subjectId: c.var.user.id,
+      subjectType: "organization",
+      subjectId: organizationId,
       provider: "stripe",
     },
   });
@@ -194,16 +207,19 @@ billingRoutes.openapi(checkoutRoute, async (c) => {
     const stripeCustomer = await stripe.customers.create(
       {
         email: c.var.user.email,
-        metadata: { userId: c.var.user.id },
+        metadata: {
+          organizationId,
+          actorUserId: c.var.user.id,
+        },
       },
-      { idempotencyKey: `billing-customer:${c.var.user.id}` },
+      { idempotencyKey: `billing-customer:org:${organizationId}` },
     );
     [customer] = await db
       .insert(billingCustomer)
       .values({
         id: crypto.randomUUID(),
-        subjectType: "user",
-        subjectId: c.var.user.id,
+        subjectType: "organization",
+        subjectId: organizationId,
         provider: "stripe",
         providerCustomerId: stripeCustomer.id,
       })
@@ -222,6 +238,7 @@ billingRoutes.openapi(checkoutRoute, async (c) => {
   await db.insert(purchaseAttempt).values({
     id: attemptId,
     userId: c.var.user.id,
+    organizationId,
     provider: "stripe",
     providerEnvironment,
     interval,
@@ -233,13 +250,23 @@ billingRoutes.openapi(checkoutRoute, async (c) => {
       {
         mode: "subscription",
         customer: customer.providerCustomerId,
-        client_reference_id: c.var.user.id,
+        client_reference_id: organizationId,
         line_items: [{ price: catalog.stripe[interval], quantity: 1 }],
         allow_promotion_codes: true,
         success_url: `${config.appUrl}/me?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${config.appUrl}/me?checkout=canceled`,
-        metadata: { userId: c.var.user.id, interval, purchaseAttemptId: attemptId },
-        subscription_data: { metadata: { userId: c.var.user.id } },
+        metadata: {
+          organizationId,
+          actorUserId: c.var.user.id,
+          interval,
+          purchaseAttemptId: attemptId,
+        },
+        subscription_data: {
+          metadata: {
+            organizationId,
+            actorUserId: c.var.user.id,
+          },
+        },
       },
       { idempotencyKey },
     );
@@ -265,7 +292,12 @@ const portalRoute = createRoute({
   path: "/portal",
   operationId: "createStripePortal",
   tags: ["Billing"],
-  middleware: [requireAuth, requireVerifiedAuth] as const,
+  middleware: [
+    requireAuth,
+    requireVerifiedAuth,
+    requireOrganization,
+    requireOrganizationRole("owner", "admin"),
+  ] as const,
   responses: {
     200: {
       content: { "application/json": { schema: BillingUrlResponseSchema } },
@@ -282,8 +314,8 @@ const portalRoute = createRoute({
 billingRoutes.openapi(portalRoute, async (c) => {
   const customer = await createDb(c.env.DB).query.billingCustomer.findFirst({
     where: {
-      subjectType: "user",
-      subjectId: c.var.user.id,
+      subjectType: "organization",
+      subjectId: c.var.organization.id,
       provider: "stripe",
     },
   });
@@ -305,7 +337,12 @@ const reconcileRoute = createRoute({
   path: "/reconcile",
   operationId: "requestBillingReconciliation",
   tags: ["Billing"],
-  middleware: [requireAuth, requireVerifiedAuth] as const,
+  middleware: [
+    requireAuth,
+    requireVerifiedAuth,
+    requireOrganization,
+    requireOrganizationRole("owner", "admin"),
+  ] as const,
   responses: {
     202: {
       content: { "application/json": { schema: ReconciliationResponseSchema } },
@@ -317,19 +354,20 @@ const reconcileRoute = createRoute({
 
 billingRoutes.openapi(reconcileRoute, async (c) => {
   const db = createDb(c.env.DB);
+  const organizationId = c.var.organization.id;
   const stripeCustomer = await db.query.billingCustomer.findFirst({
     where: {
-      subjectType: "user",
-      subjectId: c.var.user.id,
+      subjectType: "organization",
+      subjectId: organizationId,
       provider: "stripe",
     },
   });
   const targets = [
     {
-      subjectType: "user" as const,
-      subjectId: c.var.user.id,
+      subjectType: "organization" as const,
+      subjectId: organizationId,
       provider: "revenuecat" as const,
-      providerCustomerId: c.var.user.id,
+      providerCustomerId: organizationId,
     },
     ...(stripeCustomer ? [stripeCustomer] : []),
   ];
@@ -340,6 +378,7 @@ billingRoutes.openapi(reconcileRoute, async (c) => {
     action: "reconciliation_requested",
     metadata: {
       requestId: c.var.requestId,
+      organizationId,
       providers: targets.map((target) => target.provider),
     },
   });

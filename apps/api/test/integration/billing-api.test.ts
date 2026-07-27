@@ -3,24 +3,32 @@ import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
 import { createDb } from "../../src/db/client";
-import { entitlement, providerGrant, user } from "../../src/db/schema";
+import { entitlement, member, providerGrant, user } from "../../src/db/schema";
 import { getApi, postApi } from "../helpers/api-request";
 import { signUpVerifiedUser } from "../helpers/email-auth";
 
-describe("personal billing API", () => {
+async function personalOrganizationId(cookie: string | null) {
+  const orgs = (await (await getApi("/api/auth/organization/list", cookie)).json()) as Array<{
+    id: string;
+  }>;
+  const organizationId = orgs[0]?.id;
+  if (!organizationId) {
+    throw new Error("missing personal organization");
+  }
+  return organizationId;
+}
+
+describe("organization billing API", () => {
   it("returns server-authoritative grant status and enforces paid capabilities", async () => {
     const email = `billing-${crypto.randomUUID()}@example.com`;
     const account = await signUpVerifiedUser({ email });
+    const organizationId = await personalOrganizationId(account.cookie);
     const db = createDb(env.DB);
-    const storedUser = await db.query.user.findFirst({ where: { email } });
-    if (!storedUser) {
-      throw new Error("missing test user");
-    }
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     await db.insert(providerGrant).values({
       id: crypto.randomUUID(),
-      subjectType: "user",
-      subjectId: storedUser.id,
+      subjectType: "organization",
+      subjectId: organizationId,
       entitlementKey: "pro",
       provider: "revenuecat",
       providerEnvironment: "sandbox",
@@ -35,8 +43,8 @@ describe("personal billing API", () => {
     });
     await db.insert(entitlement).values({
       id: crypto.randomUUID(),
-      subjectType: "user",
-      subjectId: storedUser.id,
+      subjectType: "organization",
+      subjectId: organizationId,
       key: "pro",
       status: "active",
       source: "revenuecat",
@@ -84,5 +92,77 @@ describe("personal billing API", () => {
     });
     const response = await postApi("/api/billing/portal", undefined, account.cookie);
     expect(response.status).toBe(404);
+  });
+
+  it("lets invited members inherit organization entitlement", async () => {
+    const suffix = crypto.randomUUID();
+    const owner = await signUpVerifiedUser({
+      email: `owner-share-${suffix}@example.com`,
+      name: "Share Owner",
+    });
+    const memberAccount = await signUpVerifiedUser({
+      email: `member-share-${suffix}@example.com`,
+      name: "Share Member",
+    });
+    const organizationId = await personalOrganizationId(owner.cookie);
+    const db = createDb(env.DB);
+    const memberUser = await db.query.user.findFirst({ where: { email: memberAccount.email } });
+    if (!memberUser) {
+      throw new Error("missing member user");
+    }
+
+    await db.insert(member).values({
+      id: crypto.randomUUID(),
+      organizationId,
+      userId: memberUser.id,
+      role: "member",
+      createdAt: new Date(),
+    });
+
+    const activated = await postApi(
+      "/api/auth/organization/set-active",
+      { organizationId },
+      memberAccount.cookie,
+    );
+    expect(activated.status).toBe(200);
+
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    await db.insert(providerGrant).values({
+      id: crypto.randomUUID(),
+      subjectType: "organization",
+      subjectId: organizationId,
+      entitlementKey: "pro",
+      provider: "stripe",
+      providerEnvironment: "sandbox",
+      providerGrantId: `sub_${crypto.randomUUID()}`,
+      productId: "price_monthly",
+      interval: "monthly",
+      status: "active",
+      occurredAt: new Date(),
+      expiresAt,
+      lastProviderState: "active",
+    });
+    await db.insert(entitlement).values({
+      id: crypto.randomUUID(),
+      subjectType: "organization",
+      subjectId: organizationId,
+      key: "pro",
+      status: "active",
+      source: "stripe",
+      expiresAt,
+      computedAt: new Date(),
+    });
+
+    const status = await getApi("/api/billing/status", memberAccount.cookie);
+    expect(status.status).toBe(200);
+    await expect(status.json()).resolves.toMatchObject({ hasAccess: true });
+    expect((await getApi("/api/private/pro", memberAccount.cookie)).status).toBe(200);
+
+    const checkout = await postApi(
+      "/api/billing/checkout",
+      { interval: "monthly" },
+      memberAccount.cookie,
+    );
+    expect(checkout.status).toBe(403);
   });
 });

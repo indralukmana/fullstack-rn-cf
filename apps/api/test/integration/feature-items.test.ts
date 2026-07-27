@@ -53,6 +53,7 @@ describe("demo seed", () => {
       member: false,
       workspace: false,
       membership: false,
+      entitlement: false,
     });
     expect(second.workspace.id).toBe(first.workspace.id);
   });

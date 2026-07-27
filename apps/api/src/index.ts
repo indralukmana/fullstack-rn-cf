@@ -278,7 +278,7 @@ const proPingRoute = createRoute({
   path: "/api/private/pro",
   operationId: "getProPing",
   tags: ["Billing"],
-  middleware: [requireAuth, requireEntitlement()] as const,
+  middleware: [requireAuth, requireOrganization, requireEntitlement()] as const,
   responses: {
     200: {
       content: { "application/json": { schema: HealthResponseSchema } },

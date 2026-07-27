@@ -3,9 +3,8 @@ import type { Database } from "../../db/client";
 export type EntitlementSubjectType = "user" | "organization";
 
 /**
- * Look up a currently usable entitlement row.
- * Billing still projects onto the User by default (transitional); Organization subject is for
- * ADR 0001 target paths once provider identity catches up.
+ * Look up a currently usable entitlement row for a billing subject.
+ * Launchpad billing projects onto Organization (ADR 0001).
  */
 export async function findActiveEntitlement(
   db: Database,

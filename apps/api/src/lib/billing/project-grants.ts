@@ -7,7 +7,7 @@ import { billingCustomer, providerGrant, subscription } from "../../db/schema";
 import { recomputeEntitlement } from "./recompute-entitlement";
 
 type ProjectProviderGrantsInput = {
-  userId: string;
+  organizationId: string;
   provider: "stripe" | "revenuecat";
   providerEnvironment: ProviderEnvironment;
   entitlementKey: string;
@@ -34,19 +34,19 @@ export async function projectProviderGrants(
   db: Database,
   input: ProjectProviderGrantsInput,
 ): Promise<void> {
-  const existingUser = await db.query.user.findFirst({
-    where: { id: input.userId },
+  const existingOrganization = await db.query.organization.findFirst({
+    where: { id: input.organizationId },
     columns: { id: true },
   });
-  if (!existingUser) {
-    throw new Error("Billing event references an unknown user");
+  if (!existingOrganization) {
+    throw new Error("Billing event references an unknown organization");
   }
 
   const projectedIds: string[] = [];
   /* eslint-disable no-await-in-loop -- each grant projection preserves customer/subscription order */
   for (const grant of input.grants) {
     if (
-      grant.userId !== input.userId ||
+      grant.subjectId !== input.organizationId ||
       grant.provider !== input.provider ||
       grant.providerEnvironment !== input.providerEnvironment
     ) {
@@ -57,8 +57,8 @@ export async function projectProviderGrants(
       .insert(billingCustomer)
       .values({
         id: crypto.randomUUID(),
-        subjectType: "user",
-        subjectId: input.userId,
+        subjectType: "organization",
+        subjectId: input.organizationId,
         provider: input.provider,
         providerCustomerId: grant.providerCustomerId,
       })
@@ -116,8 +116,8 @@ export async function projectProviderGrants(
       .insert(providerGrant)
       .values({
         id: crypto.randomUUID(),
-        subjectType: "user",
-        subjectId: input.userId,
+        subjectType: "organization",
+        subjectId: input.organizationId,
         entitlementKey: input.entitlementKey,
         provider: grant.provider,
         providerEnvironment: grant.providerEnvironment,
@@ -140,8 +140,8 @@ export async function projectProviderGrants(
           providerGrant.entitlementKey,
         ],
         set: {
-          subjectType: "user",
-          subjectId: input.userId,
+          subjectType: "organization",
+          subjectId: input.organizationId,
           billingCustomerId: customer.id,
           subscriptionId: projectedSubscription.id,
           productId: grant.productId,
@@ -163,8 +163,8 @@ export async function projectProviderGrants(
 
   if (input.completeSnapshot) {
     const boundary = and(
-      eq(providerGrant.subjectType, "user"),
-      eq(providerGrant.subjectId, input.userId),
+      eq(providerGrant.subjectType, "organization"),
+      eq(providerGrant.subjectId, input.organizationId),
       eq(providerGrant.entitlementKey, input.entitlementKey),
       eq(providerGrant.provider, input.provider),
       eq(providerGrant.providerEnvironment, input.providerEnvironment),
@@ -184,8 +184,8 @@ export async function projectProviderGrants(
   }
 
   await recomputeEntitlement(db, {
-    subjectType: "user",
-    subjectId: input.userId,
+    subjectType: "organization",
+    subjectId: input.organizationId,
     entitlementKey: input.entitlementKey,
     providerEnvironment: input.providerEnvironment,
   });

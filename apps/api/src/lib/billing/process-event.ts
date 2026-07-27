@@ -44,10 +44,14 @@ function revenueCatTarget(payload: Record<string, unknown>, env: AppBindings) {
   if (!event) {
     throw new Error("RevenueCat event payload is missing event data");
   }
-  const userId = string(event.app_user_id);
+  const organizationId = string(event.app_user_id);
   const appId = string(event.app_id);
   const environmentValue = string(event.environment)?.toLowerCase();
-  if (!userId || !appId || (environmentValue !== "sandbox" && environmentValue !== "production")) {
+  if (
+    !organizationId ||
+    !appId ||
+    (environmentValue !== "sandbox" && environmentValue !== "production")
+  ) {
     throw new Error("RevenueCat event is missing identity, app, or environment");
   }
   const providerEnvironment: ProviderEnvironment =
@@ -68,7 +72,7 @@ function revenueCatTarget(payload: Record<string, unknown>, env: AppBindings) {
   }
 
   return {
-    userId,
+    organizationId,
     providerEnvironment,
   };
 }
@@ -82,7 +86,7 @@ async function processStripeEvent(
   if (target.subscriptionId) {
     const grant = await retrieveStripeGrant(env, target.subscriptionId);
     await projectProviderGrants(db, {
-      userId: grant.userId,
+      organizationId: grant.subjectId,
       provider: "stripe",
       providerEnvironment: grant.providerEnvironment,
       entitlementKey: getBillingCatalog(env).entitlementKey,
@@ -101,13 +105,13 @@ async function processStripeEvent(
       providerCustomerId: target.customerId,
     },
   });
-  if (!customer || customer.subjectType !== "user") {
-    throw new Error("Stripe event references an unknown customer");
+  if (!customer || customer.subjectType !== "organization") {
+    throw new Error("Stripe event references an unknown organization customer");
   }
   const grants = await listStripeCustomerGrants(env, target.customerId);
   const environment = payload.livemode === true ? "production" : "sandbox";
   await projectProviderGrants(db, {
-    userId: customer.subjectId,
+    organizationId: customer.subjectId,
     provider: "stripe",
     providerEnvironment: environment,
     entitlementKey: getBillingCatalog(env).entitlementKey,
@@ -122,9 +126,9 @@ async function processRevenueCatEvent(
   payload: Record<string, unknown>,
 ): Promise<void> {
   const target = revenueCatTarget(payload, env);
-  const grants = await retrieveRevenueCatGrants(env, target.userId);
+  const grants = await retrieveRevenueCatGrants(env, target.organizationId);
   await projectProviderGrants(db, {
-    userId: target.userId,
+    organizationId: target.organizationId,
     provider: "revenuecat",
     providerEnvironment: target.providerEnvironment,
     entitlementKey: getBillingCatalog(env).entitlementKey,

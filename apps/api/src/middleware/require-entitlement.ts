@@ -16,8 +16,8 @@ export type RequireEntitlementOptions = {
   key?: string;
   /**
    * Who owns the Entitlement row.
-   * - `user` (default): matches current launchpad billing projection
-   * - `organization`: requires `requireOrganization` upstream; ADR 0001 target
+   * - `organization` (default): requires `requireOrganization` upstream (ADR 0001)
+   * - `user`: legacy personal subject; prefer organization for new routes
    * - `auto`: organization when org context is set, otherwise user
    */
   subject?: EntitlementSubjectType | "auto";
@@ -27,18 +27,18 @@ function resolveOptions(
   options?: string | RequireEntitlementOptions,
 ): Required<Pick<RequireEntitlementOptions, "subject">> & { key?: string } {
   if (typeof options === "string") {
-    return { key: options, subject: "user" };
+    return { key: options, subject: "organization" };
   }
   return {
     key: options?.key,
-    subject: options?.subject ?? "user",
+    subject: options?.subject ?? "organization",
   };
 }
 
 /**
  * Fail closed when the subject lacks an active/grace Entitlement.
- * Compose after `requireAuth`. For `subject: "organization" | "auto"` with an org, also compose
- * `requireOrganization` so `c.var.organization` is set.
+ * Compose after `requireAuth`. For organization subject, also compose `requireOrganization`
+ * so `c.var.organization` is set.
  */
 export function requireEntitlement(options?: string | RequireEntitlementOptions) {
   const resolved = resolveOptions(options);
@@ -69,6 +69,9 @@ export function requireEntitlement(options?: string | RequireEntitlementOptions)
     } else if (resolved.subject === "auto" && organizationId) {
       subjectType = "organization";
       subjectId = organizationId;
+    } else if (resolved.subject === "user") {
+      subjectType = "user";
+      subjectId = c.var.user.id;
     }
 
     const allowed = await subjectHasEntitlement(createDb(c.env.DB), {

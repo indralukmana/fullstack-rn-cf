@@ -59,14 +59,14 @@ function statusFor(
 
 export async function retrieveRevenueCatGrants(
   env: AppBindings,
-  userId: string,
+  organizationId: string,
 ): Promise<NormalizedProviderGrant[]> {
   if (!env.REVENUECAT_SECRET_API_KEY) {
     throw new Error("REVENUECAT_SECRET_API_KEY must be set");
   }
 
   const response = await fetch(
-    `https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(userId)}`,
+    `https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(organizationId)}`,
     {
       headers: {
         Authorization: `Bearer ${env.REVENUECAT_SECRET_API_KEY}`,
@@ -96,11 +96,11 @@ export async function retrieveRevenueCatGrants(
     grants.push({
       provider: "revenuecat",
       providerEnvironment,
-      providerCustomerId: userId,
+      providerCustomerId: organizationId,
       providerGrantId:
         value.store_transaction_id ??
-        `${userId}:${productId}:${value.original_purchase_date ?? "unknown"}`,
-      userId,
+        `${organizationId}:${productId}:${value.original_purchase_date ?? "unknown"}`,
+      subjectId: organizationId,
       productId,
       interval,
       status: statusFor(

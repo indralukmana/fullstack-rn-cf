@@ -225,6 +225,7 @@ export const purchaseAttempt = sqliteTable(
   {
     id: text("id").primaryKey(),
     userId: text("user_id").notNull(),
+    organizationId: text("organization_id").notNull(),
     provider: text("provider", { enum: ["stripe", "revenuecat"] }).notNull(),
     providerEnvironment: text("provider_environment", {
       enum: ["sandbox", "production"],
@@ -252,9 +253,10 @@ export const purchaseAttempt = sqliteTable(
       table.provider,
       table.providerSessionId,
     ),
-    uniqueIndex("purchase_attempt_pending_user_uidx")
-      .on(table.userId)
+    uniqueIndex("purchase_attempt_pending_org_uidx")
+      .on(table.organizationId)
       .where(sql`${table.state} = 'pending'`),
+    index("purchase_attempt_org_state_idx").on(table.organizationId, table.state, table.expiresAt),
     index("purchase_attempt_user_state_idx").on(table.userId, table.state, table.expiresAt),
     check("purchase_attempt_provider_check", sql`${table.provider} in ('stripe', 'revenuecat')`),
     check(

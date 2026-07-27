@@ -32,10 +32,16 @@ describe("account privacy lifecycle", () => {
     if (!storedUser) {
       throw new Error("missing test user");
     }
+    const membership = await db.query.member.findFirst({
+      where: { userId: storedUser.id, role: "owner" },
+    });
+    if (!membership) {
+      throw new Error("missing owned organization");
+    }
     await db.insert(providerGrant).values({
       id: crypto.randomUUID(),
-      subjectType: "user",
-      subjectId: storedUser.id,
+      subjectType: "organization",
+      subjectId: membership.organizationId,
       entitlementKey: "pro",
       provider: "revenuecat",
       providerEnvironment: "sandbox",

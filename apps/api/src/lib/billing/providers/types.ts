@@ -8,7 +8,8 @@ export type NormalizedProviderGrant = {
   providerEnvironment: ProviderEnvironment;
   providerCustomerId: string;
   providerGrantId: string;
-  userId: string;
+  /** Organization id — the commercial billing subject (ADR 0001 / 0003). */
+  subjectId: string;
   productId: string;
   interval: BillingInterval;
   status: GrantStatus;
