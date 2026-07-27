@@ -41,6 +41,9 @@ The Better Auth organization plugin provides organization creation, owner/admin/
 memberships, invitations, and active organization sessions. Membership is always verified by the
 API; a client-provided organization ID is not an authorization decision.
 
+Every new User receives an **Organization of one** at signup (`{name}'s organization`). The first
+session activates that Organization. Users may still create additional Organizations later.
+
 Invitation messages are delivered through Cloudflare Email Service and link to
 `APP_URL/accept-invitation?id=...`. `APP_URL` must use HTTPS in production. Pending invitations
 and organization memberships have database uniqueness constraints to prevent duplicate state

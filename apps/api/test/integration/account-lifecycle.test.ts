@@ -15,7 +15,7 @@ describe("account privacy lifecycle", () => {
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toMatchObject({
       account: { email },
-      memberships: [],
+      memberships: [{ role: "owner", organizationId: expect.any(String) }],
       billingGrants: [],
     });
     const audit = await createDb(env.DB).query.billingAudit.findFirst({

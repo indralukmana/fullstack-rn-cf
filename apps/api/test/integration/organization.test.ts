@@ -10,6 +10,33 @@ describe("organization integration", () => {
     expect(response.status).toBe(401);
   });
 
+  it("creates a personal organization on signup and activates it on session", async () => {
+    const suffix = `${Date.now()}-${crypto.randomUUID()}`;
+    const account = await signUpVerifiedUser({
+      email: `personal-${suffix}@example.com`,
+      name: "Personal Owner",
+    });
+
+    const listed = await getApi("/api/auth/organization/list", account.cookie);
+    expect(listed.status).toBe(200);
+    const organizations = (await listed.json()) as Array<{
+      name: string;
+      slug: string;
+      id: string;
+    }>;
+    expect(organizations).toHaveLength(1);
+    expect(organizations[0]).toMatchObject({
+      name: "Personal Owner's organization",
+    });
+
+    const session = await getApi("/api/auth/get-session", account.cookie);
+    expect(session.status).toBe(200);
+    const sessionBody = (await session.json()) as {
+      session: { activeOrganizationId: string | null };
+    };
+    expect(sessionBody.session.activeOrganizationId).toBe(organizations[0]?.id);
+  });
+
   it("creates an organization and owner membership for a verified user", async () => {
     const suffix = `${Date.now()}-${crypto.randomUUID()}`;
     const account = await signUpVerifiedUser({
@@ -68,12 +95,17 @@ describe("organization integration", () => {
 
     const listed = await getApi("/api/auth/organization/list", account.cookie);
     expect(listed.status).toBe(200);
-    await expect(listed.json()).resolves.toEqual([
-      expect.objectContaining({
-        name: "Acme Company",
-        slug: `acme-${suffix}`,
-      }),
-    ]);
+    await expect(listed.json()).resolves.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "Organization Owner's organization",
+        }),
+        expect.objectContaining({
+          name: "Acme Company",
+          slug: `acme-${suffix}`,
+        }),
+      ]),
+    );
 
     const context = await getApi("/api/private/organization", account.cookie, {
       "X-Organization-Id": createdOrganization.id,
