@@ -39,6 +39,10 @@ export default function OrganizationsScreen() {
     id: string;
     label: string;
   } | null>(null);
+  const [memberPendingTransfer, setMemberPendingTransfer] = useState<{
+    id: string;
+    label: string;
+  } | null>(null);
 
   const members = activeOrganization.data?.members ?? [];
   const invitations = activeOrganization.data?.invitations ?? [];
@@ -208,6 +212,39 @@ export default function OrganizationsScreen() {
     await activeOrganization.refetch();
   }
 
+  async function onTransferOwnership(memberId: string) {
+    if (!myMembership) {
+      return;
+    }
+    setPending(true);
+    setError(null);
+    const promoted = await authClient.organization.updateMemberRole({
+      memberId,
+      role: "owner",
+    });
+    if (promoted.error) {
+      setPending(false);
+      setMemberPendingTransfer(null);
+      setError(promoted.error.message ?? "Could not transfer ownership.");
+      return;
+    }
+    const demoted = await authClient.organization.updateMemberRole({
+      memberId: myMembership.id,
+      role: "admin",
+    });
+    setPending(false);
+    setMemberPendingTransfer(null);
+    if (demoted.error) {
+      setError(
+        demoted.error.message ??
+          "Ownership was granted, but your role could not be demoted. Demote yourself manually.",
+      );
+      await activeOrganization.refetch();
+      return;
+    }
+    await activeOrganization.refetch();
+  }
+
   if (sessionPending || organizations.isPending || activeOrganization.isPending) {
     return <LoadingScreen label="Loading organizations…" />;
   }
@@ -286,6 +323,7 @@ export default function OrganizationsScreen() {
                 const isSelf = member.userId === session?.user.id;
                 const canRemove =
                   canManageMembers && !isSelf && !(member.role === "owner" && ownerCount <= 1);
+                const canTransfer = isOwner && !isSelf && member.role !== "owner";
                 return (
                   <View
                     key={member.id}
@@ -297,6 +335,19 @@ export default function OrganizationsScreen() {
                     <BodyText className="text-sm text-foreground-muted">
                       {member.user.email} · {member.role}
                     </BodyText>
+                    {canTransfer ? (
+                      <Button
+                        disabled={pending}
+                        label="Transfer ownership"
+                        onPress={() =>
+                          setMemberPendingTransfer({
+                            id: member.id,
+                            label: member.user.email,
+                          })
+                        }
+                        variant="secondary"
+                      />
+                    ) : null}
                     {canRemove ? (
                       <Button
                         disabled={pending}
@@ -489,6 +540,25 @@ export default function OrganizationsScreen() {
         pending={pending}
         title="Remove member?"
         visible={Boolean(memberPendingRemoval)}
+      />
+      <ConfirmDialog
+        cancelLabel="Keep ownership"
+        confirmLabel="Transfer"
+        destructive
+        message={
+          memberPendingTransfer
+            ? `Make ${memberPendingTransfer.label} the owner? You will become an admin.`
+            : "Transfer ownership?"
+        }
+        onCancel={() => setMemberPendingTransfer(null)}
+        onConfirm={() => {
+          if (memberPendingTransfer) {
+            void onTransferOwnership(memberPendingTransfer.id);
+          }
+        }}
+        pending={pending}
+        title="Transfer ownership?"
+        visible={Boolean(memberPendingTransfer)}
       />
     </Screen>
   );

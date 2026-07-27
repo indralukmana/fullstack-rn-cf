@@ -1,5 +1,8 @@
+import { env } from "cloudflare:workers";
 import { describe, expect, it } from "vitest";
 
+import { createDb } from "../../src/db/client";
+import { member as memberTable } from "../../src/db/schema";
 import { getApi, postApi } from "../helpers/api-request";
 import { getMailbox, signUpVerifiedUser } from "../helpers/email-auth";
 
@@ -140,5 +143,71 @@ describe("organization integration", () => {
     await expect(crossTenant.json()).resolves.toMatchObject({
       error: "forbidden",
     });
+  });
+
+  it("transfers ownership so the previous sole owner can leave", async () => {
+    const suffix = `${Date.now()}-${crypto.randomUUID()}`;
+    const owner = await signUpVerifiedUser({
+      email: `transfer-owner-${suffix}@example.com`,
+      name: "Transfer Owner",
+    });
+    const member = await signUpVerifiedUser({
+      email: `transfer-member-${suffix}@example.com`,
+      name: "Transfer Member",
+    });
+
+    const orgs = (await (
+      await getApi("/api/auth/organization/list", owner.cookie)
+    ).json()) as Array<{
+      id: string;
+    }>;
+    const organizationId = orgs[0]?.id;
+    if (!organizationId) {
+      throw new Error("missing personal organization");
+    }
+
+    const db = createDb(env.DB);
+    const memberUser = await db.query.user.findFirst({ where: { email: member.email } });
+    const ownerUser = await db.query.user.findFirst({ where: { email: owner.email } });
+    if (!memberUser || !ownerUser) {
+      throw new Error("missing users for ownership transfer");
+    }
+    await db.insert(memberTable).values({
+      id: crypto.randomUUID(),
+      organizationId,
+      userId: memberUser.id,
+      role: "member",
+      createdAt: new Date(),
+    });
+
+    const ownerMembership = await db.query.member.findFirst({
+      where: {
+        organizationId,
+        userId: ownerUser.id,
+      },
+    });
+    const memberMembership = await db.query.member.findFirst({
+      where: { organizationId, userId: memberUser.id },
+    });
+    if (!ownerMembership?.id || !memberMembership?.id) {
+      throw new Error("missing memberships for ownership transfer");
+    }
+
+    const promoted = await postApi(
+      "/api/auth/organization/update-member-role",
+      { memberId: memberMembership.id, role: "owner", organizationId },
+      owner.cookie,
+    );
+    expect(promoted.status).toBe(200);
+
+    const demoted = await postApi(
+      "/api/auth/organization/update-member-role",
+      { memberId: ownerMembership.id, role: "admin", organizationId },
+      owner.cookie,
+    );
+    expect(demoted.status).toBe(200);
+
+    const left = await postApi("/api/auth/organization/leave", { organizationId }, owner.cookie);
+    expect(left.status).toBe(200);
   });
 });
