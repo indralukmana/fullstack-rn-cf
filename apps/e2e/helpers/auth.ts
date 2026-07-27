@@ -114,3 +114,19 @@ export async function registerViaUi(
 
   return { email, name, password };
 }
+
+export async function signInViaUi(
+  page: Page,
+  options: {
+    email: string;
+    password?: string;
+  },
+) {
+  const password = options.password ?? TEST_PASSWORD;
+  await page.goto("/sign-in");
+  await fillTextbox(page, "Email", options.email);
+  await fillTextbox(page, "Password", password);
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/me/, { timeout: 15_000 });
+  await expect(page.getByRole("heading", { name: "Account" }).last()).toBeVisible();
+}
