@@ -17,7 +17,8 @@ Read [Domain language](/domain/) first so product copy and server terms stay ali
 3. **Reskin** via `apps/app/DESIGN.md` and Uniwind tokens — not a parallel UI kit.
 4. **Point env and stores** at product-specific Cloudflare, Stripe, RevenueCat, and EAS projects.
 5. **Add product features** as new routes, screens, and API modules on top of membership and
-   Entitlement checks (`requireEntitlement` + `EntitlementGate`).
+   Entitlement checks (`requireEntitlement` + `EntitlementGate`). Keep modules small; oxlint
+   modularity limits and [Agent guardrails](/agent-guardrails/) apply.
 6. **Keep launchpad upgrades mergeable** when you still track upstream; avoid rewriting the billing
    ledger or auth stack in the product fork.
 
@@ -117,9 +118,11 @@ When adding product-specific capability:
 1. Define server authorization from Active Organization **Entitlement** (and membership role when
    needed).
 2. Add Zod/OpenAPI contracts in `packages/types`, then `pnpm codegen`.
-3. Add Expo screens with shared UI primitives (`apps/app/components/ui.tsx`) and `DESIGN.md`.
+3. Add Expo screens with shared UI primitives (`apps/app/components/ui.tsx`) and `DESIGN.md`. Prefer
+   `apps/app/app/_parts/` for screen sections when a route would otherwise trip modularity lint.
 4. Extend Playwright only for user-visible web flows you care about in CI.
 5. Update Starlight docs in the same change when behavior or ops steps change.
+6. Follow [Agent guardrails](/agent-guardrails/) if an agent implements the change.
 
 ## What not to invent early
 

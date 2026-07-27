@@ -57,3 +57,19 @@ Tenant-owned API routes use `requireOrganization`. A request may send `X-Organiz
 fall back to the session's active organization. In both cases the API queries membership before
 setting trusted organization context; the header alone never grants access. Use
 `GET /api/private/organization` as the reference implementation.
+
+### Lifecycle
+
+Owners and admins manage members from `/organizations`:
+
+| Action             | Who                | Notes                                                              |
+| ------------------ | ------------------ | ------------------------------------------------------------------ |
+| Invite             | owner, admin       | Email invitation → `/accept-invitation`                            |
+| Remove member      | owner, admin       | Membership ends immediately for that User                          |
+| Leave              | any non-sole-owner | Sole owners must transfer or close first                           |
+| Transfer ownership | owner              | Promote another member to owner, then demote self (often to admin) |
+| Close organization | owner              | Blocked while an active/grace Subscription exists (ADR 0004)       |
+
+Account deletion (`/account-data`) is blocked while the User solely owns any Organization or an
+owned Organization still has live Subscription obligations (ADR 0002). Clear those blockers —
+transfer, close, or manage billing with the provider — before delete.

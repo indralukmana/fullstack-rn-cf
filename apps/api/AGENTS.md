@@ -3,7 +3,8 @@
 These instructions extend the root `AGENTS.md` for `apps/api`.
 
 - Keep `src/index.ts` composition-focused; put routes, domain services, and middleware in
-  dedicated modules.
+  dedicated modules. Prefer `src/lib/...` extractions when oxlint modularity limits fail — do not
+  disable those rules.
 - Define external request/response contracts with Zod and OpenAPI. Regenerate the API client
   after contract changes.
 - Use the generated `CloudflareBindings` type. Update Wrangler configuration and run

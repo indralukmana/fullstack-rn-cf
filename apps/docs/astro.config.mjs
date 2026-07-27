@@ -16,6 +16,7 @@ export default defineConfig({
         { label: "Derive a Product", slug: "derive-a-product" },
         { label: "Domain Language", slug: "domain" },
         { label: "Environment Configuration", slug: "environment" },
+        { label: "Agent Guardrails", slug: "agent-guardrails" },
         { label: "Agent Skills", slug: "agent-skills" },
         { label: "Architecture", slug: "architecture" },
         { label: "Authentication", slug: "auth" },

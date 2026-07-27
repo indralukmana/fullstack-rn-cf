@@ -26,5 +26,6 @@ Safe defaults come from each committed `.env.schema`; add only machine-specific 
 | API       | http://localhost:8787 |
 | Docs      | http://localhost:4321 |
 
-Next: [Derive a product](/derive-a-product/) when turning this scaffold into a named app, and
-[Domain language](/domain/) for shared vocabulary.
+Next: [Derive a product](/derive-a-product/) when turning this scaffold into a named app,
+[Domain language](/domain/) for shared vocabulary, and [Agent guardrails](/agent-guardrails/) when
+coding agents work in the repo.

@@ -6,6 +6,8 @@ These instructions extend the root `AGENTS.md` for the Expo application.
   behind `Platform` checks or platform files.
 - Read `DESIGN.md` in this package before visual or layout changes. Prefer Uniwind utilities and
   keep web-only DOM patterns out of shared screens.
+- Keep route screens thin. Extract hooks, actions, and sections under `app/_parts/` when a screen
+  would trip oxlint modularity limits; do not disable those rules.
 - Use Expo Router for navigation, TanStack Query for server state, and the generated API client
   for documented API operations.
 - Keep auth credentials in Better Auth's platform integration and native SecureStore. Never

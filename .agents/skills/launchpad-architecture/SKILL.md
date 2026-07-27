@@ -7,7 +7,9 @@ description: Applies this repository's Cloudflare, Expo, authentication, billing
 
 Use vendor skills for current product APIs, then apply this skill as the repository-specific
 constraint layer. Read the root and nearest workspace `AGENTS.md` before editing. Repository rules
-and existing behavior override generic vendor examples.
+and existing behavior override generic vendor examples. Human summary of the same contract:
+`apps/docs` → Agent guardrails. When oxlint modularity rules fail, extract modules — do not disable
+those rules.
 
 ## System shape
 

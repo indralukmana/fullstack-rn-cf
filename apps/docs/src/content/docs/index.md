@@ -9,3 +9,5 @@ Cloudflare-first monorepo with a Hono Workers API and a single Expo app for iOS,
 - [Getting started](/getting-started/) — install and run locally
 - [Derive a product](/derive-a-product/) — what to change when forking into a real product
 - [Domain language](/domain/) — shared vocabulary and ADR links
+- [Agent guardrails](/agent-guardrails/) — coding-agent contract, safety, and modularity rules
+- [Agent skills](/agent-skills/) — project-scoped vendor skills and precedence

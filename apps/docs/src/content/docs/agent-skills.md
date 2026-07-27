@@ -7,6 +7,10 @@ The repository commits project-scoped Agent Skills under `.agents/skills`. Curso
 and other compatible agents discover only skill metadata initially and load full instructions when
 a task matches, keeping normal context small.
 
+Skills are **not** the policy layer. Safety, approvals, modularity lint, and core invariants live
+in root `AGENTS.md` and [Agent guardrails](/agent-guardrails/). Skills supply vendor how-to; the
+contract wins when they conflict.
+
 ## Installed sources
 
 | Source                   | Scope                                                                  |
@@ -51,7 +55,7 @@ code-generation boundary, D1 migration policy, or release gates.
 
 ## Precedence
 
-Apply instructions in this order:
+Apply instructions in this order (same as [Agent guardrails](/agent-guardrails/)):
 
 1. User request and safety/approval boundaries.
 2. Root and nearest workspace `AGENTS.md`.

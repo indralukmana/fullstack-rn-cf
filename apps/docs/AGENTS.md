@@ -3,7 +3,9 @@
 These instructions extend the root `AGENTS.md` for the Starlight documentation.
 
 - Documentation is part of the product. Update it in the same logical change as behavior,
-  configuration, operations, or customer-flow changes.
+  configuration, operations, customer-flow, or agent-policy changes.
+- Keep agent policy in sync: root `AGENTS.md` is canonical; Starlight **Agent guardrails** is the
+  human summary. Do not invent a third conflicting policy.
 - Verify commands and file paths against the repository; do not invent successful output.
 - Mark placeholders, paid services, beta features, irreversible choices, and destructive or
   externally mutating commands explicitly.

@@ -4,6 +4,8 @@ This file is the canonical repository-wide contract for coding agents. Read the 
 `AGENTS.md` before editing a workspace. Human instructions and the current user request
 override this file.
 
+Human-oriented summary (same policy): `apps/docs` → **Agent guardrails**.
+
 For architecture, auth, billing, Expo, Worker, environment, migration, code-generation, or release
 work, load `.agents/skills/launchpad-architecture/SKILL.md` before the relevant vendor skill. For
 Expo UI / visual work, also read `apps/app/DESIGN.md` before generic frontend or deslop skills.
@@ -52,7 +54,7 @@ generated API artifacts with their contract change; those pairs are one review u
 
 Prefer small, focused modules over large screens or services. Numeric limits live in
 [`.oxlintrc.json`](.oxlintrc.json) (`complexity`, `max-lines-per-function`, `max-lines`,
-`max-statements`, `max-depth`, `max-params`).
+`max-statements`, `max-depth`, `max-params`). See also docs **Agent guardrails**.
 
 - When those rules fail, extract helpers or components into adjacent modules.
 - Do not disable, weaken, or `eslint-disable` / oxlint-ignore modularity rules without explicit
