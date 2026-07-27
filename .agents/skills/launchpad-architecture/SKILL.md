@@ -23,19 +23,21 @@ Resend, or a second environment loader unless the user explicitly requests an ar
 
 ## Billing invariants
 
-- A Better Auth user ID is the immutable billing identity. Never use email as provider identity.
-- The personal `pro` entitlement is server-authoritative and uses OR semantics across active
-  production Stripe and RevenueCat grants.
-- Native purchases use RevenueCat; web purchases use Stripe. Provider catalog IDs stay in server
-  configuration, not client requests.
+- Organization id is the immutable billing identity for Stripe and RevenueCat. Never use email as
+  provider identity. The User is only the checkout/restore actor.
+- Organization `pro` entitlement is server-authoritative and uses OR semantics across active
+  production Stripe and RevenueCat grants for that Organization.
+- Native purchases use RevenueCat with the active Organization as App User ID; web purchases use
+  Stripe. Provider catalog IDs stay in server configuration, not client requests.
 - Client RevenueCat state may drive purchase UI feedback but never authorizes paid API behavior.
-- Keep sandbox and production grants isolated. Unknown users, apps, products, or environments fail
-  closed.
+- Keep sandbox and production grants isolated. Unknown organizations, apps, products, or
+  environments fail closed.
 - Webhooks are authenticated, durably ingested, deduplicated, queued, and reconciled against
   authoritative provider state. Design for duplicate, delayed, and out-of-order delivery.
 - Never grant access by directly editing aggregate entitlements. Project provider grants and
   recompute, replay, or reconcile.
-- Account deletion must reject active provider subscriptions and preserve required audit records.
+- Account deletion must reject when the user owns Organizations with active provider subscriptions
+  and preserve required audit records.
 
 When a RevenueCat skill recommends client-only entitlement gating, retain the server status and
 paid-route checks. When a Stripe skill recommends Connect, ignore it unless the product actually

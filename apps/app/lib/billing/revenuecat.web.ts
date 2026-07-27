@@ -8,7 +8,7 @@ function nativeOnly(): never {
   throw new Error("RevenueCat purchases are available only in native builds");
 }
 
-export async function configureNativeBilling(_userId: string): Promise<void> {
+export async function configureNativeBilling(_organizationId: string): Promise<void> {
   nativeOnly();
 }
 

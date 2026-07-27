@@ -13,16 +13,16 @@ export type NativePackage = {
 const packages = new Map<string, PurchasesPackage>();
 let configuredUserId: string | null = null;
 
-export async function configureNativeBilling(userId: string): Promise<void> {
+export async function configureNativeBilling(organizationId: string): Promise<void> {
   const apiKey = Platform.OS === "ios" ? env.revenueCatIosApiKey : env.revenueCatAndroidApiKey;
   if (!configuredUserId) {
-    Purchases.configure({ apiKey, appUserID: userId });
-    configuredUserId = userId;
+    Purchases.configure({ apiKey, appUserID: organizationId });
+    configuredUserId = organizationId;
     return;
   }
-  if (configuredUserId !== userId) {
-    await Purchases.logIn(userId);
-    configuredUserId = userId;
+  if (configuredUserId !== organizationId) {
+    await Purchases.logIn(organizationId);
+    configuredUserId = organizationId;
   }
 }
 

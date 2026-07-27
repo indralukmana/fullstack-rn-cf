@@ -44,7 +44,7 @@ export function EntitlementGate({
       <Screen centered>
         <ScreenTitle>Subscription required</ScreenTitle>
         <ScreenLead>
-          This area needs the {access.entitlementKey} entitlement on the active billing subject.
+          This area needs the {access.entitlementKey} entitlement on the active organization.
         </ScreenLead>
         <Link href={subscribeHref} asChild>
           <Button label="View subscription" />

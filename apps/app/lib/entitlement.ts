@@ -20,10 +20,11 @@ export function useEntitlementAccess(
   entitlementKey = env.billingEntitlementKey,
 ): EntitlementAccess {
   const { data: session, isPending: sessionPending } = authClient.useSession();
+  const activeOrganization = authClient.useActiveOrganization();
   const statusQuery = useGetBillingStatus({
     query: {
       queryKey: getGetBillingStatusQueryKey(),
-      enabled: Boolean(session?.user),
+      enabled: Boolean(session?.user && activeOrganization.data?.id),
     },
   });
 
@@ -32,8 +33,11 @@ export function useEntitlementAccess(
   const keyMatches = !status || status.entitlement === entitlementKey;
 
   return {
-    isPending: sessionPending || (Boolean(session?.user) && statusQuery.isPending),
-    isError: Boolean(session?.user) && statusQuery.isError,
+    isPending:
+      sessionPending ||
+      activeOrganization.isPending ||
+      (Boolean(session?.user && activeOrganization.data?.id) && statusQuery.isPending),
+    isError: Boolean(session?.user && activeOrganization.data?.id) && statusQuery.isError,
     hasAccess: Boolean(status?.hasAccess && keyMatches),
     status: status?.status ?? null,
     entitlementKey,

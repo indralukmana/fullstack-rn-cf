@@ -25,7 +25,7 @@ export default function MeScreen() {
   const billingQuery = useGetBillingStatus({
     query: {
       queryKey: getGetBillingStatusQueryKey(),
-      enabled: Boolean(session?.user),
+      enabled: Boolean(session?.user && activeOrganization.data?.id),
     },
   });
   const billingStatus =

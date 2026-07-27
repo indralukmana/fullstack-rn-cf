@@ -8,29 +8,23 @@ yearly products. Stripe owns web checkout and RevenueCat owns native Apple/Googl
 Provider SDK objects are not the authorization model. Catalog key strings are not domain nouns —
 see [Domain language](/domain/).
 
-## Target vs transitional identity
-
-**Target (ADRs):** provider customers and Subscriptions belong to the **Organization**; the User is
-only the actor who checks out. Entitlement is evaluated for the **Active Organization**.
-
-**Current code:** Better Auth's immutable `user.id` is still the RevenueCat App User ID and Stripe
-metadata subject in this scaffold. That is transitional. Do not deepen User-as-payer assumptions
-when deriving products that will need org-owned billing later. See
-[ADR 0001](/adr/0001-organization-owns-subscription/) and
-[ADR 0003](/adr/0003-provider-customers-map-to-organization/).
-
 ## Product and identity policy
 
+- Provider customers and Subscriptions belong to the **Organization** (including an Organization of
+  one). The User is only the actor who checks out or restores.
+- Entitlement is evaluated for the **Active Organization**. Members inherit that Organization's
+  Entitlement while it is active.
 - A verified account is required before any checkout or native purchase UI is shown.
-- Email addresses are mutable and must never identify purchases. Until org-scoped provider identity
-  ships, the launchpad uses `user.id` as the provider subject.
+- Email addresses are mutable and must never identify purchases. Stripe metadata and RevenueCat App
+  User IDs use the immutable Organization id.
+- Only Organization owners and admins may create checkout sessions, open the Stripe portal, or
+  request reconciliation. Members may read billing status for the Active Organization.
 - Product and app identifiers are allowlisted in the server environment. Unknown products, apps,
-  environments, and users fail closed instead of creating access.
+  environments, and organizations fail closed instead of creating access.
 - Native builds use the platform store through RevenueCat. Do not globally steer native customers
   to Stripe; only show web checkout where current App Store and Play policies permit it.
-- RevenueCat restore currently uses the signed-in `user.id` (transitional). Configure the
-  RevenueCat project to transfer purchases to the latest identified subject, and warn support that
-  a transfer can remove access from the previous subject.
+- Configure the RevenueCat project to transfer purchases to the latest identified App User ID
+  (Organization id), and warn support that a transfer can remove access from the previous subject.
 - Cancellation preserves access through the paid period. Billing issues grant only the configured
   provider grace period. Refunds, chargebacks, and expiration revoke that provider grant, but
   another active Stripe or RevenueCat grant continues to unlock the catalog entitlement key.
@@ -49,9 +43,8 @@ when deriving products that will need org-owned billing later. See
    (see `apps/api/src/middleware/require-entitlement.ts`). App UI may use `EntitlementGate` for
    display only — never as the sole authorization decision.
 
-The schema already separates subjects with `subject_type` (`user` | `organization`). The target
-domain uses Organization as the commercial subject (including an Organization of one). Hybrid
-user-plus-org payer modes are not the launchpad north star.
+The schema separates subjects with `subject_type` (`user` | `organization`). Launchpad billing uses
+**Organization** as the commercial subject. Hybrid user-plus-org payer modes are not supported.
 
 ## Invariants
 
@@ -111,21 +104,22 @@ All purchase endpoints require an authenticated, verified account:
 - `POST /api/billing/portal` returns Stripe's hosted management URL.
 - `POST /api/billing/reconcile` requests an authoritative provider refresh.
 
-Checkout reuses one Stripe Customer per Better Auth user, sets immutable `user.id` metadata,
-enforces one pending attempt, and uses the persisted attempt ID as Stripe's idempotency key.
-Existing active/grace grants block a second checkout. Customer apps must authorize from the
-status endpoint; `requireEntitlement("pro")` is the matching server middleware for paid routes.
+Checkout reuses one Stripe Customer per Organization, sets immutable `organizationId` metadata,
+enforces one pending attempt per Organization, and uses the persisted attempt ID as Stripe's
+idempotency key. Existing active/grace grants block a second checkout. Customer apps must authorize
+from the status endpoint; `requireEntitlement()` (default organization subject) is the matching
+server middleware for paid routes.
 
 ## Universal app behavior
 
 `/subscription` is account-protected and never renders purchase controls for an unverified user.
-Web launches Stripe Checkout or Portal from server-issued URLs. Native builds configure
-RevenueCat only after authentication with Better Auth `user.id`, load monthly/yearly packages
-from the configured offering, expose user-initiated restore, and use RevenueCat Customer Center
-for management.
+Web launches Stripe Checkout or Portal from server-issued URLs. Native builds configure RevenueCat
+with the **active Organization id** as the App User ID, load monthly/yearly packages from the
+configured offering, expose user-initiated restore for owners/admins, and use RevenueCat Customer
+Center for management.
 
-After purchase or restore, the app requests reconciliation and refreshes
+After purchase or restore, owners/admins request reconciliation and refresh
 `GET /api/billing/status`. Local RevenueCat `CustomerInfo` can improve feedback but never unlocks
-paid UI or APIs. Signing out clears the RevenueCat identity. Native purchase testing requires an
-Expo development build; Expo Go's RevenueCat UI is preview-only and cannot complete real store
-transactions.
+paid UI or APIs. Signing out clears the RevenueCat identity. Switching the Active Organization
+re-identifies RevenueCat to that Organization. Native purchase testing requires an Expo development
+build; Expo Go's RevenueCat UI is preview-only and cannot complete real store transactions.

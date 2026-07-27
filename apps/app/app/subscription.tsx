@@ -46,7 +46,7 @@ export default function SubscriptionScreen() {
   const statusQuery = useGetBillingStatus({
     query: {
       queryKey: getGetBillingStatusQueryKey(),
-      enabled: Boolean(session?.user),
+      enabled: Boolean(session?.user && activeOrganization.data?.id),
     },
   });
   const checkout = useCreateStripeCheckout();
@@ -60,13 +60,14 @@ export default function SubscriptionScreen() {
     (member) => member.userId === session?.user.id,
   )?.role;
   const canManageBilling = membershipRole === "owner" || membershipRole === "admin";
+  const organizationId = activeOrganization.data?.id;
 
   useEffect(() => {
-    if (Platform.OS === "web" || !session?.user.id || !canManageBilling) {
+    if (Platform.OS === "web" || !organizationId || !canManageBilling) {
       return undefined;
     }
     let active = true;
-    void configureNativeBilling(session.user.id)
+    void configureNativeBilling(organizationId)
       .then(() => getNativePackages())
       .then((items) => {
         if (active) {
@@ -81,13 +82,22 @@ export default function SubscriptionScreen() {
     return () => {
       active = false;
     };
-  }, [session?.user.id, canManageBilling]);
+  }, [organizationId, canManageBilling]);
 
   if (sessionPending || activeOrganization.isPending) {
     return <LoadingScreen label="Checking your account…" />;
   }
   if (!session?.user) {
     return <Redirect href="/sign-in?returnTo=/subscription" />;
+  }
+  if (!activeOrganization.data) {
+    return (
+      <Screen centered>
+        <ScreenTitle>Select an organization</ScreenTitle>
+        <ScreenLead>Choose an active organization before managing Pro.</ScreenLead>
+        <QuietLink href="/organizations">Organizations</QuietLink>
+      </Screen>
+    );
   }
   if (!session.user.emailVerified) {
     return (
@@ -114,7 +124,9 @@ export default function SubscriptionScreen() {
   );
 
   async function refreshStatus() {
-    await reconcile.mutateAsync();
+    if (canManageBilling) {
+      await reconcile.mutateAsync();
+    }
     await statusQuery.refetch();
   }
 
