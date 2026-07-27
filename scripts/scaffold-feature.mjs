@@ -231,7 +231,7 @@ Then add a Stack.Screen in apps/app/app/_layout.tsx and a link from Account.`);
   }
 
   mkdirSync(dirname(screenPath), { recursive: true });
-  writeFileSync(screenPath, screenTemplate({ name, title, featureKey }));
+  writeFileSync(screenPath, screenTemplate({ title, featureKey }));
   writeFileSync(e2ePath, e2eTemplate({ name, title, featureKey }));
 
   console.log(`Created ${screenPath}`);
