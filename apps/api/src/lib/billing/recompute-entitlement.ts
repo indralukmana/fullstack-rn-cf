@@ -105,10 +105,42 @@ export async function recomputeEntitlement(
       ${nowMs}
     )
     on conflict(subject_type, subject_id, key) do update set
-      status = excluded.status,
-      source = excluded.source,
-      source_subscription_id = null,
-      expires_at = excluded.expires_at,
+      status = case
+        when excluded.status in ('active', 'grace_period') then excluded.status
+        when ${entitlement.source} = 'manual'
+          and ${entitlement.status} = 'active'
+          and ${entitlement.expiresAt} is not null
+          and ${entitlement.expiresAt} > ${nowMs}
+        then ${entitlement.status}
+        else excluded.status
+      end,
+      source = case
+        when excluded.status in ('active', 'grace_period') then excluded.source
+        when ${entitlement.source} = 'manual'
+          and ${entitlement.status} = 'active'
+          and ${entitlement.expiresAt} is not null
+          and ${entitlement.expiresAt} > ${nowMs}
+        then ${entitlement.source}
+        else excluded.source
+      end,
+      source_subscription_id = case
+        when excluded.status in ('active', 'grace_period') then null
+        when ${entitlement.source} = 'manual'
+          and ${entitlement.status} = 'active'
+          and ${entitlement.expiresAt} is not null
+          and ${entitlement.expiresAt} > ${nowMs}
+        then ${entitlement.sourceSubscriptionId}
+        else null
+      end,
+      expires_at = case
+        when excluded.status in ('active', 'grace_period') then excluded.expires_at
+        when ${entitlement.source} = 'manual'
+          and ${entitlement.status} = 'active'
+          and ${entitlement.expiresAt} is not null
+          and ${entitlement.expiresAt} > ${nowMs}
+        then ${entitlement.expiresAt}
+        else excluded.expires_at
+      end,
       computed_at = excluded.computed_at,
       updated_at = excluded.updated_at
   `);

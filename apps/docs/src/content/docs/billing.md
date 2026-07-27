@@ -110,6 +110,13 @@ idempotency key. Existing active/grace grants block a second checkout. Customer 
 from the status endpoint; `requireEntitlement()` (default organization subject) is the matching
 server middleware for paid routes.
 
+## Trials
+
+A **Trial** is a time-boxed Organization Entitlement without a provider Grant (`source: manual`).
+Use `grantOrganizationTrial()` in `apps/api/src/lib/billing/grant-organization-trial.ts`. Provider
+recompute preserves an unexpired manual trial when no active Stripe/RevenueCat grant exists. The
+demo seed applies a 14-day trial on `demo-workspace`.
+
 ## Universal app behavior
 
 `/subscription` is account-protected and never renders purchase controls for an unverified user.

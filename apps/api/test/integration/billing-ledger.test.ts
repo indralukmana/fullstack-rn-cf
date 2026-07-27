@@ -224,6 +224,48 @@ describe("billing ledger invariants", () => {
     expect(projected?.status).toBe("revoked");
   });
 
+  it("preserves an unexpired manual trial when provider grants are absent", async () => {
+    const db = createDb(env.DB);
+    const organizationId = `org_${crypto.randomUUID()}`;
+    const now = new Date("2026-07-26T00:00:00.000Z");
+    const trialEnds = new Date("2026-08-09T00:00:00.000Z");
+
+    await db.insert(organization).values({
+      id: organizationId,
+      name: "Trial Org",
+      slug: `trial-${organizationId.slice(0, 12)}`,
+      createdAt: now,
+    });
+    await db.insert(entitlement).values({
+      id: crypto.randomUUID(),
+      subjectType: "organization",
+      subjectId: organizationId,
+      key: "pro",
+      status: "active",
+      source: "manual",
+      expiresAt: trialEnds,
+      computedAt: now,
+    });
+
+    await recomputeEntitlement(db, {
+      subjectType: "organization",
+      subjectId: organizationId,
+      entitlementKey: "pro",
+      providerEnvironment: "production",
+      now,
+    });
+
+    expect(
+      await db.query.entitlement.findFirst({
+        where: { subjectId: organizationId },
+      }),
+    ).toMatchObject({
+      status: "active",
+      source: "manual",
+      expiresAt: trialEnds,
+    });
+  });
+
   it("deduplicates purchase attempts by idempotency key", async () => {
     const db = createDb(env.DB);
     const organizationId = `org_${crypto.randomUUID()}`;

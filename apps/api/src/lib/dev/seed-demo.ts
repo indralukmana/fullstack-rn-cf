@@ -3,9 +3,9 @@ import { eq } from "drizzle-orm";
 import type { Auth, AuthEnv } from "../better-auth";
 
 import { createDb } from "../../db/client";
-import { entitlement, user } from "../../db/schema";
+import { user } from "../../db/schema";
 import { createAuth } from "../better-auth";
-import { getBillingCatalog } from "../billing/catalog";
+import { grantOrganizationTrial } from "../billing/grant-organization-trial";
 
 export const DEMO_PASSWORD = "demo-password-change-me";
 export const DEMO_OWNER_EMAIL = "owner@example.com";
@@ -118,29 +118,10 @@ export async function seedDemoData(env: AuthEnv): Promise<DemoSeedResult> {
     createdMembership = true;
   }
 
-  const catalog = getBillingCatalog(env);
-  const existingEntitlement = await db.query.entitlement.findFirst({
-    where: {
-      subjectType: "organization",
-      subjectId: workspace.id,
-      key: catalog.entitlementKey,
-    },
+  const trial = await grantOrganizationTrial(db, env, {
+    organizationId: workspace.id,
+    durationMs: 14 * 24 * 60 * 60 * 1000,
   });
-  let createdEntitlement = false;
-  if (!existingEntitlement) {
-    const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
-    await db.insert(entitlement).values({
-      id: crypto.randomUUID(),
-      subjectType: "organization",
-      subjectId: workspace.id,
-      key: catalog.entitlementKey,
-      status: "active",
-      source: "manual",
-      expiresAt,
-      computedAt: new Date(),
-    });
-    createdEntitlement = true;
-  }
 
   return {
     password: DEMO_PASSWORD,
@@ -156,7 +137,7 @@ export async function seedDemoData(env: AuthEnv): Promise<DemoSeedResult> {
       member: memberResult.created,
       workspace: createdWorkspace,
       membership: createdMembership,
-      entitlement: createdEntitlement,
+      entitlement: trial.created,
     },
   };
 }
