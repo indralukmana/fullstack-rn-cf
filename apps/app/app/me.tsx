@@ -21,6 +21,7 @@ import { clearNativeBillingIdentity } from "@/lib/billing/revenuecat";
 export default function MeScreen() {
   const { data: session, isPending: sessionPending } = authClient.useSession();
   const meQuery = useGetMe();
+  const activeOrganization = authClient.useActiveOrganization();
   const billingQuery = useGetBillingStatus({
     query: {
       queryKey: getGetBillingStatusQueryKey(),
@@ -32,6 +33,11 @@ export default function MeScreen() {
       ? billingQuery.data.data
       : null;
   const [signOutError, setSignOutError] = useState<string | null>(null);
+
+  const membershipRole = activeOrganization.data?.members?.find(
+    (member) => member.userId === session?.user.id,
+  )?.role;
+  const canManageBilling = membershipRole === "owner" || membershipRole === "admin";
 
   async function onSignOut() {
     setSignOutError(null);
@@ -75,6 +81,37 @@ export default function MeScreen() {
         )}
       </Section>
 
+      {session?.user ? (
+        <Section title="Active organization">
+          {activeOrganization.isPending ? (
+            <BodyText className="text-base text-foreground-secondary">Loading…</BodyText>
+          ) : activeOrganization.error ? (
+            <QueryError
+              message="Could not load the active organization."
+              onRetry={() => void activeOrganization.refetch()}
+            />
+          ) : activeOrganization.data ? (
+            <View className="gap-2">
+              <BodyText className="text-lg text-foreground" weight="semibold">
+                {activeOrganization.data.name}
+              </BodyText>
+              <BodyText className="text-sm text-foreground-muted">
+                {activeOrganization.data.slug}
+                {membershipRole ? ` · ${membershipRole}` : ""}
+              </BodyText>
+              <QuietLink href="/organizations">Switch organization</QuietLink>
+            </View>
+          ) : (
+            <View className="gap-2">
+              <BodyText className="text-base text-foreground-secondary">
+                No active organization.
+              </BodyText>
+              <QuietLink href="/organizations">Choose organization</QuietLink>
+            </View>
+          )}
+        </Section>
+      ) : null}
+
       <Section title="Subscription">
         {session?.user && billingQuery.isError ? (
           <QueryError
@@ -101,7 +138,7 @@ export default function MeScreen() {
         {session?.user ? (
           <>
             <Link href="./subscription" asChild>
-              <Button label="Manage subscription" />
+              <Button label={canManageBilling ? "Manage subscription" : "View subscription"} />
             </Link>
             <Link href="./organizations" asChild>
               <Button label="Organizations" variant="secondary" />

@@ -207,8 +207,8 @@ export default function OrganizationsScreen() {
           </View>
         ) : (
           <EmptyState
-            description="Create an organization below to collaborate and invite members."
-            title="No organizations yet"
+            description="You should already have a personal organization from signup. Create another below if you need a separate workspace."
+            title="No organizations listed"
           />
         )}
       </Section>
@@ -306,7 +306,7 @@ export default function OrganizationsScreen() {
         </Section>
       ) : null}
 
-      <Section title="Create organization">
+      <Section title="Create another organization">
         <View className="gap-3">
           <Field
             autoComplete="organization"

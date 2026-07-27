@@ -42,6 +42,7 @@ function message(error: unknown): string {
 
 export default function SubscriptionScreen() {
   const { data: session, isPending: sessionPending } = authClient.useSession();
+  const activeOrganization = authClient.useActiveOrganization();
   const statusQuery = useGetBillingStatus({
     query: {
       queryKey: getGetBillingStatusQueryKey(),
@@ -55,8 +56,13 @@ export default function SubscriptionScreen() {
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const membershipRole = activeOrganization.data?.members?.find(
+    (member) => member.userId === session?.user.id,
+  )?.role;
+  const canManageBilling = membershipRole === "owner" || membershipRole === "admin";
+
   useEffect(() => {
-    if (Platform.OS === "web" || !session?.user.id) {
+    if (Platform.OS === "web" || !session?.user.id || !canManageBilling) {
       return undefined;
     }
     let active = true;
@@ -75,9 +81,9 @@ export default function SubscriptionScreen() {
     return () => {
       active = false;
     };
-  }, [session?.user.id]);
+  }, [session?.user.id, canManageBilling]);
 
-  if (sessionPending) {
+  if (sessionPending || activeOrganization.isPending) {
     return <LoadingScreen label="Checking your account…" />;
   }
   if (!session?.user) {
@@ -163,7 +169,11 @@ export default function SubscriptionScreen() {
   return (
     <Screen scroll>
       <ScreenTitle>Pro subscription</ScreenTitle>
-      <ScreenLead>One account unlocks Pro on web, iOS, and Android.</ScreenLead>
+      <ScreenLead>
+        {canManageBilling
+          ? "Owners and admins manage billing for the active organization."
+          : "Members can view access for the active organization. Only owners and admins manage billing."}
+      </ScreenLead>
 
       <Section title="Access">
         {statusQuery.isError ? (
@@ -180,6 +190,11 @@ export default function SubscriptionScreen() {
                   ? `Pro · ${status.status.replace("_", " ")}`
                   : "Free"}
             </BodyText>
+            {activeOrganization.data ? (
+              <BodyText className="text-sm text-foreground-secondary">
+                Active organization: {activeOrganization.data.name}
+              </BodyText>
+            ) : null}
             {activeGrant ? (
               <BodyText className="text-sm text-foreground-secondary">
                 Managed by {activeGrant.provider === "stripe" ? "Stripe" : "your app store"}
@@ -190,60 +205,78 @@ export default function SubscriptionScreen() {
       </Section>
 
       <View className="gap-3">
-        {status?.hasAccess ? (
-          <Button
-            disabled={Boolean(pendingAction)}
-            label="Manage subscription"
-            onPress={() => run("manage", manageSubscription)}
-          />
-        ) : Platform.OS === "web" ? (
-          (["monthly", "yearly"] as const).map((interval) => (
-            <Button
-              key={interval}
-              disabled={Boolean(pendingAction)}
-              label={`Choose ${interval}`}
-              onPress={() => run(interval, () => startWebCheckout(interval))}
-            />
-          ))
-        ) : nativePackages.length === 0 ? (
-          <EmptyState
-            description={
-              error
-                ? "Store offerings could not be loaded. Check your network or RevenueCat configuration, then refresh."
-                : "No store packages are available yet. Refresh after the RevenueCat offering is configured."
-            }
-            title="No packages available"
-          />
-        ) : (
+        {canManageBilling ? (
           <>
-            {nativePackages.map((item) => (
+            {status?.hasAccess ? (
               <Button
-                key={item.id}
                 disabled={Boolean(pendingAction)}
-                label={`${item.interval} · ${item.price}`}
-                onPress={() => run(item.id, () => buyNative(item))}
+                label="Manage subscription"
+                onPress={() => run("manage", manageSubscription)}
               />
-            ))}
+            ) : Platform.OS === "web" ? (
+              (["monthly", "yearly"] as const).map((interval) => (
+                <Button
+                  key={interval}
+                  disabled={Boolean(pendingAction)}
+                  label={`Choose ${interval}`}
+                  onPress={() => run(interval, () => startWebCheckout(interval))}
+                />
+              ))
+            ) : nativePackages.length === 0 ? (
+              <EmptyState
+                description={
+                  error
+                    ? "Store offerings could not be loaded. Check your network or RevenueCat configuration, then refresh."
+                    : "No store packages are available yet. Refresh after the RevenueCat offering is configured."
+                }
+                title="No packages available"
+              />
+            ) : (
+              <>
+                {nativePackages.map((item) => (
+                  <Button
+                    key={item.id}
+                    disabled={Boolean(pendingAction)}
+                    label={`${item.interval} · ${item.price}`}
+                    onPress={() => run(item.id, () => buyNative(item))}
+                  />
+                ))}
+                <Button
+                  disabled={Boolean(pendingAction)}
+                  label="Restore purchases"
+                  onPress={() =>
+                    run("restore", async () => {
+                      await restoreNativePurchases();
+                      await refreshStatus();
+                    })
+                  }
+                  variant="secondary"
+                />
+              </>
+            )}
+
             <Button
               disabled={Boolean(pendingAction)}
-              label="Restore purchases"
-              onPress={() =>
-                run("restore", async () => {
-                  await restoreNativePurchases();
-                  await refreshStatus();
-                })
-              }
+              label="Refresh subscription"
+              onPress={() => run("refresh", refreshStatus)}
               variant="secondary"
             />
           </>
+        ) : (
+          <EmptyState
+            description="Ask an organization owner or admin if you need billing changes. You can still refresh status below."
+            title="Members cannot manage billing"
+          />
         )}
 
-        <Button
-          disabled={Boolean(pendingAction)}
-          label="Refresh subscription"
-          onPress={() => run("refresh", refreshStatus)}
-          variant="secondary"
-        />
+        {!canManageBilling ? (
+          <Button
+            disabled={Boolean(pendingAction)}
+            label="Refresh subscription"
+            onPress={() => run("refresh", refreshStatus)}
+            variant="secondary"
+          />
+        ) : null}
       </View>
 
       {pendingAction ? <StatusText tone="muted">Please wait…</StatusText> : null}
