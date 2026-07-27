@@ -64,8 +64,8 @@ client.
 
 ### Entitlement gates
 
-- API: compose `requireAuth` then `requireEntitlement()` (optional key / `subject: "organization"`
-  when org-owned billing is live). See `GET /api/private/pro`.
+- API: compose `requireAuth`, `requireOrganization`, then `requireEntitlement()` (optional key).
+  See `GET /api/private/pro`.
 - App: wrap paid screens in `EntitlementGate` and still protect the API. Example: `/pro`.
 
 ### Feature modules
@@ -99,17 +99,15 @@ Creates verified `owner@example.com` / `member@example.com` (password printed) a
   configure per product; do not promote them into ubiquitous language.
 - UI may say “Premium” or “Full access”; the API still authorizes from **Entitlement**.
 
-## Target model vs current billing code
+## Billing subject
 
-Architectural decisions say the **Organization** owns the Subscription and provider customer
-identity. Current launchpad code still keys many billing paths to the **User**. That mismatch is
-**deferred** while the scaffold is polished; do not deepen User-as-payer shortcuts in product
-forks if you expect org-owned billing later.
-
-See:
+The **Organization** owns the Subscription and provider customer identity. Stripe metadata and the
+RevenueCat App User ID use the Organization id. Paid access follows the **Active Organization**
+Entitlement — members inherit it. See:
 
 - [Organization owns the subscription](/adr/0001-organization-owns-subscription/)
 - [Provider customers map to Organization](/adr/0003-provider-customers-map-to-organization/)
+- [Billing and entitlements](/billing/)
 
 ## Product feature checklist
 
