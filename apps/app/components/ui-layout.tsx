@@ -14,19 +14,30 @@ export function Screen({
   centered?: boolean;
   scroll?: boolean;
 }) {
-  const contentClassName = centered
-    ? "flex-grow justify-center gap-5 px-6 py-10"
-    : "gap-5 px-6 py-8";
+  const body = (
+    <View
+      className={`w-full max-w-lg gap-5 self-center ${
+        centered ? "flex-grow justify-center px-6 py-10" : "px-6 py-8"
+      } ${centered || scroll ? "" : "flex-1"}`}
+    >
+      {children}
+    </View>
+  );
 
   if (scroll) {
     return (
-      <SafeAreaView className="flex-1 bg-canvas" edges={["bottom", "left", "right"]}>
+      <SafeAreaView
+        className="flex-1 bg-canvas"
+        edges={["bottom", "left", "right"]}
+        style={{ flex: 1 }}
+      >
         <ScrollView
           className="flex-1"
-          contentContainerClassName={contentClassName}
+          contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
+          style={{ flex: 1 }}
         >
-          <View className="w-full max-w-lg gap-5 self-center">{children}</View>
+          {body}
         </ScrollView>
       </SafeAreaView>
     );
@@ -34,12 +45,11 @@ export function Screen({
 
   return (
     <SafeAreaView
-      className={`flex-1 bg-canvas ${centered ? "justify-center" : ""} px-6 py-8`}
+      className={`flex-1 bg-canvas ${centered ? "justify-center" : ""}`}
       edges={["bottom", "left", "right"]}
+      style={{ flex: 1 }}
     >
-      <View className={`w-full max-w-lg gap-5 self-center ${centered ? "" : "flex-1"}`}>
-        {children}
-      </View>
+      {body}
     </SafeAreaView>
   );
 }
