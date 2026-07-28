@@ -1,70 +1,62 @@
-# RN CF Monorepo
+# RN CF — Expo + Cloudflare SaaS launchpad
 
-Cloudflare-first pnpm monorepo scaffold with a universal Expo app (iOS, Android, web via React Native Web) and a Hono Workers API.
+**GitHub template** for a Cloudflare-first pnpm monorepo: universal Expo app (iOS, Android, web)
+and a Hono Workers API with Better Auth, Organization tenancy, and org-owned Stripe/RevenueCat
+billing.
 
-## Status
+## Use this template
 
-- App: Expo Router + Uniwind — home, sign-in, register, check-email, forgot/reset password, account/health
-- API: Hono Workers + OpenAPI + Scalar + Better Auth + D1 + varlock
-- Auth email: verification + password reset (console locally / Cloudflare Email Service in production)
-- Tenancy: organizations, owner/admin/member roles, invitations, and active organization sessions
-- Hardening: security headers, CORS allowlist, rate limits, body limit, `requireAuth` sample
-- API client: Orval-generated TanStack Query hooks, MSW handlers, and Faker factories
-- Docs site: Astro Starlight
-- E2E: Playwright smoke tests against Expo web + API
-- CI/CD: GitLab multi-file pipeline
+1. Click **Use this template** → **Create a new repository** (or
+   `gh repo create my-app --template indralukmana/fullstack-rn-cf --clone`).
+2. `pnpm install && pnpm setup`
+3. Rename for your product:
 
-## Tech Stack
+```bash
+pnpm productize -- --dry-run --name "Acme Learn" --slug acme-learn
+pnpm productize -- --name "Acme Learn" --slug acme-learn --scheme acmelearn --bundle-id com.acme.learn
+```
 
-- **Package manager:** pnpm workspaces
-- **Client:** Expo (React Native + React Native Web), Expo Router, Uniwind (Tailwind v4)
-- **API:** Hono, Cloudflare Workers, `@hono/zod-openapi`, Better Auth (+ Expo plugin), varlock
-- **Docs:** Astro Starlight
-- **Linting:** oxlint
-- **Formatting:** oxfmt
-- **Secrets / env:** varlock (`.env.schema`, `varlock-wrangler`, `varlock scan`)
-- **Type checking:** tsgo (`@typescript/native-preview`) / `tsc` (Expo) / `astro check`
-- **Git hooks:** Lefthook
+4. Follow docs: **Derive a product**, **Domain language**, and **Agent guardrails**
+   (`pnpm dev:docs` → http://localhost:4321).
 
-## Quick Start
+Coding agents: read root `AGENTS.md` (and the nearest workspace `AGENTS.md`). Do not disable
+oxlint modularity rules; extract modules instead.
 
-### Prerequisites
+## What’s included
 
-- Node.js 24+ (see `.nvmrc`)
-- pnpm 11 (`corepack enable`)
+- **App:** Expo Router + Uniwind — auth, organizations (invite/leave/close/transfer), subscription,
+  account lifecycle, feature screens (`/notes` + `pnpm scaffold-feature`)
+- **API:** Hono Workers + OpenAPI + Scalar + Better Auth + D1 + Queues + varlock
+- **Billing:** Organization-owned Stripe (web) + RevenueCat (native), ledger → Entitlement projection,
+  trials, shared-org Pro inheritance
+- **Hardening:** fail-closed production config, security headers, CORS, rate limits, modularity lint
+- **API client:** Orval TanStack Query hooks, MSW, Faker
+- **Docs:** Astro Starlight (architecture, billing ADRs, agent guardrails)
+- **E2E:** Playwright against Expo web + API
+- **CI:** GitLab multi-file pipeline (optional for forks; GitHub Actions not required to use the
+  template)
 
-### Install
+## Tech stack
+
+| Area        | Choice                                             |
+| ----------- | -------------------------------------------------- |
+| Packages    | pnpm workspaces                                    |
+| Client      | Expo Router, Uniwind (Tailwind v4)                 |
+| API         | Hono, Cloudflare Workers, Better Auth, D1, Drizzle |
+| Billing     | Stripe + RevenueCat → server Entitlements          |
+| Env/secrets | varlock (`.env.schema`, `varlock-wrangler`, scan)  |
+| Lint/format | oxlint (incl. size/complexity), oxfmt, Lefthook    |
+| Types       | tsgo / `tsc` (Expo) / `astro check`                |
+
+## Quick start
+
+**Prerequisites:** Node.js 24+ (`.nvmrc`), pnpm 11 (`corepack enable`).
 
 ```bash
 pnpm install
 pnpm setup
-```
-
-To rename the scaffold for a new product (preview first):
-
-```bash
-pnpm productize -- --dry-run --name "Acme Learn" --slug acme-learn
-```
-
-Seed local demo users + shared workspace (API must be running):
-
-```bash
-pnpm seed:demo
-```
-
-Scaffold another org-scoped feature screen:
-
-```bash
-pnpm scaffold-feature -- --name tasks --title "Tasks"
-```
-
-### Start the scaffold
-
-```bash
 pnpm dev
 ```
-
-This starts:
 
 | Surface | URL                   |
 | ------- | --------------------- |
@@ -72,17 +64,17 @@ This starts:
 | API     | http://localhost:8787 |
 | Docs    | http://localhost:4321 |
 
-Run services individually:
+Useful local commands:
 
 ```bash
-pnpm dev:app
-pnpm dev:api
-pnpm dev:docs
-pnpm dev:ios
-pnpm dev:android
+pnpm seed:demo                                          # demo org + users (API running)
+pnpm scaffold-feature -- --name tasks --title "Tasks"   # auto-wires nav + Account link
+pnpm ci:check                                           # local CI-equivalent gate
 ```
 
-## Workspace Layout
+Per-app: `pnpm dev:app`, `pnpm dev:api`, `pnpm dev:docs`, `pnpm dev:ios`, `pnpm dev:android`.
+
+## Workspace layout
 
 ```text
 apps/
@@ -93,11 +85,11 @@ apps/
 
 packages/
   config/      Shared tsconfig presets
-  types/       Shared zod schemas and DTOs
-  api-client/  Orval-generated TanStack Query hooks and MSW
+  types/       Shared Zod / OpenAPI contracts
+  api-client/  Orval-generated TanStack Query + MSW
 ```
 
-## Common Commands
+## Common commands
 
 | Command             | Purpose                                                         |
 | ------------------- | --------------------------------------------------------------- |
@@ -112,6 +104,7 @@ packages/
 | `pnpm codegen`      | Export OpenAPI + regenerate api-client                          |
 | `pnpm build`        | Build all workspaces                                            |
 | `pnpm ci:check`     | Run local CI-equivalent checks                                  |
+| `pnpm productize`   | Rename identity for a product fork                              |
 
 ## Cloudflare notes
 
@@ -122,4 +115,5 @@ packages/
 4. Deploy API: `pnpm --filter @rn-cf/api deploy` (`varlock-wrangler`)
 5. Export and deploy web: `pnpm --filter @rn-cf/app deploy`
 
-See [SECURITY.md](./SECURITY.md) for hardening details.
+See [SECURITY.md](./SECURITY.md) for hardening details. Never commit `.env`, `.env.local`, or
+provider secrets.
