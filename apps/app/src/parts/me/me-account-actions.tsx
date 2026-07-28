@@ -23,6 +23,9 @@ export function MeAccountActions({ signedIn, canManageBilling, onSignOut }: MeAc
           <Link href="./notes" asChild>
             <Button label="Notes" variant="secondary" />
           </Link>
+          <Link href="./tasks" asChild>
+            <Button label="Tasks" variant="secondary" />
+          </Link>
           <Link href="./organizations" asChild>
             <Button label="Organizations" variant="secondary" />
           </Link>
