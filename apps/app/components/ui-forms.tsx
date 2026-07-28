@@ -8,6 +8,17 @@ import { fieldClassName, StatusText } from "./ui-primitives";
 
 type TextInputProps = ComponentProps<typeof TextInput>;
 
+function FieldLabel({ label }: { label: string }) {
+  return (
+    <Text
+      className="text-sm font-medium text-foreground-secondary"
+      style={{ fontFamily: fontSansSemiBold }}
+    >
+      {label}
+    </Text>
+  );
+}
+
 export function Field({
   label,
   error,
@@ -21,13 +32,8 @@ export function Field({
   const { placeholder } = useThemeColors();
 
   return (
-    <View className="gap-1.5">
-      <Text
-        className="text-sm font-medium text-foreground-muted"
-        style={{ fontFamily: fontSansSemiBold }}
-      >
-        {label}
-      </Text>
+    <View className="gap-2">
+      <FieldLabel label={label} />
       <TextInput
         accessibilityLabel={label}
         className={className ? `${fieldClassName} ${className}` : fieldClassName}
@@ -59,13 +65,8 @@ export function PasswordField({
   const { placeholder: placeholderColor } = useThemeColors();
 
   return (
-    <View className="gap-1.5">
-      <Text
-        className="text-sm font-medium text-foreground-muted"
-        style={{ fontFamily: fontSansSemiBold }}
-      >
-        {label}
-      </Text>
+    <View className="gap-2">
+      <FieldLabel label={label} />
       <View className="relative">
         <TextInput
           accessibilityLabel={label}
@@ -81,11 +82,11 @@ export function PasswordField({
         <Pressable
           accessibilityLabel={visible ? "Hide characters" : "Show characters"}
           accessibilityRole="button"
-          className="absolute inset-y-0 right-0 justify-center px-3"
+          className="absolute inset-y-0 right-0 justify-center px-3 active:opacity-70"
           onPress={() => setVisible((current) => !current)}
         >
           <Text
-            className="text-sm font-semibold text-foreground-muted"
+            className="text-sm font-semibold text-foreground-secondary"
             style={{ fontFamily: fontSansSemiBold }}
           >
             {visible ? "Hide" : "Show"}

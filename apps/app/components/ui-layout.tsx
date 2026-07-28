@@ -16,7 +16,7 @@ export function Screen({
 }) {
   const body = (
     <View
-      className={`w-full max-w-lg gap-5 self-center ${
+      className={`w-full max-w-lg gap-6 self-center ${
         centered ? "flex-grow justify-center px-6 py-10" : "px-6 py-8"
       } ${centered || scroll ? "" : "flex-1"}`}
     >
@@ -79,9 +79,9 @@ export function ScreenLead({ children }: { children: ReactNode }) {
 
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <View className="gap-3 border-t border-border-subtle pt-5">
+    <View className="gap-3 border-t border-border-subtle pt-6">
       <Text
-        className="text-sm font-semibold text-foreground-muted"
+        className="text-xs font-semibold text-foreground-muted"
         style={{ fontFamily: fontSansSemiBold }}
       >
         {title}
@@ -94,7 +94,7 @@ export function Section({ title, children }: { title: string; children: ReactNod
 export function QuietLinkText({ children }: { children: ReactNode }) {
   return (
     <Text
-      className="text-center text-base text-foreground-secondary"
+      className="text-center text-base text-foreground-muted underline underline-offset-2"
       style={{ fontFamily: fontSans }}
     >
       {children}
@@ -105,8 +105,44 @@ export function QuietLinkText({ children }: { children: ReactNode }) {
 export function QuietLink({ href, children }: { href: Href; children: ReactNode }) {
   return (
     <Link href={href} asChild>
-      <Pressable accessibilityRole="link" className="min-h-11 items-center justify-center py-2">
+      <Pressable
+        accessibilityRole="link"
+        className="min-h-11 items-center justify-center py-2 active:opacity-70"
+      >
         <QuietLinkText>{children}</QuietLinkText>
+      </Pressable>
+    </Link>
+  );
+}
+
+export function NavRow({ href, label, hint }: { href: Href; label: string; hint?: string }) {
+  return (
+    <Link href={href} asChild>
+      <Pressable
+        accessibilityRole="link"
+        className="min-h-12 flex-row items-center justify-between gap-3 border-b border-border-subtle py-3.5 active:bg-selected"
+      >
+        <View className="min-w-0 flex-1 gap-0.5">
+          <Text
+            className="text-base font-semibold text-foreground"
+            style={{ fontFamily: fontSansSemiBold }}
+          >
+            {label}
+          </Text>
+          {hint ? (
+            <Text className="text-sm text-foreground-muted" style={{ fontFamily: fontSans }}>
+              {hint}
+            </Text>
+          ) : null}
+        </View>
+        <Text
+          accessibilityElementsHidden
+          className="text-lg text-foreground-muted"
+          importantForAccessibility="no"
+          style={{ fontFamily: fontSans }}
+        >
+          ›
+        </Text>
       </Pressable>
     </Link>
   );

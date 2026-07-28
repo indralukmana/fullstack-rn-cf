@@ -36,10 +36,10 @@ export function Button({
 }) {
   const variantClassName =
     variant === "secondary"
-      ? "border border-border bg-elevated"
+      ? "border border-border bg-elevated active:bg-selected"
       : variant === "danger"
-        ? "bg-danger-strong"
-        : "bg-action";
+        ? "bg-danger-strong active:opacity-80"
+        : "bg-action active:opacity-80";
   const labelClassName =
     variant === "secondary"
       ? "text-center font-semibold text-foreground"
@@ -48,7 +48,7 @@ export function Button({
   return (
     <Pressable
       accessibilityRole="button"
-      className={`rounded-lg px-5 py-3.5 ${variantClassName} ${disabled ? "opacity-50" : ""} ${className ?? ""}`}
+      className={`min-h-12 w-full justify-center rounded-lg px-5 py-3.5 ${variantClassName} ${disabled ? "opacity-50" : ""} ${className ?? ""}`}
       disabled={disabled}
       {...props}
     >
