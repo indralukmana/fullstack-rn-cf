@@ -70,10 +70,19 @@ treatments without a shared primitive.
 
 ## Components
 
-Primary button: filled `action`, medium padding, semibold label. Secondary button: elevated
-surface, muted border, foreground label. Prefer `Pressable` + Uniwind classes over nested card
-wrappers. Cards, chips, and badge clusters are allowed only when they contain a real interaction
-or status the user must act on — not as default section chrome.
+Primary button: filled `action`, full width, `min-h-12`, medium padding, semibold label, and
+pressed opacity via Uniwind `active:`. Secondary button: elevated surface, muted border,
+foreground label, pressed `bg-selected`. Prefer `Pressable` + Uniwind classes over nested card
+wrappers.
+
+`NavRow`: navigation destination in a list (label, optional hint, chevron). Use for account and
+settings destinations that are not primary CTAs. Keep one primary `Button` for the main action on
+a screen; do not stack secondary buttons when `NavRow` fits.
+
+`QuietLink`: muted underlined text for secondary navigation (for example Home). Keep session-ending
+actions such as Sign out as a bordered secondary `Button`, not quiet text. Cards, chips, and badge
+clusters are allowed only when they contain a real interaction or status the user must act on —
+not as default section chrome.
 
 Dev-only panels (for example local mailbox helpers) may use a distinct warning surface so they
 never read as production brand UI.

@@ -82,14 +82,12 @@ function wireAccountLink(name, title) {
   if (source.includes(`href="./${name}"`)) {
     return { path: actionsPath, changed: false };
   }
-  const anchor = `<Link href="./organizations" asChild>`;
+  const anchor = `<NavRow href="./organizations" label="Organizations" />`;
   if (!source.includes(anchor)) {
     throw new Error(`Could not find organizations Account link anchor in ${actionsPath}`);
   }
-  const insertion = `<Link href="./${name}" asChild>
-            <Button label="${title}" variant="secondary" />
-          </Link>
-          ${anchor}`;
+  const insertion = `<NavRow href="./${name}" label="${title}" />
+            ${anchor}`;
   source = source.replace(anchor, insertion);
   writeFileSync(actionsPath, source);
   return { path: actionsPath, changed: true };
@@ -105,7 +103,7 @@ function assertWireTargets(name) {
   }
   if (
     !actions.includes(`href="./${name}"`) &&
-    !actions.includes(`<Link href="./organizations" asChild>`)
+    !actions.includes(`<NavRow href="./organizations" label="Organizations" />`)
   ) {
     throw new Error(`Could not find organizations Account link anchor in ${actionsPath}`);
   }
