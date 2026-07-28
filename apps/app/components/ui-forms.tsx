@@ -53,6 +53,7 @@ export function PasswordField({
   onChangeText,
   placeholder,
   autoComplete,
+  testID,
 }: {
   label: string;
   error?: string | null;
@@ -60,6 +61,7 @@ export function PasswordField({
   onChangeText: (value: string) => void;
   placeholder?: string;
   autoComplete?: TextInputProps["autoComplete"];
+  testID?: string;
 }) {
   const [visible, setVisible] = useState(false);
   const { placeholder: placeholderColor } = useThemeColors();
@@ -77,6 +79,7 @@ export function PasswordField({
           placeholderTextColor={placeholderColor}
           secureTextEntry={!visible}
           style={{ fontFamily: fontSans }}
+          testID={testID}
           value={value}
         />
         <Pressable

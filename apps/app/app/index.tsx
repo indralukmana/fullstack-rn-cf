@@ -27,19 +27,19 @@ export default function HomeScreen() {
         {signedIn ? (
           <>
             <Link href="/me" asChild>
-              <Button label="Account" />
+              <Button label="Account" testID="home-account" />
             </Link>
             <Link href="/organizations" asChild>
-              <Button label="Organizations" variant="secondary" />
+              <Button label="Organizations" testID="home-organizations" variant="secondary" />
             </Link>
           </>
         ) : (
           <>
             <Link href="/sign-up" asChild>
-              <Button label="Get started" />
+              <Button label="Get started" testID="home-get-started" />
             </Link>
             <Link href="/sign-in" asChild>
-              <Button label="Sign in" variant="secondary" />
+              <Button label="Sign in" testID="home-sign-in" variant="secondary" />
             </Link>
           </>
         )}

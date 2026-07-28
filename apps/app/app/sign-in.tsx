@@ -33,6 +33,7 @@ export default function SignInScreen() {
               setEmailError(null);
             }
           }}
+          testID="auth-email"
           value={email}
         />
         <PasswordField
@@ -45,11 +46,17 @@ export default function SignInScreen() {
               setPasswordError(null);
             }
           }}
+          testID="auth-password"
           value={password}
         />
       </View>
       <View className="gap-3">
-        <Button disabled={pending} label={pending ? "Signing in…" : "Sign in"} onPress={onSubmit} />
+        <Button
+          disabled={pending}
+          label={pending ? "Signing in…" : "Sign in"}
+          onPress={onSubmit}
+          testID="auth-sign-in-submit"
+        />
         <View className="gap-1">
           <QuietLink href="/forgot-password">Forgot password?</QuietLink>
           <QuietLink href="/sign-up">Need an account? Register</QuietLink>

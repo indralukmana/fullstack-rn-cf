@@ -15,20 +15,32 @@ export function MeAccountActions({ signedIn, canManageBilling, onSignOut }: MeAc
       {signedIn ? (
         <>
           <Link href="./subscription" asChild>
-            <Button label={canManageBilling ? "Manage subscription" : "View subscription"} />
+            <Button
+              label={canManageBilling ? "Manage subscription" : "View subscription"}
+              testID="account-subscription"
+            />
           </Link>
           <View>
-            <NavRow href="./notes" label="Notes" />
-            <NavRow href="./tasks" label="Tasks" />
-            <NavRow href="./organizations" label="Organizations" />
-            <NavRow href="./account-data" label="Account data" />
-            <NavRow href="./pro" label="Paid example" />
+            <NavRow href="./notes" label="Notes" testID="account-nav-notes" />
+            <NavRow href="./tasks" label="Tasks" testID="account-nav-tasks" />
+            <NavRow
+              href="./organizations"
+              label="Organizations"
+              testID="account-nav-organizations"
+            />
+            <NavRow href="./account-data" label="Account data" testID="account-nav-account-data" />
+            <NavRow href="./pro" label="Paid example" testID="account-nav-pro" />
           </View>
-          <Button label="Sign out" onPress={onSignOut} variant="secondary" />
+          <Button
+            label="Sign out"
+            onPress={onSignOut}
+            testID="account-sign-out"
+            variant="secondary"
+          />
         </>
       ) : (
         <Link href="/sign-in" asChild>
-          <Button label="Sign in" />
+          <Button label="Sign in" testID="account-sign-in" />
         </Link>
       )}
       <QuietLink href="/">Home</QuietLink>

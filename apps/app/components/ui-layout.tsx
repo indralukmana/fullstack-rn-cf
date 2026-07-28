@@ -115,12 +115,23 @@ export function QuietLink({ href, children }: { href: Href; children: ReactNode 
   );
 }
 
-export function NavRow({ href, label, hint }: { href: Href; label: string; hint?: string }) {
+export function NavRow({
+  href,
+  label,
+  hint,
+  testID,
+}: {
+  href: Href;
+  label: string;
+  hint?: string;
+  testID?: string;
+}) {
   return (
     <Link href={href} asChild>
       <Pressable
         accessibilityRole="link"
         className="min-h-12 flex-row items-center justify-between gap-3 border-b border-border-subtle py-3.5 active:bg-selected"
+        testID={testID}
       >
         <View className="min-w-0 flex-1 gap-0.5">
           <Text
