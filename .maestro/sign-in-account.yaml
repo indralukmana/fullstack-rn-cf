@@ -1,0 +1,33 @@
+appId: com.rncf.launchpad
+tags:
+  - smoke
+  - auth
+---
+# Sign in with the local demo owner, open Account, assert primary chrome.
+# Requires DEMO_PASSWORD (and optional DEMO_EMAIL) via `maestro test -e …`.
+- launchApp:
+    clearState: true
+- assertVisible: "RN CF"
+- tapOn: "Sign in"
+- tapOn: "Email"
+- inputText: ${DEMO_EMAIL || "owner@example.com"}
+- tapOn: "Password"
+- inputText: ${DEMO_PASSWORD}
+- hideKeyboard
+- tapOn:
+    text: "Sign in"
+    retryTapIfNoChange: true
+- assertVisible: "Account"
+- tapOn: "Account"
+- assertVisible: "Account"
+- scrollUntilVisible:
+    element: ".*subscription"
+    direction: DOWN
+    timeout: 15000
+- assertVisible: "Notes"
+- scrollUntilVisible:
+    element: "Sign out"
+    direction: DOWN
+    timeout: 15000
+- assertVisible: "Sign out"
+- assertVisible: "Home"
