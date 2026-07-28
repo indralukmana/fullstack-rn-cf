@@ -99,7 +99,9 @@ Small differences: use `Platform.select` / `Platform.OS`. For larger ones, split
 
 ## AI and config files
 
-Agent instructions live at the repo root — `AGENTS.md` / `CLAUDE.md`, with project skills under `.claude/`. Other config and assets stay outside `src/`: `app.json` / `app.config.ts`, `eas.json`, `package.json`, `assets/`, and `scripts/`.
+Agent instructions live at the repo root — `AGENTS.md`, with project skills under `.agents/skills`
+and Playbooks under `.agents/playbooks/`. Other config and assets stay outside `src/`: `app.json` /
+`app.config.ts`, `eas.json`, `package.json`, `assets/`, and `scripts/`.
 
 ---
 

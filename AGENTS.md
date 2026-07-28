@@ -6,9 +6,16 @@ override this file.
 
 Human-oriented summary (same policy): `apps/docs` → **Agent guardrails**.
 
+**Language:** product terms in root `CONTEXT.md`; agent operating terms in `.agents/CONTEXT.md`
+(map: `CONTEXT-MAP.md`).
+
+**Task routing:** for non-trivial work, load `.agents/skills/launchpad-orchestrate/SKILL.md` and
+follow one Playbook under `.agents/playbooks/` (native-dx, billing, expo-ui, api-worker).
+
 For architecture, auth, billing, Expo, Worker, environment, migration, code-generation, or release
-work, load `.agents/skills/launchpad-architecture/SKILL.md` before the relevant vendor skill. For
-Expo UI / visual work, also read `apps/app/DESIGN.md` before generic frontend or deslop skills.
+work, load `.agents/skills/launchpad-architecture/SKILL.md` before the relevant vendor skill (or
+when the Playbook names it). For Expo UI / visual work, also read `apps/app/DESIGN.md` before
+generic frontend or deslop skills.
 
 ## Repository map
 

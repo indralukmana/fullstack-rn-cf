@@ -19,8 +19,9 @@ pnpm productize -- --name "Acme Learn" --slug acme-learn --scheme acmelearn --bu
 4. Follow docs: **Derive a product**, **Domain language**, and **Agent guardrails**
    (`pnpm dev:docs` → http://localhost:4321).
 
-Coding agents: read root `AGENTS.md` (and the nearest workspace `AGENTS.md`). Do not disable
-oxlint modularity rules; extract modules instead.
+Coding agents: read root `AGENTS.md` (and the nearest workspace `AGENTS.md`). For non-trivial
+tasks, load `launchpad-orchestrate` and follow a Playbook. Do not disable oxlint modularity rules;
+extract modules instead.
 
 ## What’s included
 
