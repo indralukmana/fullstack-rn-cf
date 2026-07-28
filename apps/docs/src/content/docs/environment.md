@@ -54,7 +54,23 @@ install (or after native dependency changes):
 pnpm dev:android -- --run
 ```
 
-For a physical device, override those URLs to the machine's LAN IP and bind the API on `0.0.0.0`.
+### Physical device (Wi‑Fi or Tailscale)
+
+Emulator loopback (`10.0.2.2`) does **not** work on a phone. The device needs your machine’s LAN
+or Tailscale address for both the API and Metro.
+
+1. Print suggestions (no file writes): `pnpm native:urls` (or `--prefer lan` / `--prefer tailscale`).
+2. Bind the API for non-loopback clients: `pnpm dev:api:lan` (`--ip 0.0.0.0 --port 8787`).
+3. Set `EXPO_PUBLIC_API_URL` and `EXPO_PUBLIC_APP_URL` to `http://<host>:8787` and
+   `http://<host>:8081` in the environment or ignored `apps/app/.env.local`.
+4. Append `http://<host>:8081` to `CORS_ORIGINS` in ignored `apps/api/.env.local` (merge with
+   schema defaults; origins only — no paths or trailing slashes).
+5. Start Expo with a reachable host, e.g. `pnpm --filter @rn-cf/app exec expo start --lan --port 8081`.
+
+Tailscale: phone and PC on the same tailnet; use the `100.x` address from `native:urls`. Wi‑Fi:
+same LAN subnet; watch for AP/client isolation. Never commit machine IPs — keep them in `.env.local`
+or the shell.
+
 Public RevenueCat SDK keys belong in the EAS environment for preview/production builds. Stripe and
 RevenueCat secret keys belong only to the API.
 

@@ -52,9 +52,10 @@ and reinvents what Maestro already does.
 
 ## Native Maestro (local)
 
-Prerequisites: API on the host (`pnpm dev:api`), demo seed (`pnpm seed:demo`), Android emulator or
-iOS simulator with a development build of `com.rncf.launchpad`, Metro reachable from the device
-(`pnpm dev:android` sets `10.0.2.2` URLs for the emulator).
+Prerequisites: API on the host (`pnpm dev:api` or `pnpm dev:api:lan` for devices), demo seed
+(`pnpm seed:demo`), Android emulator or physical device with a development build of
+`com.rncf.launchpad`, Metro reachable from the device. Emulator URLs: `pnpm dev:android`. Phone /
+Tailscale: `pnpm native:urls` then follow [Getting started](/getting-started/).
 
 Install the [Maestro CLI](https://docs.maestro.dev/maestro-cli/how-to-install-maestro-cli), then:
 
@@ -65,8 +66,9 @@ maestro test .maestro/sign-in-account.yaml \
   -e DEMO_PASSWORD='…'
 ```
 
-Flows live in `.maestro/` at the repo root. Start with sign-in → Account. Expand only for
-user-visible native regressions Playwright cannot see (safe area, SecureStore session, deep links).
+Flows live in `.maestro/` at the repo root and prefer `testID` / Maestro `id:` selectors. Start with
+sign-in → Account. Expand only for user-visible native regressions Playwright cannot see (safe area,
+SecureStore session, deep links).
 
 EAS Workflows can run the same flows after an `e2e-test` profile build; see Expo’s
 [Maestro E2E example](https://docs.expo.dev/eas/workflows/examples/e2e-tests/). That path is optional

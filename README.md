@@ -69,11 +69,13 @@ Useful local commands:
 ```bash
 pnpm seed:demo                                          # demo org + users (API running)
 pnpm scaffold-feature -- --name tasks --title "Tasks"   # auto-wires nav + Account link
+pnpm native:urls                                        # print LAN/Tailscale URL suggestions
 pnpm ci:check                                           # local CI-equivalent gate
 ```
 
-Per-app: `pnpm dev:app`, `pnpm dev:api`, `pnpm dev:docs`, `pnpm dev:ios`, `pnpm dev:android`
-(emulator URLs; first install: `pnpm dev:android -- --run`).
+Per-app: `pnpm dev:app`, `pnpm dev:api`, `pnpm dev:api:lan` (API on `0.0.0.0` for phones),
+`pnpm dev:docs`, `pnpm dev:ios`, `pnpm dev:android` (emulator URLs; first install:
+`pnpm dev:android -- --run`). Physical device: see docs **Getting started** (Wi‑Fi / Tailscale).
 
 ## Workspace layout
 
