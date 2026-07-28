@@ -1,5 +1,6 @@
 import { router } from "expo-router";
 import { useState } from "react";
+import { View } from "react-native";
 
 import { Button, Field, QuietLink, Screen, ScreenLead, ScreenTitle } from "@/components/ui";
 import { appCallbackUrl } from "@/lib/app-url";
@@ -39,8 +40,10 @@ export default function ForgotPasswordScreen() {
 
   return (
     <Screen centered>
-      <ScreenTitle>Forgot password</ScreenTitle>
-      <ScreenLead>Enter your email and we will send a reset link if an account exists.</ScreenLead>
+      <View className="gap-2">
+        <ScreenTitle>Forgot password</ScreenTitle>
+        <ScreenLead>Enter your email. We will send a reset link if an account exists.</ScreenLead>
+      </View>
       <Field
         autoCapitalize="none"
         autoComplete="email"
@@ -53,15 +56,16 @@ export default function ForgotPasswordScreen() {
             setError(null);
           }
         }}
-        placeholder="Email"
         value={email}
       />
-      <Button
-        disabled={pending}
-        label={pending ? "Sending…" : "Send reset link"}
-        onPress={onSubmit}
-      />
-      <QuietLink href="/sign-in">Back to sign in</QuietLink>
+      <View className="gap-3">
+        <Button
+          disabled={pending}
+          label={pending ? "Sending…" : "Send reset link"}
+          onPress={onSubmit}
+        />
+        <QuietLink href="/sign-in">Back to sign in</QuietLink>
+      </View>
     </Screen>
   );
 }

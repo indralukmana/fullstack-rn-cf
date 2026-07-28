@@ -62,9 +62,7 @@ export default function MeScreen() {
       </Section>
 
       <Section title="Appearance">
-        <BodyText className="text-sm text-foreground-secondary">
-          Choose system, light, or dark. The canvas and controls follow Uniwind theme tokens.
-        </BodyText>
+        <BodyText className="text-sm text-foreground-secondary">System, light, or dark.</BodyText>
         <ThemeSwitcher />
       </Section>
 

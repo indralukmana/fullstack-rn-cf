@@ -51,7 +51,7 @@ export default function SignUpScreen() {
   return (
     <Screen centered>
       <ScreenTitle>Get started</ScreenTitle>
-      <View className="gap-3">
+      <View className="gap-4">
         <Field
           autoComplete="name"
           error={nameError}
@@ -62,7 +62,6 @@ export default function SignUpScreen() {
               setNameError(null);
             }
           }}
-          placeholder="Name"
           value={name}
         />
         <Field
@@ -77,7 +76,6 @@ export default function SignUpScreen() {
               setEmailError(null);
             }
           }}
-          placeholder="Email"
           value={email}
         />
         <PasswordField
@@ -90,16 +88,17 @@ export default function SignUpScreen() {
               setPasswordError(null);
             }
           }}
-          placeholder="Password"
           value={password}
         />
       </View>
-      <Button
-        disabled={pending}
-        label={pending ? "Creating account…" : "Create account"}
-        onPress={onSubmit}
-      />
-      <QuietLink href="/sign-in">Already have an account? Sign in</QuietLink>
+      <View className="gap-3">
+        <Button
+          disabled={pending}
+          label={pending ? "Creating account…" : "Create account"}
+          onPress={onSubmit}
+        />
+        <QuietLink href="/sign-in">Already have an account? Sign in</QuietLink>
+      </View>
     </Screen>
   );
 }

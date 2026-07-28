@@ -60,7 +60,7 @@ export default function ResetPasswordScreen() {
           This reset link is missing a token. Request a new link from forgot password.
         </StatusText>
       ) : null}
-      <View className="gap-3">
+      <View className="gap-4">
         <PasswordField
           autoComplete="new-password"
           error={passwordError}
@@ -71,7 +71,6 @@ export default function ResetPasswordScreen() {
               setPasswordError(null);
             }
           }}
-          placeholder="New password"
           value={password}
         />
         <PasswordField
@@ -84,17 +83,18 @@ export default function ResetPasswordScreen() {
               setConfirmError(null);
             }
           }}
-          placeholder="Confirm password"
           value={confirm}
         />
       </View>
       {formError ? <StatusText>{formError}</StatusText> : null}
-      <Button
-        disabled={pending || !token}
-        label={pending ? "Saving…" : "Update password"}
-        onPress={onSubmit}
-      />
-      <QuietLink href="/forgot-password">Request a new link</QuietLink>
+      <View className="gap-3">
+        <Button
+          disabled={pending || !token}
+          label={pending ? "Saving…" : "Update password"}
+          onPress={onSubmit}
+        />
+        <QuietLink href="/forgot-password">Request a new link</QuietLink>
+      </View>
     </Screen>
   );
 }

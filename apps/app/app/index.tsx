@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import { View } from "react-native";
 
-import { BodyText, Button, QuietLink, Screen, ScreenLead, ScreenTitle } from "@/components/ui";
+import { BodyText, Button, Screen, ScreenLead, ScreenTitle } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 
 export default function HomeScreen() {
@@ -11,14 +11,12 @@ export default function HomeScreen() {
 
   return (
     <Screen centered>
-      <View className="gap-3">
+      <View className="gap-2">
         <ScreenTitle>RN CF</ScreenTitle>
-        <ScreenLead>
-          A Cloudflare Workers API with a universal Expo app for web, iOS, and Android.
-        </ScreenLead>
+        <ScreenLead>Workers API and Expo app for web, iOS, and Android.</ScreenLead>
         {signedIn && !sessionPending ? (
           <BodyText className="text-sm text-foreground-secondary">
-            Active organization:{" "}
+            Organization:{" "}
             {activeOrganization.isPending
               ? "Loading…"
               : (activeOrganization.data?.name ?? "None selected")}
@@ -43,7 +41,6 @@ export default function HomeScreen() {
             <Link href="/sign-in" asChild>
               <Button label="Sign in" variant="secondary" />
             </Link>
-            <QuietLink href="/me">Account</QuietLink>
           </>
         )}
       </View>

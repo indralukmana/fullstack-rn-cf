@@ -20,7 +20,7 @@ export default function SignInScreen() {
   return (
     <Screen centered>
       <ScreenTitle>Sign in</ScreenTitle>
-      <View className="gap-3">
+      <View className="gap-4">
         <Field
           autoCapitalize="none"
           autoComplete="email"
@@ -33,7 +33,6 @@ export default function SignInScreen() {
               setEmailError(null);
             }
           }}
-          placeholder="Email"
           value={email}
         />
         <PasswordField
@@ -46,14 +45,15 @@ export default function SignInScreen() {
               setPasswordError(null);
             }
           }}
-          placeholder="Password"
           value={password}
         />
       </View>
-      <Button disabled={pending} label={pending ? "Signing in…" : "Sign in"} onPress={onSubmit} />
       <View className="gap-3">
-        <QuietLink href="/forgot-password">Forgot password?</QuietLink>
-        <QuietLink href="/sign-up">Need an account? Register</QuietLink>
+        <Button disabled={pending} label={pending ? "Signing in…" : "Sign in"} onPress={onSubmit} />
+        <View className="gap-1">
+          <QuietLink href="/forgot-password">Forgot password?</QuietLink>
+          <QuietLink href="/sign-up">Need an account? Register</QuietLink>
+        </View>
       </View>
     </Screen>
   );
