@@ -65,11 +65,14 @@ or Tailscale address for both the API and Metro.
    `http://<host>:8081` in the environment or ignored `apps/app/.env.local`.
 4. Append `http://<host>:8081` to `CORS_ORIGINS` in ignored `apps/api/.env.local` (merge with
    schema defaults; origins only — no paths or trailing slashes).
-5. Start Expo with a reachable host, e.g. `pnpm --filter @rn-cf/app exec expo start --lan --port 8081`.
+5. Start Expo with a reachable host, e.g. `pnpm --filter @rn-cf/app exec expo start --lan --port 8081`
+   with the Tailscale/LAN `EXPO_PUBLIC_*` exports (add `--clear` after switching from emulator URLs).
 
 Tailscale: phone and PC on the same tailnet; use the `100.x` address from `native:urls`. Wi‑Fi:
 same LAN subnet; watch for AP/client isolation. Never commit machine IPs — keep them in `.env.local`
-or the shell.
+or the shell. Confirm `http://<host>:8787/health` from the device browser before app debugging.
+
+This scaffold needs a **development client**, not Expo Go.
 
 Public RevenueCat SDK keys belong in the EAS environment for preview/production builds. Stripe and
 RevenueCat secret keys belong only to the API.

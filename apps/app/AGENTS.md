@@ -45,7 +45,16 @@ Adapt; skip steps that already pass. Human docs: Starlight **Getting started** /
    origin into `apps/api/.env.local` `CORS_ORIGINS`.
 4. Start Metro with a reachable host (`expo start --lan` or Tailscale host URLs). Install/open the
    development build on the device; do not use emulator `10.0.2.2` URLs on a phone.
-5. Verify from the device browser that `http://<host>:8787` responds before chasing app bugs.
+5. Verify from the device browser that `http://<host>:8787/health` returns `{"status":"ok",...}`
+   before chasing app bugs. Packager URL on the phone should be `http://<host>:8081` (or `exp://`).
+
+## Agent procedure: iOS Simulator (macOS)
+
+1. `pnpm dev:api` + `pnpm seed:demo`.
+2. Use schema defaults (`127.0.0.1` / `localhost`) — not `10.0.2.2`, not Tailscale unless testing
+   a physical iPhone on the tailnet (then use the physical-device procedure).
+3. `expo run:ios` once for the development client; later `pnpm dev:ios` / Metro on `8081`.
+4. Development client only — Expo Go is unsupported for this scaffold.
 
 Focused check:
 
