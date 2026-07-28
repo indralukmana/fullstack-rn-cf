@@ -77,22 +77,38 @@ function wireStackScreen(name, title) {
 }
 
 function wireAccountLink(name, title) {
-  const mePath = join(root, "apps/app/app/me.tsx");
-  let source = readFileSync(mePath, "utf8");
+  const actionsPath = join(root, "apps/app/src/parts/me/me-account-actions.tsx");
+  let source = readFileSync(actionsPath, "utf8");
   if (source.includes(`href="./${name}"`)) {
-    return { path: mePath, changed: false };
+    return { path: actionsPath, changed: false };
   }
   const anchor = `<Link href="./organizations" asChild>`;
   if (!source.includes(anchor)) {
-    throw new Error(`Could not find organizations Account link anchor in ${mePath}`);
+    throw new Error(`Could not find organizations Account link anchor in ${actionsPath}`);
   }
   const insertion = `<Link href="./${name}" asChild>
-              <Button label="${title}" variant="secondary" />
-            </Link>
-            ${anchor}`;
+            <Button label="${title}" variant="secondary" />
+          </Link>
+          ${anchor}`;
   source = source.replace(anchor, insertion);
-  writeFileSync(mePath, source);
-  return { path: mePath, changed: true };
+  writeFileSync(actionsPath, source);
+  return { path: actionsPath, changed: true };
+}
+
+function assertWireTargets(name) {
+  const layoutPath = join(root, "apps/app/app/_layout.tsx");
+  const actionsPath = join(root, "apps/app/src/parts/me/me-account-actions.tsx");
+  const layout = readFileSync(layoutPath, "utf8");
+  const actions = readFileSync(actionsPath, "utf8");
+  if (!layout.includes(`name="${name}"`) && !layout.includes(`<Stack.Screen name="account-data"`)) {
+    throw new Error(`Could not find account-data Stack.Screen anchor in ${layoutPath}`);
+  }
+  if (
+    !actions.includes(`href="./${name}"`) &&
+    !actions.includes(`<Link href="./organizations" asChild>`)
+  ) {
+    throw new Error(`Could not find organizations Account link anchor in ${actionsPath}`);
+  }
 }
 
 function main() {
@@ -107,7 +123,7 @@ Creates:
   apps/e2e/<name>.spec.ts
 
 Uses shared /api/features/{featureKey}/items (feature_item table).
-Wires Stack.Screen in _layout.tsx and an Account link in me.tsx when missing.`);
+Wires Stack.Screen in _layout.tsx and an Account link in src/parts/me/me-account-actions.tsx when missing.`);
     process.exit(args.help ? 0 : 1);
   }
 
@@ -123,6 +139,8 @@ Wires Stack.Screen in _layout.tsx and an Account link in me.tsx when missing.`);
   if (existsSync(screenPath) || existsSync(e2ePath)) {
     throw new Error(`Refusing to overwrite existing files for "${name}".`);
   }
+
+  assertWireTargets(name);
 
   mkdirSync(dirname(screenPath), { recursive: true });
   writeFileSync(screenPath, screenTemplate({ title, featureKey }));
