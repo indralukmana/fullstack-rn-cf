@@ -1,8 +1,7 @@
 import { View } from "react-native";
 
 import { Button, Field, PasswordField, QuietLink, Screen, ScreenTitle } from "@/components/ui";
-
-import { useSignInScreen } from "./_parts/sign-in/use-sign-in-screen";
+import { useSignInScreen } from "@/src/parts/sign-in/use-sign-in-screen";
 
 export default function SignInScreen() {
   const {

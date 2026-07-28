@@ -119,7 +119,7 @@ When adding product-specific capability:
    needed).
 2. Add Zod/OpenAPI contracts in `packages/types`, then `pnpm codegen`.
 3. Add Expo screens with shared UI primitives (`apps/app/components/ui.tsx`) and `DESIGN.md`. Prefer
-   `apps/app/app/_parts/` for screen sections when a route would otherwise trip modularity lint.
+   `apps/app/src/parts/` for screen sections when a route would otherwise trip modularity lint.
 4. Extend Playwright only for user-visible web flows you care about in CI.
 5. Update Starlight docs in the same change when behavior or ops steps change.
 6. Follow [Agent guardrails](/agent-guardrails/) if an agent implements the change.

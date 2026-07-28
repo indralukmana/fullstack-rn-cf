@@ -277,7 +277,7 @@
       }
     },
     {
-      "files": ["apps/app/app/**/*.{ts,tsx}"],
+      "files": ["apps/app/app/**/*.{ts,tsx}", "apps/app/src/parts/**/*.{ts,tsx}"],
       "rules": {
         "typescript/no-misused-promises": "off",
         "complexity": ["error", 25],

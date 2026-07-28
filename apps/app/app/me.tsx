@@ -8,11 +8,10 @@ import {
   Section,
   StatusText,
 } from "@/components/ui";
-
-import { ActiveOrganizationSection } from "./_parts/me/active-organization-section";
-import { MeAccountActions } from "./_parts/me/me-account-actions";
-import { SignedInAsSection } from "./_parts/me/signed-in-as-section";
-import { useMeScreen } from "./_parts/me/use-me-screen";
+import { ActiveOrganizationSection } from "@/src/parts/me/active-organization-section";
+import { MeAccountActions } from "@/src/parts/me/me-account-actions";
+import { SignedInAsSection } from "@/src/parts/me/signed-in-as-section";
+import { useMeScreen } from "@/src/parts/me/use-me-screen";
 
 export default function MeScreen() {
   const {

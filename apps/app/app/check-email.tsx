@@ -9,9 +9,8 @@ import {
   ScreenTitle,
   StatusText,
 } from "@/components/ui";
-
-import { DevMailboxPanel } from "./_parts/check-email/dev-mailbox-panel";
-import { useCheckEmailScreen } from "./_parts/check-email/use-check-email-screen";
+import { DevMailboxPanel } from "@/src/parts/check-email/dev-mailbox-panel";
+import { useCheckEmailScreen } from "@/src/parts/check-email/use-check-email-screen";
 
 export default function CheckEmailScreen() {
   const params = useLocalSearchParams<{ email?: string; purpose?: string }>();

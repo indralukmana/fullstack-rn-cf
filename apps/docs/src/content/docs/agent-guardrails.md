@@ -51,7 +51,7 @@ and scripts use documented overrides; numbers in that file win over this page.
 When a modularity rule fails:
 
 - Extract helpers, services, or section components into adjacent modules (API:
-  `apps/api/src/lib/...`; Expo screens: `apps/app/app/_parts/...`; shared UI:
+  `apps/api/src/lib/...`; Expo screens: `apps/app/src/parts/...`; shared UI:
   `apps/app/components/...`).
 - Split along real responsibilities — not one-line wrappers to game line counts.
 - **Do not** disable, weaken, or `eslint-disable` / oxlint-ignore modularity rules without

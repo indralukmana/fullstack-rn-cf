@@ -9,10 +9,9 @@ import {
   ScreenTitle,
   StatusText,
 } from "@/components/ui";
-
-import { SubscriptionAccessSection } from "./_parts/subscription/subscription-access-section";
-import { SubscriptionBillingActions } from "./_parts/subscription/subscription-billing-actions";
-import { useSubscriptionScreen } from "./_parts/subscription/use-subscription-screen";
+import { SubscriptionAccessSection } from "@/src/parts/subscription/subscription-access-section";
+import { SubscriptionBillingActions } from "@/src/parts/subscription/subscription-billing-actions";
+import { useSubscriptionScreen } from "@/src/parts/subscription/use-subscription-screen";
 
 export default function SubscriptionScreen() {
   const state = useSubscriptionScreen();

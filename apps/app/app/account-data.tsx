@@ -10,9 +10,8 @@ import {
   ScreenTitle,
   StatusText,
 } from "@/components/ui";
-
-import { DeleteAccountSection } from "./_parts/account-data/delete-account-section";
-import { useAccountDataScreen } from "./_parts/account-data/use-account-data-screen";
+import { DeleteAccountSection } from "@/src/parts/account-data/delete-account-section";
+import { useAccountDataScreen } from "@/src/parts/account-data/use-account-data-screen";
 
 export default function AccountDataScreen() {
   const {

@@ -1,8 +1,7 @@
 import { LoadingScreen, QuietLink, Screen, ScreenLead, ScreenTitle } from "@/components/ui";
-
-import { FeatureItemCreateSection } from "./_parts/feature-items/feature-item-create-section";
-import { FeatureItemsListSection } from "./_parts/feature-items/feature-items-list-section";
-import { useFeatureItemsScreen } from "./_parts/feature-items/use-feature-items-screen";
+import { FeatureItemCreateSection } from "@/src/parts/feature-items/feature-item-create-section";
+import { FeatureItemsListSection } from "@/src/parts/feature-items/feature-items-list-section";
+import { useFeatureItemsScreen } from "@/src/parts/feature-items/use-feature-items-screen";
 
 const FEATURE_KEY = "notes";
 

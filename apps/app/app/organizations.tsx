@@ -10,14 +10,13 @@ import {
   ScreenTitle,
   StatusText,
 } from "@/components/ui";
-
-import { CreateOrganizationSection } from "./_parts/organizations/create-organization-section";
-import { InviteMemberSection } from "./_parts/organizations/invite-member-section";
-import { MembersSection } from "./_parts/organizations/members-section";
-import { MembershipActionsSection } from "./_parts/organizations/membership-actions-section";
-import { OrganizationConfirmDialogs } from "./_parts/organizations/organization-confirm-dialogs";
-import { OrganizationListSection } from "./_parts/organizations/organization-list-section";
-import { useOrganizationsScreen } from "./_parts/organizations/use-organizations-screen";
+import { CreateOrganizationSection } from "@/src/parts/organizations/create-organization-section";
+import { InviteMemberSection } from "@/src/parts/organizations/invite-member-section";
+import { MembersSection } from "@/src/parts/organizations/members-section";
+import { MembershipActionsSection } from "@/src/parts/organizations/membership-actions-section";
+import { OrganizationConfirmDialogs } from "@/src/parts/organizations/organization-confirm-dialogs";
+import { OrganizationListSection } from "@/src/parts/organizations/organization-list-section";
+import { useOrganizationsScreen } from "@/src/parts/organizations/use-organizations-screen";
 
 export default function OrganizationsScreen() {
   const state = useOrganizationsScreen();
