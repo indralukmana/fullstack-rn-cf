@@ -18,7 +18,7 @@
     "dev:api": "pnpm --filter @rn-cf/api dev",
     "dev:app": "pnpm --filter @rn-cf/app dev",
     "dev:ios": "pnpm --filter @rn-cf/app ios",
-    "dev:android": "pnpm --filter @rn-cf/app android",
+    "dev:android": "node scripts/dev-android.mjs",
     "dev:docs": "pnpm --filter @rn-cf/docs dev",
     "openapi:export": "node scripts/openapi-export.mjs",
     "codegen": "pnpm openapi:export && pnpm exec orval",

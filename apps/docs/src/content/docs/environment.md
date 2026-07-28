@@ -46,15 +46,15 @@ Application code reads `ENV` from `varlock/env`. Non-sensitive values are compil
 JavaScript bundle and are publicly recoverable; native code must never reference an item marked
 `@sensitive`.
 
-For an Android emulator, override host URLs for that command without changing shared defaults:
+`pnpm dev:android` defaults API/app URLs to the Android emulator loopback (`http://10.0.2.2:8787`
+and `http://10.0.2.2:8081`). Keep the Workers API on the host (`pnpm dev:api`). First native
+install (or after native dependency changes):
 
 ```bash
-EXPO_PUBLIC_API_URL=http://10.0.2.2:8787 \
-EXPO_PUBLIC_APP_URL=http://10.0.2.2:8081 \
-pnpm dev:android
+pnpm dev:android -- --run
 ```
 
-For a physical device, use the development machine's LAN IP and expose the API on `0.0.0.0`.
+For a physical device, override those URLs to the machine's LAN IP and bind the API on `0.0.0.0`.
 Public RevenueCat SDK keys belong in the EAS environment for preview/production builds. Stripe and
 RevenueCat secret keys belong only to the API.
 

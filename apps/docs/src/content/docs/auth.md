@@ -7,7 +7,7 @@ Email/password auth is enabled via Better Auth on the Workers API.
 
 - Server plugin: `@better-auth/expo`
 - Client: `better-auth/react` + `@better-auth/expo/client`
-- Trusted origins: `CORS_ORIGINS` + `TRUSTED_ORIGINS` + native `rn-cf://` / `exp://`
+- Trusted origins: `CORS_ORIGINS` + `TRUSTED_ORIGINS` + native scheme from `app.json` (`rncf://`) / `exp://`
 - Secrets and URLs: validated by varlock (`apps/api/.env.schema`)
 
 ## Email verification

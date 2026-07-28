@@ -72,7 +72,8 @@ pnpm scaffold-feature -- --name tasks --title "Tasks"   # auto-wires nav + Accou
 pnpm ci:check                                           # local CI-equivalent gate
 ```
 
-Per-app: `pnpm dev:app`, `pnpm dev:api`, `pnpm dev:docs`, `pnpm dev:ios`, `pnpm dev:android`.
+Per-app: `pnpm dev:app`, `pnpm dev:api`, `pnpm dev:docs`, `pnpm dev:ios`, `pnpm dev:android`
+(emulator URLs; first install: `pnpm dev:android -- --run`).
 
 ## Workspace layout
 
