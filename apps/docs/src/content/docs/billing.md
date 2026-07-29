@@ -130,3 +130,8 @@ After purchase or restore, owners/admins request reconciliation and refresh
 paid UI or APIs. Signing out clears the RevenueCat identity. Switching the Active Organization
 re-identifies RevenueCat to that Organization. Native purchase testing requires an Expo development
 build; Expo Go's RevenueCat UI is preview-only and cannot complete real store transactions.
+
+## Related notes
+
+Parked external paywall experiment notes (not product policy):
+[Paywall experiment notes](/paywall-experiment-notes/).

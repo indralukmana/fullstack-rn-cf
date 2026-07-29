@@ -23,6 +23,7 @@ export default defineConfig({
         { label: "Authentication", slug: "auth" },
         { label: "Billing", slug: "billing" },
         { label: "Billing Operations", slug: "billing-operations" },
+        { label: "Paywall experiment notes", slug: "paywall-experiment-notes" },
         { label: "Native Release", slug: "native-release" },
         { label: "Launch Checklist", slug: "launch-checklist" },
         { label: "Security", slug: "security" },
