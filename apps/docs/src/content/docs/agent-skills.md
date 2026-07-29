@@ -29,11 +29,14 @@ contract wins when they conflict.
 | Hono creator skill       | Routing, middleware, Worker runtime, and request testing               |
 | Drizzle ORM              | Schema, queries, and Kit workflows (D1/RQB v2 overrides in launchpad)  |
 | `launchpad-architecture` | Repository-specific invariants and conflict resolution                 |
+| `launchpad-orchestrate`  | Playbook router (native-dx, billing, expo-ui, api-worker)              |
+
+Playbooks live under `.agents/playbooks/` and are **routers** (skills + Subagent gates + pointers
+to Recipes). They do not replace Starlight runbooks. Agent vocabulary: `.agents/CONTEXT.md`
+(map: root `CONTEXT-MAP.md`).
 
 Product visual intent for the Expo app lives in `apps/app/DESIGN.md`. Generic UI skills must
-follow that file and Uniwind constraints.
-
-### UI skill overrides (Expo / Uniwind)
+follow that file and Uniwind constraints.### UI skill overrides (Expo / Uniwind)
 
 Vendor UI skills (`baseline-ui`, `improve-ui`, `frontend-ui-engineering`, `fixing-accessibility`)
 often assume DOM stacks (Base UI / Radix, `motion/react`, `text-balance`, CSS Grid dashboards).
@@ -59,9 +62,10 @@ Apply instructions in this order (same as [Agent guardrails](/agent-guardrails/)
 
 1. User request and safety/approval boundaries.
 2. Root and nearest workspace `AGENTS.md`.
-3. `.cursor/rules` and `launchpad-architecture`.
-4. Vendor skills for current product APIs.
-5. Generic model knowledge.
+3. Playbook from `launchpad-orchestrate` when the task matches.
+4. `.cursor/rules` and `launchpad-architecture`.
+5. Vendor skills for current product APIs.
+6. Generic model knowledge.
 
 This matters when a generic skill conflicts with the template. RevenueCat client state cannot
 authorize the API, Expo API routes do not replace the Hono Worker, NativeWind guidance does not

@@ -3,8 +3,9 @@ title: Domain language
 description: Ubiquitous language for the RN CF launchpad
 ---
 
-Canonical source for coding agents: repository root `CONTEXT.md`. Keep that file and this page in
-sync when language changes. Architectural decisions live under [ADRs](/adr/0001-organization-owns-subscription/)
+Canonical source for coding agents: repository root `CONTEXT.md`. Agent operating language lives
+in `.agents/CONTEXT.md` (see root `CONTEXT-MAP.md`). Keep product terms here and the Starlight page
+in sync when you change them. Architectural decisions live under [ADRs](/adr/0001-organization-owns-subscription/)
 and also as `docs/adr/` at the repository root.
 
 ## Language

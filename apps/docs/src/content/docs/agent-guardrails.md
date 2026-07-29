@@ -10,9 +10,13 @@ file (and the nearest workspace `AGENTS.md`) even when a vendor skill suggests s
 
 1. Human request and explicit approval boundaries
 2. Root and nearest workspace `AGENTS.md`
-3. `.cursor/rules` and `.agents/skills/launchpad-architecture`
-4. Vendor skills for the API you are calling (Cloudflare, Expo, Stripe, …)
-5. Generic model knowledge
+3. Playbook from `launchpad-orchestrate` (when the task matches)
+4. `.cursor/rules` and `.agents/skills/launchpad-architecture`
+5. Vendor skills for the API you are calling (Cloudflare, Expo, Stripe, …)
+6. Generic model knowledge
+
+Product language: root `CONTEXT.md`. Agent operating language: `.agents/CONTEXT.md` (see
+`CONTEXT-MAP.md`). Host-only plugins are non-normative — clones must not need them.
 
 See [Agent skills](/agent-skills/) for skill install/update rules and Expo UI overrides.
 

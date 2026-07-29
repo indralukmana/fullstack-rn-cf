@@ -49,6 +49,10 @@ export default defineConfig({
               label: "0004 Organization close blockers",
               slug: "adr/0004-organization-close-blocked-on-subscription",
             },
+            {
+              label: "0005 Repo Playbooks route agents",
+              slug: "adr/0005-repo-playbooks-route-agents",
+            },
           ],
         },
       ],
