@@ -95,20 +95,21 @@ packages/
 
 ## Common commands
 
-| Command             | Purpose                                                         |
-| ------------------- | --------------------------------------------------------------- |
-| `pnpm setup`        | Prepare local Varlock overrides, migrate D1, install Playwright |
-| `pnpm format`       | Format with oxfmt                                               |
-| `pnpm format:check` | Check formatting                                                |
-| `pnpm lint`         | Fix lint issues with oxlint                                     |
-| `pnpm lint:check`   | Lint without writing                                            |
-| `pnpm typecheck`    | Run workspace type checks                                       |
-| `pnpm test`         | Run workspace smoke tests                                       |
-| `pnpm test:e2e`     | Run Playwright smoke tests                                      |
-| `pnpm codegen`      | Export OpenAPI + regenerate api-client                          |
-| `pnpm build`        | Build all workspaces                                            |
-| `pnpm ci:check`     | Run local CI-equivalent checks                                  |
-| `pnpm productize`   | Rename identity for a product fork                              |
+| Command                   | Purpose                                                         |
+| ------------------------- | --------------------------------------------------------------- |
+| `pnpm setup`              | Prepare local Varlock overrides, migrate D1, install Playwright |
+| `pnpm format`             | Format with oxfmt                                               |
+| `pnpm format:check`       | Check formatting                                                |
+| `pnpm lint`               | Fix lint issues with oxlint                                     |
+| `pnpm lint:check`         | Lint without writing                                            |
+| `pnpm typecheck`          | Run workspace type checks                                       |
+| `pnpm check:architecture` | Ban silencing modularity / complexity lint rules                |
+| `pnpm test`               | Run workspace smoke tests                                       |
+| `pnpm test:e2e`           | Run Playwright smoke tests                                      |
+| `pnpm codegen`            | Export OpenAPI + regenerate api-client                          |
+| `pnpm build`              | Build all workspaces                                            |
+| `pnpm ci:check`           | Run local CI-equivalent checks                                  |
+| `pnpm productize`         | Rename identity for a product fork                              |
 
 ## Cloudflare notes
 

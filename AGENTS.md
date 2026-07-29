@@ -54,8 +54,11 @@ generated API artifacts with their contract change; those pairs are one review u
 - TypeScript/API: `pnpm --filter @rn-cf/api typecheck` and focused Vitest tests
 - Expo app: `pnpm --filter @rn-cf/app typecheck`
 - Docs: `pnpm --filter @rn-cf/docs typecheck`
+- Architecture sensors: `pnpm check:architecture` (bans silencing modularity lint rules)
 - API contract changes: `pnpm codegen`, then verify the generated diff
 - Milestone completion: `pnpm ci:check`; run E2E when user-visible flows change
+
+Harness map (guides vs sensors): Starlight **Agent harness**.
 
 ## Code size and modularity
 

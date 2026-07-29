@@ -1,0 +1,4 @@
+architecture:
+  stage: lint
+  script:
+    - pnpm check:architecture

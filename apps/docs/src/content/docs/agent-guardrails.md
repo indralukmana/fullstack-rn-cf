@@ -18,7 +18,9 @@ file (and the nearest workspace `AGENTS.md`) even when a vendor skill suggests s
 Product language: root `CONTEXT.md`. Agent operating language: `.agents/CONTEXT.md` (see
 `CONTEXT-MAP.md`). Host-only plugins are non-normative — clones must not need them.
 
-See [Agent skills](/agent-skills/) for skill install/update rules and Expo UI overrides.
+See [Agent skills](/agent-skills/) for skill install/update rules and Expo UI overrides. See
+[Agent harness](/agent-harness/) for feedforward guides vs feedback sensors (lint, tests,
+modularity-disable ban).
 
 ## Hard stops (need explicit human approval)
 
@@ -61,7 +63,9 @@ When a modularity rule fails:
 - **Do not** disable, weaken, or `eslint-disable` / oxlint-ignore modularity rules without
   explicit human approval.
 
-Pre-commit runs format, lint, typecheck, and secret scan. Fix the rule; do not skip hooks.
+Pre-commit runs format, lint, typecheck, and secret scan. Pre-push and `ci:check` also run
+`pnpm check:architecture` (bans silencing modularity / complexity rules). Fix the rule; do not
+skip hooks.
 
 ## Domain and billing invariants
 

@@ -20,3 +20,5 @@ pre-push:
       run: pnpm lint:check
     typecheck:
       run: pnpm typecheck
+    architecture:
+      run: pnpm check:architecture

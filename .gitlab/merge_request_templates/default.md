@@ -6,6 +6,7 @@
 
 - [ ] `pnpm format:check`
 - [ ] `pnpm lint:check`
+- [ ] `pnpm check:architecture`
 - [ ] `pnpm typecheck`
 - [ ] `pnpm test`
 - [ ] `pnpm test:e2e` (if relevant)
