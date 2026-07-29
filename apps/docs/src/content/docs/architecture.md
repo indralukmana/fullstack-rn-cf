@@ -8,7 +8,7 @@ apps/api   Hono on Cloudflare Workers + D1 + Better Auth
 apps/app   Expo Router (iOS / Android / web)
 apps/docs  Astro Starlight
 apps/e2e   Playwright against Expo web + API
-.maestro/  Maestro flows against native Expo builds (optional local/EAS)
+.maestro/  Maestro native smoke (local only; not GitLab) — sign-in → Account
 
 packages/types       Shared Zod / OpenAPI schemas
 packages/api-client  Orval-generated TanStack Query client

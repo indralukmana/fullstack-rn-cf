@@ -114,5 +114,7 @@ For D1 changes:
 - Never read or print raw override files. Validate with redacted `varlock load`.
 - Do not deploy, submit stores, migrate remote D1, mutate provider dashboards, or rotate secrets
   without explicit user approval.
-- Before milestone completion run focused tests, then `pnpm release:check`. Native billing still
-  requires the documented Apple Sandbox/TestFlight and Google license/internal-test matrix.
+- Before milestone or PR completion run focused tests, then `pnpm ci:check`. Before launch or a
+  clean-tree release candidate run `pnpm release:check` (adds codegen/env/migration drift and web
+  export). Native billing still requires the documented Apple Sandbox/TestFlight and Google
+  license/internal-test matrix. Maestro is local-only.

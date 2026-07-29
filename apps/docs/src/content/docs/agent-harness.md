@@ -28,7 +28,9 @@ Industry framing (feedforward vs feedback, computational vs inferential): Martin
 | Typecheck                         | pre-commit (TS) + pre-push + CI | Broken contracts                             |
 | Varlock staged scan               | pre-commit                      | Secrets in the index                         |
 | `pnpm check:architecture`         | pre-push + `ci:check`           | Silencing modularity / complexity lint rules |
-| Vitest / Playwright / Maestro     | CI or Playbook done-criteria    | Behavior holes that still typecheck          |
+| Vitest                            | `ci:check` / GitLab             | API behavior holes that still typecheck      |
+| Playwright                        | `ci:check` / GitLab             | Expo **web** customer flows                  |
+| Maestro                           | Local only (Playbook native-dx) | Native sign-in → Account smoke (not CI)      |
 | Human review                      | After green sensors             | Intent, product judgment                     |
 
 Modularity lint (and the ban on disabling it) is an **architecture fitness function**. A giant

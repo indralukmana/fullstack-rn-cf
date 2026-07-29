@@ -44,8 +44,9 @@ store app.
 
 ## UI / device verification (non-billing)
 
-Web E2E does not prove native chrome. Prefer automated Maestro smoke under `.maestro/` for
-sign-in and Account (see [Testing](/testing/)). On a development build or simulator, also confirm:
+Web E2E does not prove native chrome. Run the local Maestro smoke under `.maestro/` for
+sign-in → Account when you change those paths (see [Testing](/testing/); not in GitLab). On a
+development build or simulator, also confirm:
 
 - [ ] Safe-area padding clears home indicator / notches under the stack header
 - [ ] Source Serif / Source Sans faces load (titles and body are not system fallback)

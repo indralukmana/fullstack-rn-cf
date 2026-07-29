@@ -75,12 +75,12 @@ Shared org-scoped storage lives in `feature_item` (`/api/features/{featureKey}/i
 screen + e2e stub:
 
 ```bash
-pnpm scaffold-feature -- --name tasks --title "Tasks"
+pnpm scaffold-feature -- --name bookmarks --title "Bookmarks"
 ```
 
 The script creates the Expo screen and e2e stub, then wires `Stack.Screen` in `_layout.tsx` and an
-Account link in `me-account-actions.tsx` when those are missing. The launchpad ships
-`/notes` as the reference screen.
+Account link in `me-account-actions.tsx` when those are missing. The launchpad already ships
+`/notes` and `/tasks` as demo screens; pick a new `--name` for your product.
 
 ### Demo seed
 

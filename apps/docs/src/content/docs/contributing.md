@@ -12,8 +12,9 @@ description: Local workflow for humans and coding agents
 5. Env changes belong in `.env.schema` (varlock); run `pnpm exec varlock codegen --path apps/api`
    (and `apps/app`) after schema edits
 
-Pre-commit (lefthook) runs format, oxlint, workspace typecheck, and a secret scan. Fix failures;
-do not use `--no-verify`.
+Pre-commit (lefthook) runs format, oxlint, workspace typecheck, and a secret scan. Pre-push also
+runs format/lint/typecheck checks and `pnpm check:architecture`. Fix failures; do not use
+`--no-verify`.
 
 ## Coding agents
 

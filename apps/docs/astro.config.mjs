@@ -9,7 +9,7 @@ export default defineConfig({
     starlight({
       title: "RN CF Docs",
       editLink: {
-        baseUrl: "https://github.com/indralukmana/fullstack-rn-cf/-/edit/main/apps/docs/",
+        baseUrl: "https://github.com/indralukmana/fullstack-rn-cf/edit/main/apps/docs/",
       },
       sidebar: [
         { label: "Getting Started", slug: "getting-started" },

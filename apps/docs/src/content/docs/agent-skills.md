@@ -36,7 +36,9 @@ to Recipes). They do not replace Starlight runbooks. Agent vocabulary: `.agents/
 (map: root `CONTEXT-MAP.md`).
 
 Product visual intent for the Expo app lives in `apps/app/DESIGN.md`. Generic UI skills must
-follow that file and Uniwind constraints.### UI skill overrides (Expo / Uniwind)
+follow that file and Uniwind constraints.
+
+### UI skill overrides (Expo / Uniwind)
 
 Vendor UI skills (`baseline-ui`, `improve-ui`, `frontend-ui-engineering`, `fixing-accessibility`)
 often assume DOM stacks (Base UI / Radix, `motion/react`, `text-balance`, CSS Grid dashboards).

@@ -25,10 +25,10 @@ export default defineConfig({
   testDir: ".",
   fullyParallel: true,
   // Local wrangler/workerd is unstable under heavy parallel signup load.
-  workers: process.env.CI ? 2 : 2,
+  workers: 2,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  reporter: process.env.CI ? "github" : "list",
+  reporter: "list",
   use: {
     baseURL: `http://127.0.0.1:${webPort}`,
     trace: "on-first-retry",

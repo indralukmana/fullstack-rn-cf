@@ -16,18 +16,27 @@ pnpm release:check  # full clean-tree launch gate
 
 ## Layers
 
-| Layer                       | Tool                      | What it proves                                   |
-| --------------------------- | ------------------------- | ------------------------------------------------ |
-| API / domain                | Vitest in `@rn-cf/api`    | Authz, billing projection, webhooks, D1 behavior |
-| Expo **web** customer flows | Playwright in `apps/e2e`  | Browser UI against local Worker + Expo web       |
-| Expo **native** smoke       | Maestro under `.maestro/` | Emulator/simulator UI on the real RN binary      |
-| Store billing               | Manual / sandbox matrix   | StoreKit and Play Billing (not CI)               |
+| Layer                       | Tool                      | Where it runs                          | What it proves                                 |
+| --------------------------- | ------------------------- | -------------------------------------- | ---------------------------------------------- |
+| API / domain                | Vitest in `@rn-cf/api`    | `pnpm test` / GitLab                   | Authz, billing projection, webhooks, D1        |
+| Expo **web** customer flows | Playwright in `apps/e2e`  | `pnpm test` / `pnpm test:e2e` / GitLab | Browser UI against local Worker + Expo web     |
+| Expo **native** smoke       | Maestro under `.maestro/` | **Local only** (not Lefthook / GitLab) | One sign-in → Account flow on a real RN binary |
+| Store billing               | Manual / sandbox matrix   | Devices / stores                       | StoreKit and Play Billing                      |
 
-Billing tests cover authenticated webhook receipt, durable deduplication, authoritative provider
-projection, dual-provider OR access, sandbox isolation, restore/refund/grace/expiry normalization,
-unknown catalog/environment rejection, Queue replay, Checkout/Portal authorization, paid-route
-enforcement, privacy export, and subscription-safe deletion. Playwright covers the protected web
-paywall and mocked Stripe launch/return.
+### Gates
+
+| Command              | Scope                                                                                                     |
+| -------------------- | --------------------------------------------------------------------------------------------------------- |
+| `pnpm ci:check`      | format, lint, typecheck, modularity-disable ban, workspace tests (API Vitest + Playwright via `apps/e2e`) |
+| `pnpm release:check` | `ci:check` plus codegen/env/migration drift checks and Expo web export                                    |
+| GitLab pipeline      | Those gates split across jobs, plus docs/web builds; Maestro and store matrix are not CI                  |
+
+Billing Vitest covers authenticated webhook receipt, durable deduplication, provider projection,
+dual-provider OR access, sandbox isolation, grace/expiry paths, unknown catalog/environment
+rejection in several unit cases, Queue replay, Checkout/Portal authorization, paid-route
+enforcement, privacy export, and subscription-safe deletion. Restore/refund are exercised mainly as
+ledger states, not full provider-event → normalize integration paths. Playwright covers the protected
+web paywall and mocked Stripe launch/return.
 
 Native StoreKit and Play Billing cannot be proven in Node or browser CI. Complete the real-device
 matrix in the [native release runbook](/native-release/) for every production candidate.
@@ -66,13 +75,13 @@ maestro test .maestro/sign-in-account.yaml \
   -e DEMO_PASSWORD='…'
 ```
 
-Flows live in `.maestro/` at the repo root and prefer `testID` / Maestro `id:` selectors. Start with
-sign-in → Account. Expand only for user-visible native regressions Playwright cannot see (safe area,
-SecureStore session, deep links).
+Flows live in `.maestro/` at the repo root and prefer `testID` / Maestro `id:` selectors. Today that
+is one smoke: sign-in → Account (`.maestro/sign-in-account.yaml`). Expand only for user-visible
+native regressions Playwright cannot see (safe area, SecureStore session, deep links).
 
 EAS Workflows can run the same flows after an `e2e-test` profile build; see Expo’s
-[Maestro E2E example](https://docs.expo.dev/eas/workflows/examples/e2e-tests/). That path is optional
-and paid — keep local emulator smoke free.
+[Maestro E2E example](https://docs.expo.dev/eas/workflows/examples/e2e-tests/). That path is optional,
+paid, and **not wired** in this repo’s GitLab or `eas.json` — keep local emulator smoke free.
 
 ## Sources
 

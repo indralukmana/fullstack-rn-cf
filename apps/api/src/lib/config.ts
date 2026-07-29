@@ -55,8 +55,6 @@ const DEFAULT_DEV_CORS_ORIGINS = [
   "http://localhost:8081",
   "http://127.0.0.1:8081",
   "http://10.0.2.2:8081",
-  "http://localhost:19006",
-  "http://127.0.0.1:19006",
 ];
 
 const NATIVE_TRUSTED_ORIGINS = ["rncf://", "exp://"];

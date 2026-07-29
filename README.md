@@ -71,7 +71,8 @@ Useful local commands:
 pnpm seed:demo                                          # demo org + users (API running)
 pnpm scaffold-feature -- --name tasks --title "Tasks"   # auto-wires nav + Account link
 pnpm native:urls                                        # print LAN/Tailscale URL suggestions
-pnpm ci:check                                           # local CI-equivalent gate
+pnpm ci:check                                           # format/lint/types/architecture + workspace tests
+# pnpm release:check                                    # launch gate (ci:check + drift + web export)
 ```
 
 Per-app: `pnpm dev:app`, `pnpm dev:api`, `pnpm dev:api:lan` (API on `0.0.0.0` for phones),
@@ -108,7 +109,9 @@ packages/
 | `pnpm test:e2e`           | Run Playwright smoke tests                                      |
 | `pnpm codegen`            | Export OpenAPI + regenerate api-client                          |
 | `pnpm build`              | Build all workspaces                                            |
-| `pnpm ci:check`           | Run local CI-equivalent checks                                  |
+| `pnpm ci:check`           | format, lint, types, modularity ban, workspace tests            |
+| `pnpm release:check`      | `ci:check` + codegen/env/migration drift + Expo web export      |
+| `pnpm test:maestro`       | Local Maestro smoke (not CI)                                    |
 | `pnpm productize`         | Rename identity for a product fork                              |
 
 ## Cloudflare notes

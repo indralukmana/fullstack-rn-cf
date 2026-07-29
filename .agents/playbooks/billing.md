@@ -21,5 +21,8 @@ Not allowed: Subagent changing live catalog, webhooks to production, or store cr
 
 ## Done when
 
-Server authorization path is correct (Entitlement / paid routes), and client UI does not grant
-access on its own.
+- Server authorization path is correct (Entitlement / paid routes); client UI does not grant access
+  on its own.
+- Changed billing, webhook, grant, or Entitlement code has Vitest coverage on the touched path
+  (types-only is not enough).
+- Focused API tests pass; broader `pnpm --filter @rn-cf/api test` when the change is non-trivial.

@@ -70,3 +70,4 @@ _Avoid_: Grace Period, freemium, Free, Campaign (as launchpad ubiquitous languag
 - [Account deletion blocks on org obligations](/adr/0002-account-deletion-blocks-on-org-obligations/)
 - [Provider customers map to Organization](/adr/0003-provider-customers-map-to-organization/)
 - [Organization close blocked on subscription](/adr/0004-organization-close-blocked-on-subscription/)
+- [Repo Playbooks route agents](/adr/0005-repo-playbooks-route-agents/)

@@ -56,7 +56,8 @@ generated API artifacts with their contract change; those pairs are one review u
 - Docs: `pnpm --filter @rn-cf/docs typecheck`
 - Architecture sensors: `pnpm check:architecture` (bans silencing modularity lint rules)
 - API contract changes: `pnpm codegen`, then verify the generated diff
-- Milestone completion: `pnpm ci:check`; run E2E when user-visible flows change
+- Milestone / PR gate: `pnpm ci:check` (format, lint, types, modularity-disable ban, workspace
+  tests including Playwright). Launch / clean-tree gate: `pnpm release:check`. Maestro is local-only.
 
 Harness map (guides vs sensors): Starlight **Agent harness**.
 
