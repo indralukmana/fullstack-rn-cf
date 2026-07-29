@@ -17,6 +17,10 @@ work, load `.agents/skills/launchpad-architecture/SKILL.md` before the relevant 
 when the Playbook names it). For Expo UI / visual work, also read `apps/app/DESIGN.md` before
 generic frontend or deslop skills.
 
+Auth: identity (email/password + Expo) is the Better Auth core; the organization plugin is a
+compose-time adapter always applied in this launchpad — not an env flag and not “multi-tenancy
+removed.”
+
 ## Repository map
 
 - `apps/api`: Hono API on Cloudflare Workers, D1, Drizzle, Better Auth

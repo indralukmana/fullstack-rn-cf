@@ -5,6 +5,18 @@ description: Better Auth on Workers + Expo
 
 Email/password auth is enabled via Better Auth on the Workers API.
 
+Auth construction is split at a compose-time seam:
+
+- **Identity core** — email/password, verification, Expo (`createIdentityAuthOptions` /
+  `createIdentityAuthClientPlugins`)
+- **Organization adapter** — Better Auth `organization` plugin, personal Organization on signup,
+  default active Organization on session (`applyOrganizationAuthAdapter` /
+  `createOrganizationAuthClientPlugins`)
+
+This launchpad always composes the organization adapter inside `createAuth` and `authClient`. That
+is not an env flag. A no-tenancy fork omits the adapter; it does **not** mean Organizations are
+gone from this product while the adapter stays wired.
+
 - Server plugin: `@better-auth/expo`
 - Client: `better-auth/react` + `@better-auth/expo/client`
 - Trusted origins: `CORS_ORIGINS` + `TRUSTED_ORIGINS` + native scheme from `app.json` (`rncf://`) / `exp://`

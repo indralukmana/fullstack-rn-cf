@@ -1,21 +1,14 @@
-import { expoClient } from "@better-auth/expo/client";
-import { organizationClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
-import * as SecureStore from "expo-secure-store";
 
-import { getAppScheme } from "./app-scheme";
+import { createIdentityAuthClientPlugins } from "./auth-identity-client";
+import { createOrganizationAuthClientPlugins } from "./auth-organization-client";
 import { env } from "./env";
 
-const scheme = getAppScheme();
-
+/**
+ * Launchpad auth client: identity (Expo) + organization adapter composed in.
+ * Omit createOrganizationAuthClientPlugins for a no-tenancy fork.
+ */
 export const authClient = createAuthClient({
   baseURL: env.apiUrl,
-  plugins: [
-    expoClient({
-      scheme,
-      storagePrefix: scheme,
-      storage: SecureStore,
-    }),
-    organizationClient(),
-  ],
+  plugins: [...createIdentityAuthClientPlugins(), ...createOrganizationAuthClientPlugins()],
 });

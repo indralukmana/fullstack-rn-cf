@@ -1,70 +1,45 @@
 import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { organization } from "better-auth/plugins";
 
+import type { CreateOrganizationFn } from "./personal-organization";
+import type { AuthEnv } from "./types";
+
 import { createDb } from "../../db/client";
-import * as schema from "../../db/schema";
-import { getRuntimeConfig, type AppBindings } from "../config";
-import { createBetterAuthOptions } from "./options";
+import { getRuntimeConfig } from "../config";
+import { createIdentityAuthOptions } from "./identity-auth";
+import { createOrganizationAuthDatabaseHooks } from "./organization-auth-adapter";
 import { createOrganizationOptions } from "./organization-options";
-import {
-  ensurePersonalOrganization,
-  resolveDefaultActiveOrganizationId,
-  type CreateOrganizationFn,
-} from "./personal-organization";
 
-export type AuthEnv = AppBindings & {
-  DB: D1Database;
-};
+export type { AuthEnv } from "./types";
+export { createIdentityAuthOptions, createIdentityAuthPlugins } from "./identity-auth";
+export {
+  applyOrganizationAuthAdapter,
+  createOrganizationAuthDatabaseHooks,
+  createOrganizationAuthPlugins,
+} from "./organization-auth-adapter";
 
+/**
+ * Public auth entry for this launchpad: identity core + organization adapter composed in.
+ * Plugins are listed as a fresh tuple so Better Auth can infer organization API types.
+ * Forks that drop multi-tenancy: betterAuth(createIdentityAuthOptions(...)) and skip org.
+ */
 export function createAuth(env: AuthEnv) {
   const db = createDb(env.DB);
   const config = getRuntimeConfig(env);
   const createOrganizationRef: { current: CreateOrganizationFn | null } = { current: null };
 
+  const identity = createIdentityAuthOptions(env, db, config);
+
   const auth = betterAuth({
-    ...createBetterAuthOptions(env),
-    database: drizzleAdapter(db, {
-      provider: "sqlite",
-      schema,
-    }),
-    baseURL: config.authUrl,
-    secret: config.authSecret,
+    ...identity,
+    // Literal plugin tuple (do not spread identity.plugins) — required for InferAPI.
     plugins: [expo(), organization(createOrganizationOptions(env, config.appUrl))],
-    trustedOrigins: config.trustedOrigins,
-    databaseHooks: {
-      user: {
-        create: {
-          after: async (user) => {
-            const createOrganization = createOrganizationRef.current;
-            if (!createOrganization) {
-              throw new Error("Auth is not ready to create a personal organization");
-            }
-            await ensurePersonalOrganization(createOrganization, db, user);
-          },
-        },
-      },
-      session: {
-        create: {
-          before: async (session) => {
-            if (session.activeOrganizationId) {
-              return { data: session };
-            }
-            const organizationId = await resolveDefaultActiveOrganizationId(db, session.userId);
-            if (!organizationId) {
-              return { data: session };
-            }
-            return {
-              data: {
-                ...session,
-                activeOrganizationId: organizationId,
-              },
-            };
-          },
-        },
-      },
-    },
+    databaseHooks: createOrganizationAuthDatabaseHooks({
+      db,
+      createOrganizationRef,
+      prior: identity.databaseHooks,
+    }),
   });
 
   createOrganizationRef.current = (input) => auth.api.createOrganization(input);
