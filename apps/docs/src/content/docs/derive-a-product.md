@@ -7,6 +7,9 @@ Use this launchpad as the shared basis for multiple products. Change product ide
 catalog; leave auth, tenancy, billing ledger, and codegen mechanics alone unless you are
 deliberately evolving the launchpad itself.
 
+How the launchpad repo and a product repo should stay connected (upstream sync, no-tenancy forks,
+what not to merge): [Launchpad and product forks](/launchpad-and-product-forks/).
+
 Read [Domain language](/domain/) first so product copy and server terms stay aligned.
 
 ## Recommended fork shape
@@ -20,7 +23,8 @@ Read [Domain language](/domain/) first so product copy and server terms stay ali
    Entitlement checks (`requireEntitlement` + `EntitlementGate`). Keep modules small; oxlint
    modularity limits and [Agent guardrails](/agent-guardrails/) apply.
 6. **Keep launchpad upgrades mergeable** when you still track upstream; avoid rewriting the billing
-   ledger or auth stack in the product fork.
+   ledger or auth stack in the product fork. Prefer cherry-picks of sync-safe paths — see
+   [Launchpad and product forks](/launchpad-and-product-forks/).
 
 ### Productize command
 

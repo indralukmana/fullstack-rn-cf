@@ -14,6 +14,7 @@ export default defineConfig({
       sidebar: [
         { label: "Getting Started", slug: "getting-started" },
         { label: "Derive a Product", slug: "derive-a-product" },
+        { label: "Launchpad and product forks", slug: "launchpad-and-product-forks" },
         { label: "Domain Language", slug: "domain" },
         { label: "Environment Configuration", slug: "environment" },
         { label: "Agent Guardrails", slug: "agent-guardrails" },
